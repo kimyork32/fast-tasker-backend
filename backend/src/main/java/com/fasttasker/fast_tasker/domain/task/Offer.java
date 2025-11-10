@@ -1,55 +1,66 @@
 package com.fasttasker.fast_tasker.domain.task;
 
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
  * 
  */
+@Entity
+@Table(name = "offer")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class Offer {
 
     /**
-     * Default constructor
-     */
-    public Offer() {
-    }
-
-    /**
      * 
      */
+    @Id
     private UUID id;
 
     /**
-     * 
+     *
      */
+    @Column(name = "price")
     private int price;
 
     /**
-     * 
+     * max size of 500 characters
      */
+    @Column(name = "description", length = 500, nullable = false)
     private String description;
 
     /**
      * 
      */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
     private OfferStatus status;
 
     /**
      * 
      */
-    private UUID taskId;
+    @Column(name = "offerted_by_id", nullable = false)
+    private UUID offertedById;
 
     /**
      * 
      */
-    private UUID offertedBy;
+    @Column(name = "create", nullable = false)
+    private LocalDateTime createdAt;
 
     /**
-     * 
+     *
      */
-    /*
-    private LocalDateTime date;
-     */
-
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_id", nullable = false)
+    @ToString.Exclude
+    private Task task;
 
 }
