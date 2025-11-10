@@ -24,7 +24,7 @@ public class Question {
 
     /**
      * content of the question
-     * size of 500 characters
+     * max size of 500 characters
      */
     @Column(name = "description", length = 500, nullable = false)
     private String description;
