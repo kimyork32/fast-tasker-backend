@@ -6,7 +6,7 @@ import lombok.*;
 /**
  * represents a OV for an email address.
  * this class encapsulates the value of an email address and is immutable.
- * @Embeddable is used so that JPA stores it as a column.
+ * @ Embeddable is used so that JPA stores it as a column.
  */
 @Embeddable
 @NoArgsConstructor
