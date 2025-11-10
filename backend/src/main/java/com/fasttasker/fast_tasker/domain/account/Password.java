@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
  * the security logic, ALWAYS storing a hash of the password,
  * never the plaintext.
  *
- * @Embeddable is used so that JPA stores it as columns
+ * @ Embeddable is used so that JPA stores it as columns
  * in the owner entity's table Account.
  */
 @Embeddable
