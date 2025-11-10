@@ -2,7 +2,10 @@ package com.fasttasker.fast_tasker.domain.account;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.UUID;
 
 /**
@@ -13,7 +16,8 @@ import java.util.UUID;
 @Table(name = "account")
 @AllArgsConstructor
 @NoArgsConstructor
-
+@Getter
+@Setter
 public class Account {
 
     /**
