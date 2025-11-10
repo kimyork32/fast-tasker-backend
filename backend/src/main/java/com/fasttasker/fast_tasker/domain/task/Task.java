@@ -75,6 +75,13 @@ public class Task {
     private TaskStatus status;
 
     /**
+     * the ID of the account that posted this task.
+     * ForeignKey that links it to the Account .
+     */
+    @Column(name = "poster_id", nullable = false)
+    private UUID posterId;
+
+    /**
      * List of questions posted by Taskers regarding this task.
      * This is the "One" side of the relationship. The 'Question'
      * entity manages the relationship (mappedBy = "task").
