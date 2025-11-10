@@ -1,12 +1,17 @@
 package com.fasttasker.fast_tasker.domain.account;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
- * AccountRepository used JPA repository.
+ * repository por for the account entity.
+ * define the contract that the application layer needs.
  */
-@Repository
-public interface IAccountRepository extends JpaRepository<Account, Integer> {
-    // SOMETHING
+public interface IAccountRepository {
+
+    Account save(Account account);
+
+    Optional<Account> findById(UUID id);
+
+    Optional<Account> findByEmailValue(String emailValue);
 }
