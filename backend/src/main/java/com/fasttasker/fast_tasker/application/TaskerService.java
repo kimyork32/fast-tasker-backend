@@ -1,12 +1,11 @@
 package com.fasttasker.fast_tasker.application;
 
-import domain.tasker.ITaskerRepository;
-import domain.account.IAccountRepository;
-import domain.task.ITaskRepository;
-import domain.tasker.Profile;
+import com.fasttasker.fast_tasker.domain.account.IAccountRepository;
+import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
+import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
+import com.fasttasker.fast_tasker.domain.tasker.Profile;
 
-import java.io.*;
-import java.util.*;
+import java.util.UUID;
 
 /**
  * 

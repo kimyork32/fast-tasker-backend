@@ -1,9 +1,6 @@
 package com.fasttasker.fast_tasker.persistence;
 
-import domain.tasker.ITaskerRepository;
-
-import java.io.*;
-import java.util.*;
+import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 
 /**
  * 
@@ -13,7 +10,9 @@ public class TaskerRepository implements ITaskerRepository {
     /**
      * Default constructor
      */
+    /*
     public TaskerRepository() {
     }
+     */
 
 }

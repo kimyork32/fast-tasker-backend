@@ -1,7 +1,7 @@
 package com.fasttasker.fast_tasker.domain.notification;
 
-import java.io.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * 

@@ -1,12 +1,11 @@
 package com.fasttasker.fast_tasker.application;
 
-import domain.task.ITaskRepository;
-import domain.tasker.ITaskerRepository;
-import domain.notification.INotificationRepository;
-import domain.task.TaskStatus;
+import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
+import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
+import com.fasttasker.fast_tasker.domain.task.TaskStatus;
+import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 
-import java.io.*;
-import java.util.*;
+import java.util.UUID;
 
 /**
  * 

@@ -1,7 +1,6 @@
 package com.fasttasker.fast_tasker.domain.task;
 
-import java.io.*;
-import java.util.*;
+import java.util.UUID;
 
 /**
  * 
@@ -47,7 +46,9 @@ public class Offer {
     /**
      * 
      */
+    /*
     private LocalDateTime date;
+     */
 
 
 

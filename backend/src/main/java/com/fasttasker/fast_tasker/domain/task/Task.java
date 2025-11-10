@@ -1,9 +1,10 @@
 package com.fasttasker.fast_tasker.domain.task;
 
-import domain.tasker.Location;
+import com.fasttasker.fast_tasker.domain.tasker.Location;
 
-import java.io.*;
-import java.util.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 

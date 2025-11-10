@@ -1,13 +1,11 @@
 package com.fasttasker.fast_tasker.persistence;
 
-import domain.task.ITaskRepository;
-
-import java.io.*;
-import java.util.*;
+import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
 
 /**
  * 
  */
+
 public class TaskRepository implements ITaskRepository {
 
     /**

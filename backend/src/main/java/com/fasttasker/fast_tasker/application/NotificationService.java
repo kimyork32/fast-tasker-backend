@@ -1,10 +1,9 @@
 package com.fasttasker.fast_tasker.application;
 
-import domain.notification.INotificationRepository;
-import domain.notification.NotificationType;
+import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
+import com.fasttasker.fast_tasker.domain.notification.NotificationType;
 
-import java.io.*;
-import java.util.*;
+import java.util.UUID;
 
 /**
  * 

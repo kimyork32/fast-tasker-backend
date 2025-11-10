@@ -1,8 +1,5 @@
 package com.fasttasker.fast_tasker.domain.tasker;
 
-import java.io.*;
-import java.util.*;
-
 /**
  * 
  */
@@ -11,8 +8,11 @@ public class Location {
     /**
      * Default constructor
      */
+    /*
     public Location() {
     }
+    */
+
 
     /**
      * 
@@ -48,8 +48,10 @@ public class Location {
     /**
      * 
      */
+    /*
     public void hashCode() {
         // TODO implement here
     }
+     */
 
 }
