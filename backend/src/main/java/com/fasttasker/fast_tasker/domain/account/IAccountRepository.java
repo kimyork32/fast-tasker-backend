@@ -1,12 +1,12 @@
 package com.fasttasker.fast_tasker.domain.account;
 
-import java.io.*;
-import java.util.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
- * 
+ * AccountRepository used JPA repository.
  */
-public interface IAccountRepository {
-
-
+@Repository
+public interface IAccountRepository extends JpaRepository<Account, Integer> {
+    // SOMETHING
 }
