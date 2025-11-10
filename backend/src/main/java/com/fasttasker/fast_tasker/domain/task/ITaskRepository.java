@@ -13,6 +13,8 @@ public interface ITaskRepository {
 
     Optional<Task> findById(UUID id);
 
+    void deleteById(UUID id);
+
     /**
      * find all tasks created by a specific user (Tasker)
      * @param posterId poster id (Tasker)
