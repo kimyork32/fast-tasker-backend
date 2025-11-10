@@ -1,7 +1,5 @@
 package com.fasttasker.fast_tasker.domain.notification;
 
-import com.fasttasker.fast_tasker.domain.account.Account;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,6 +12,6 @@ public interface INotificationRepository {
 
     List<Notification> findAll();
 
-    List<Notification> findByAccount(Account account);
+    Optional<Notification> findByReceiverTaskerId(UUID receiverTaskerId);
 
 }
