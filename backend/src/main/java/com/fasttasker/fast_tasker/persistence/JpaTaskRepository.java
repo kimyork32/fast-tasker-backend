@@ -15,9 +15,9 @@ import java.util.UUID;
 @Repository
 public interface JpaTaskRepository extends JpaRepository<Task, UUID>, ITaskRepository {
 
-    List<Task> findByReceiverTaskerId(UUID receiverTaskerId);
+    List<Task> findByPosterId(UUID receiverTaskerId);
 
-    List<Task> findByReceiverTaskerIdAndStatus(UUID receiverTaskerId, TaskStatus status);
+    List<Task> findByPosterIdAndStatus(UUID posterId, TaskStatus status);
 
     // NOTE: Spring implemented the other methods (query methods conversions)
 

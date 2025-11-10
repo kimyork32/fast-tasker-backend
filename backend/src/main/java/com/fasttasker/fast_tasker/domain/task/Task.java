@@ -55,7 +55,7 @@ public class Task {
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "latitude", column = @Column(name = "latitude", nullable = false)),
-            @AttributeOverride(name = "latitude", column = @Column(name = "longitude", nullable = false)),
+            @AttributeOverride(name = "longitude", column = @Column(name = "longitude", nullable = false)),
             @AttributeOverride(name = "address", column = @Column(name = "address", length = 255, nullable = false))
     })
     private Location location;

@@ -1,5 +1,6 @@
 package com.fasttasker.fast_tasker.persistence;
 
+import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
 import com.fasttasker.fast_tasker.domain.notification.Notification;
 import com.fasttasker.fast_tasker.domain.notification.NotificationStatus;
 import com.fasttasker.fast_tasker.domain.notification.NotificationType;
@@ -18,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class JpaNotificationRepositoryTest {
 
     @Autowired
-    private JpaNotificationRepository notificationRepository;
+    private INotificationRepository notificationRepository;
 
     @Test
     void shouldSaveAndFindByAccountId() {
