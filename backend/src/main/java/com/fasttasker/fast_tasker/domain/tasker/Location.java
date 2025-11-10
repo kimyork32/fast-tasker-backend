@@ -1,18 +1,20 @@
 package com.fasttasker.fast_tasker.domain.tasker;
 
+import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 /**
  * 
  */
+@Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@EqualsAndHashCode
 public class Location {
-
-    /**
-     * Default constructor
-     */
-    /*
-    public Location() {
-    }
-    */
-
 
     /**
      * 
@@ -28,30 +30,5 @@ public class Location {
      * 
      */
     private String address;
-
-
-
-    /**
-     * 
-     */
-    public Location() {
-        // TODO implement here
-    }
-
-    /**
-     * 
-     */
-    public void equal() {
-        // TODO implement here
-    }
-
-    /**
-     * 
-     */
-    /*
-    public void hashCode() {
-        // TODO implement here
-    }
-     */
 
 }
