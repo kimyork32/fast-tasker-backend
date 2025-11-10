@@ -22,6 +22,10 @@ class JpaAccountRepositoryTest {
         UUID id = UUID.randomUUID();
         Email email = new Email("test@domain.com");
         Password hash = new Password("bcrypt-hash-string-12345");
+        System.out.println("expected:");
+        System.out.println("id: " + id);
+        System.out.println("email: " + email.getValue());
+        System.out.println("hashed password: " + hash.getValue());
 
         Account newAccount = new Account(
                 id,
@@ -29,6 +33,7 @@ class JpaAccountRepositoryTest {
                 hash,
                 AccountStatus.PENDING_VERIFICATION
         );
+        System.out.println(newAccount); // automatic toString
 
         // 2. ACT
         // save account in the test bd
@@ -46,5 +51,33 @@ class JpaAccountRepositoryTest {
         assertThat(accountFound.getEmail()).isEqualTo(email);
         assertThat(accountFound.getPasswordHash()).isEqualTo(hash);
         assertThat(accountFound.getStatus()).isEqualTo(AccountStatus.PENDING_VERIFICATION);
+    }
+
+    @Test
+    void shouldSaveAndFindYourAccountById() {
+        // 1. ARRANGE
+        UUID id = UUID.randomUUID();
+        Email email = new Email("test2@domain.com");
+        Password hash = new Password("bcrypt-hash-string-313131");
+        Account newAccount = new Account(
+                id,
+                email,
+                hash,
+                AccountStatus.PENDING_VERIFICATION
+        );
+
+        // 2. ACT
+        // save account in the test bd
+        accountRepository.save(newAccount);
+        // we tried find it with ID use the repository method
+        Optional<Account> accountFoundOpt = accountRepository.findById(id);
+
+        // 3. ASSERT
+        // verify if it was found
+        assertThat(accountFoundOpt).isPresent();
+        Account accountFound = accountFoundOpt.get();
+
+        // checking if it is equal to what was expected
+        assertThat(accountFound.getEmail()).isEqualTo(email);
     }
 }
