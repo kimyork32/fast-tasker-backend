@@ -4,14 +4,19 @@ import com.fasttasker.fast_tasker.domain.account.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+@DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = AccountRepositoryImpl.class))
 class JpaAccountRepositoryTest {
+
+    Logger logger = Logger.getLogger(JpaAccountRepositoryTest.class.getName());
 
     @Autowired
     private IAccountRepository accountRepository;
@@ -22,10 +27,10 @@ class JpaAccountRepositoryTest {
         UUID id = UUID.randomUUID();
         Email email = new Email("test@domain.com");
         Password hash = new Password("bcrypt-hash-string-12345");
-        System.out.println("expected:");
-        System.out.println("id: " + id);
-        System.out.println("email: " + email.getValue());
-        System.out.println("hashed password: " + hash.getValue());
+        logger.info("expected:");
+        logger.info("id: " + id);
+        logger.info("email: " + email.getValue());
+        logger.info("hashed password: " + hash.getValue());
 
         Account newAccount = new Account(
                 id,
@@ -33,7 +38,7 @@ class JpaAccountRepositoryTest {
                 hash,
                 AccountStatus.PENDING_VERIFICATION
         );
-        System.out.println(newAccount); // automatic toString
+        logger.info(newAccount.toString()); // automatic toString
 
         // 2. ACT
         // save account in the test bd
