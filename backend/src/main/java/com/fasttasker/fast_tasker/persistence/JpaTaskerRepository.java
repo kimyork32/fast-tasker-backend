@@ -5,12 +5,10 @@ import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 /**
  * 
  */
-public class TaskerRepository implements ITaskerRepository {
+public class JpaTaskerRepository implements ITaskerRepository {
 
     /**
-     * Default constructor
-     */
-    /*
+     *
     public TaskerRepository() {
     }
      */

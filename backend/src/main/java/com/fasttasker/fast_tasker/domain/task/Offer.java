@@ -16,6 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@EqualsAndHashCode
 public class Offer {
 
     /**
@@ -52,7 +53,7 @@ public class Offer {
     /**
      * 
      */
-    @Column(name = "create", nullable = false)
+    @Column(name = "create_at", nullable = false)
     private LocalDateTime createdAt;
 
     /**

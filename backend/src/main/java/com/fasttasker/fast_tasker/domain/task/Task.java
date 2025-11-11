@@ -19,7 +19,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"questions", "offers"})
 public class Task {
 
     @Id
@@ -90,8 +90,8 @@ public class Task {
      * CascadeType.ALL: If this Task is deleted, its Questions are deleted too.
      */
     @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Question> questions;
-
 
     /**
      * List of offers made by Taskers for this task.
@@ -100,6 +100,7 @@ public class Task {
      * CascadeType.ALL: If this Task is deleted, its Offers are deleted too.
      */
     @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Offer> offers;
 
 }
