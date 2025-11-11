@@ -1,84 +1,214 @@
 package com.fasttasker.fast_tasker.application;
 
+import com.fasttasker.fast_tasker.application.dto.AccountResponse;
+import com.fasttasker.fast_tasker.application.dto.RegisterAccountRequest;
+import com.fasttasker.fast_tasker.application.exception.AccountNotFoundException;
+import com.fasttasker.fast_tasker.application.exception.EmailAlreadyExistsException;
+import com.fasttasker.fast_tasker.domain.account.*;
 import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
+import com.fasttasker.fast_tasker.domain.notification.Notification;
+import com.fasttasker.fast_tasker.domain.notification.NotificationStatus;
+import com.fasttasker.fast_tasker.domain.notification.NotificationType;
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
+import com.fasttasker.fast_tasker.domain.task.Task;
+import com.fasttasker.fast_tasker.domain.task.TaskStatus;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
+import com.fasttasker.fast_tasker.domain.tasker.Location;
+import com.fasttasker.fast_tasker.domain.tasker.Profile;
+import com.fasttasker.fast_tasker.domain.tasker.Tasker;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
- * 
+ *
  */
+@Service
 public class AccountService {
 
+    private final IAccountRepository accountRepository;
+    private final ITaskerRepository taskerRepository;
+    private final ITaskRepository taskRepository;
+    private final INotificationRepository notificationRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
     /**
-     * Default constructor
+     *
      */
-    public AccountService() {
+    public AccountService(
+            IAccountRepository accountRepository,
+            ITaskerRepository taskerRepository,
+            ITaskRepository taskRepository,
+            INotificationRepository notificationRepository,
+            PasswordEncoder passwordEncoder
+    ) {
+        this.accountRepository = accountRepository;
+        this.taskerRepository = taskerRepository;
+        this.taskRepository = taskRepository;
+        this.notificationRepository = notificationRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
-     * 
+     *
+     * @param request
+     * @return
      */
-    private ITaskRepository taskRepository;
+    @Transactional
+    public AccountResponse registerAccount(RegisterAccountRequest request) {
+        accountRepository.findByEmailValue(request.email()).ifPresent(acc -> {
+            throw new EmailAlreadyExistsException(
+                    "the email address" + request.email() + " is already in use");
+        });
+
+        // the password is receiver of the client in plain text. The client will send
+        // it using a secure channel such as HTTPS.
+        String hashedPassword = passwordEncoder.encode(request.rawPassword());
+
+        Account account = new Account(
+                UUID.randomUUID(),
+                new Email(request.email()),
+                new Password(hashedPassword),
+                AccountStatus.PENDING_VERIFICATION
+        );
+
+        // save account, if any error occurs then rollback
+        accountRepository.save(account);
+
+        Location defaultLocation = new Location(
+                0,
+                0,
+                ""
+        );
+
+        Profile defaultProfile = new Profile(
+                "",
+                defaultLocation,
+                "",
+                0,
+                0,
+                0
+        );
+
+        Tasker tasker = new Tasker(
+                UUID.randomUUID(), // probability of generating two identical id: 1 / 2^122
+                account.getTaskerId(),
+                defaultProfile
+        );
+
+        // save account, if any error occurs then rollback
+        taskerRepository.save(tasker);
+
+        Notification welcomeNotification = new Notification(
+                UUID.randomUUID(),
+                account.getTaskerId(),
+                NotificationType.SYSTEM,
+                "¡Bienvenido a FastTasker! Completa tu perfil para empezar.",
+                LocalDateTime.now(),
+                false,
+                NotificationStatus.UNREAD
+        );
+
+        // save notification, if any error occurs then rollback
+        notificationRepository.save(welcomeNotification);
+
+        return toResponse(account);
+    }
 
     /**
-     * 
-     */
-    private ITaskerRepository taskerRepository;
-
-    /**
-     * 
-     */
-    private INotificationRepository notificationRepository;
-
-
-
-
-    /**
-     * @param email 
+     *
+     * @param email
      * @param rawPassword
+     * @return
      */
-    public void registerAccount(String email, String rawPassword) {
-        // TODO implement here
+    @Transactional(readOnly = true)
+    public AccountResponse login(String email, String rawPassword) {
+        Account account = accountRepository.findByEmailValue(email)
+                .orElseThrow(() -> new AccountNotFoundException("invalid credentials"));
+
+        if (!passwordEncoder.matches(rawPassword, account.getPasswordHash().getValue())) {
+            throw new AccountNotFoundException("invalid credentials");
+        }
+
+        if (account.getStatus() == AccountStatus.BANNED) {
+            throw new RuntimeException("your account has been banned");
+        }
+
+        return toResponse(account);
     }
 
     /**
-     * @param email 
-     * @param rawPassword
+     *
      */
-    public void login(String email, String rawPassword) {
-        // TODO implement here
-    }
-
-    /**
-     * @param accountId 
-     * @param oldPass 
-     * @param newPass
-     */
+    @Transactional
     public void changePassword(UUID accountId, String oldPass, String newPass) {
-        // TODO implement here
+        Account account = findAccountById(accountId);
+
+        if (!passwordEncoder.matches(oldPass, account.getPasswordHash().getValue())) {
+            throw new RuntimeException("the password has been incorrect");
+        }
+
+        String newHashedPassword = passwordEncoder.encode(newPass);
+        account.setPasswordHash(new Password(newHashedPassword));
+        accountRepository.save(account);
     }
 
     /**
-     * @param accountId
+     *
      */
+    @Transactional
     public void activate(UUID accountId) {
-        // TODO implement here
+        Account account = findAccountById(accountId);
+        account.setStatus(AccountStatus.ACTIVE);
+        accountRepository.save(account);
     }
 
     /**
-     * @param accountId
+     *
      */
+    @Transactional
     public void ban(UUID accountId) {
-        // TODO implement here
+        Account account = findAccountById(accountId);
+        account.setStatus(AccountStatus.BANNED);
+        accountRepository.save(account);
+
+        List<Task> userTasks = taskRepository.findByPosterIdAndStatus(accountId, TaskStatus.ACTIVE);
+        for (Task task : userTasks) {
+            task.setStatus(TaskStatus.CANCELLED);
+        }
+        taskRepository.saveAll(userTasks);
     }
 
     /**
-     * @param accountId
+     *
      */
-    public void getById(UUID accountId) {
-        // TODO implement here
+    @Transactional(readOnly = true)
+    public AccountResponse getById(UUID accountId) {
+        Account account = findAccountById(accountId);
+        return toResponse(account);
     }
 
+    /**
+     *
+     */
+    private Account findAccountById(UUID accountId) {
+        return accountRepository.findById(accountId)
+                .orElseThrow(() -> new AccountNotFoundException("not found account with id: " + accountId));
+    }
+
+    /**
+     *
+     */
+    private AccountResponse toResponse(Account account) {
+        return new AccountResponse(
+                account.getTaskerId(),
+                account.getEmail().getValue(),
+                account.getStatus()
+        );
+    }
 }

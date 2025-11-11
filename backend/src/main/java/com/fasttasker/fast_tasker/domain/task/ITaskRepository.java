@@ -10,6 +10,10 @@ import java.util.UUID;
 public interface ITaskRepository {
 
     Task save(Task task);
+    /**
+     *
+     */
+    List<Task> saveAll(List<Task> tasks);
 
     Optional<Task> findById(UUID id);
 
