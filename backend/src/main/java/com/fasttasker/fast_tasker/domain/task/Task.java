@@ -19,6 +19,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class Task {
 
     @Id
@@ -63,8 +64,8 @@ public class Task {
     /**
      * Specific date on which the task must be carried out.
      */
-    @Column(name = "day", nullable = false)
-    private LocalDate day;
+    @Column(name = "task_date", nullable = false)
+    private LocalDate taskDate;
 
     /**
      * Current status of the task lifecycle (e.g., OPEN, IN_PROGRESS).
