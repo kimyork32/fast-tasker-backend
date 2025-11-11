@@ -13,7 +13,7 @@ import java.util.UUID;
  * 
  */
 @Repository
-public interface JpaTaskRepository extends JpaRepository<Task, UUID>, ITaskRepository {
+public interface JpaTaskRepository extends JpaRepository<Task, UUID> {
 
     List<Task> findByPosterId(UUID receiverTaskerId);
 
