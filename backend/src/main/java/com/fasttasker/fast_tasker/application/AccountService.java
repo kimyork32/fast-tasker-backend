@@ -129,10 +129,10 @@ public class AccountService {
     @Transactional(readOnly = true)
     public AccountResponse login(String email, String rawPassword) {
         Account account = accountRepository.findByEmailValue(email)
-                .orElseThrow(() -> new AccountNotFoundException("invalid credentials"));
+                .orElseThrow(() -> new AccountNotFoundException("login exception: invalid email"));
 
         if (!passwordEncoder.matches(rawPassword, account.getPasswordHash().getValue())) {
-            throw new AccountNotFoundException("invalid credentials");
+            throw new AccountNotFoundException("login exception: invalid password");
         }
 
         if (account.getStatus() == AccountStatus.BANNED) {

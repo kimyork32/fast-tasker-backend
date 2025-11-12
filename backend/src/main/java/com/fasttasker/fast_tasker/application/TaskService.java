@@ -4,38 +4,29 @@ import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
 import com.fasttasker.fast_tasker.domain.task.TaskStatus;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 /**
  * 
  */
+@Service
 public class TaskService {
 
-    /**
-     * Default constructor
-     */
-    public TaskService() {
+    private final ITaskRepository taskRepository;
+    private final ITaskerRepository taskerRepository;
+    private final INotificationRepository notificationRepository;
+
+    public TaskService(
+            ITaskRepository taskRepository,
+            ITaskerRepository taskerRepository,
+            INotificationRepository notificationRepository
+    ) {
+        this.taskRepository = taskRepository;
+        this.taskerRepository = taskerRepository;
+        this.notificationRepository = notificationRepository;
     }
-
-    /**
-     * 
-     */
-    private ITaskRepository taskRepository;
-
-    /**
-     * 
-     */
-    private ITaskerRepository taskerRepository;
-
-    /**
-     * 
-     */
-    private INotificationRepository notificationRepository;
-
-
-
-
 
     /**
      * 
