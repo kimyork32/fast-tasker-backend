@@ -4,6 +4,7 @@ import com.fasttasker.fast_tasker.application.dto.AccountResponse;
 import com.fasttasker.fast_tasker.application.dto.RegisterAccountRequest;
 import com.fasttasker.fast_tasker.application.exception.AccountNotFoundException;
 import com.fasttasker.fast_tasker.application.exception.EmailAlreadyExistsException;
+import com.fasttasker.fast_tasker.application.mapper.AccountMapper;
 import com.fasttasker.fast_tasker.domain.account.*;
 import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
 import com.fasttasker.fast_tasker.domain.notification.Notification;
@@ -34,6 +35,7 @@ public class AccountService {
     private final ITaskerRepository taskerRepository;
     private final ITaskRepository taskRepository;
     private final INotificationRepository notificationRepository;
+    private final AccountMapper accountMapper;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -44,13 +46,14 @@ public class AccountService {
             IAccountRepository accountRepository,
             ITaskerRepository taskerRepository,
             ITaskRepository taskRepository,
-            INotificationRepository notificationRepository,
+            INotificationRepository notificationRepository, AccountMapper accountMapper,
             PasswordEncoder passwordEncoder
     ) {
         this.accountRepository = accountRepository;
         this.taskerRepository = taskerRepository;
         this.taskRepository = taskRepository;
         this.notificationRepository = notificationRepository;
+        this.accountMapper = accountMapper;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -117,7 +120,7 @@ public class AccountService {
         // save notification, if any error occurs then rollback
         notificationRepository.save(welcomeNotification);
 
-        return toResponse(account);
+        return accountMapper.toResponse(account);
     }
 
     /**
@@ -139,7 +142,7 @@ public class AccountService {
             throw new RuntimeException("your account has been banned");
         }
 
-        return toResponse(account);
+        return accountMapper.toResponse(account);
     }
 
     /**
@@ -190,7 +193,7 @@ public class AccountService {
     @Transactional(readOnly = true)
     public AccountResponse getById(UUID accountId) {
         Account account = findAccountById(accountId);
-        return toResponse(account);
+        return accountMapper.toResponse(account);
     }
 
     /**
@@ -199,16 +202,5 @@ public class AccountService {
     private Account findAccountById(UUID accountId) {
         return accountRepository.findById(accountId)
                 .orElseThrow(() -> new AccountNotFoundException("not found account with id: " + accountId));
-    }
-
-    /**
-     *
-     */
-    private AccountResponse toResponse(Account account) {
-        return new AccountResponse(
-                account.getTaskerId(),
-                account.getEmail().getValue(),
-                account.getStatus()
-        );
     }
 }
