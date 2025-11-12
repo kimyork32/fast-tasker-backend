@@ -32,7 +32,7 @@ public class AccountController {
 
     /**
      *
-     * @param request the DTO {@link ResponseEntity} that contain email and rawPassword
+     * @param request the DTO {@link RegisterAccountRequest} that contain email and rawPassword
      * @return an {@link ResponseEntity} that contain the DTO {@link AccountResponse}
      * of the newly created user and  HTTP status code {@code 201 Created}
      */
