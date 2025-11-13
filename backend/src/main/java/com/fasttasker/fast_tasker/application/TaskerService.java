@@ -1,54 +1,71 @@
 package com.fasttasker.fast_tasker.application;
 
+import com.fasttasker.fast_tasker.application.dto.TaskerResponse;
+import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
+import com.fasttasker.fast_tasker.application.mapper.TaskerMapper;
 import com.fasttasker.fast_tasker.domain.account.IAccountRepository;
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import com.fasttasker.fast_tasker.domain.tasker.Profile;
+import com.fasttasker.fast_tasker.domain.tasker.Tasker;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.UUID;
 
-/**
- * 
- */
+@Service
 public class TaskerService {
 
-    /**
-     * Default constructor
-     */
-    public TaskerService() {
+    private final ITaskerRepository taskerRepository;
+    private final IAccountRepository accountRepository;
+    private final ITaskRepository taskRepository;
+    private final TaskerMapper taskerMapper;
+
+
+    public TaskerService(ITaskerRepository taskerRepository, IAccountRepository accountRepository, ITaskRepository taskRepository, ITaskerFactory taskerFactory, TransactionalOperator transactional, TaskerMapper taskerMapper) {
+        this.taskerRepository = taskerRepository;
+        this.accountRepository = accountRepository;
+        this.taskRepository = taskRepository;
+        this.taskerMapper = taskerMapper;
     }
 
     /**
-     * 
+     * @param accountId account id
+     * @param profile profile of the tasker
      */
-    private ITaskerRepository taskerRepository;
+    @Transactional
+    public TaskerResponse registerTasker(UUID accountId, Profile profile) {
+        Optional<Tasker> taskerOpt = taskerRepository.findByAccountId(accountId);
 
-    /**
-     * 
-     */
-    private IAccountRepository accountRepository;
+        if (taskerOpt.isEmpty()) {
+            throw new TaskerNotFoundException(
+                    "the tasker not found with account id: " + accountId);
+        }
 
-    /**
-     * 
-     */
-    private ITaskRepository taskRepository;
+        Tasker tasker = taskerOpt.get();
+        tasker.setProfile(profile);
 
-
-
-
-    /**
-     * @param accountId 
-     * @param profile
-     */
-    public void registerTasker(UUID accountId, Profile profile) {
-        // TODO implement here
+        taskerRepository.save(tasker);
+        return taskerMapper.toResponse(tasker);
     }
 
     /**
-     * @param taskerId
+     * @param taskerId tasker id
      */
-    public void getById(UUID taskerId) {
-        // TODO implement here
+    public TaskerResponse getById(UUID taskerId) {
+        Optional<Tasker> taskerOpt = taskerRepository.findById(taskerId);
+
+        if (taskerOpt.isEmpty()) {
+            throw new TaskerNotFoundException(
+                    "the tasker not found with id: " + taskerId);
+        }
+
+        Tasker tasker = taskerOpt.get();
+
+        return taskerMapper.toResponse(tasker);
     }
 
     /**
