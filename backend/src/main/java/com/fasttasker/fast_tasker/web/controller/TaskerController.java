@@ -1,17 +1,42 @@
 package com.fasttasker.fast_tasker.web.controller;
 
-import java.io.*;
-import java.util.*;
+import com.fasttasker.fast_tasker.application.TaskerService;
+import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
+import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 /**
  * 
  */
+@RestController
+@RequestMapping("api/v1/tasker")
 public class TaskerController {
 
+    private final TaskerService taskerService;
+
     /**
-     * Default constructor
+     * constructor for dependencies injection
      */
-    public TaskerController() {
+    @Autowired
+    public TaskerController(TaskerService taskerService) {
+        this.taskerService = taskerService;
+    }
+
+    @PutMapping("/register")
+    public ResponseEntity<TaskerResponse> initialRegister(@RequestBody TaskerRequest request) {
+
+        TaskerResponse response = taskerService.registerTasker(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<TaskerResponse> getTaskerById(@PathVariable UUID userId) {
+        TaskerResponse response = taskerService.getById((userId));
+        return ResponseEntity.ok(response);
     }
 
 }

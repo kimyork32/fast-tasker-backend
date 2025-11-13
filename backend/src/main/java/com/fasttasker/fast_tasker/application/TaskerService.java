@@ -1,6 +1,7 @@
 package com.fasttasker.fast_tasker.application;
 
-import com.fasttasker.fast_tasker.application.dto.TaskerResponse;
+import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
+import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
 import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
 import com.fasttasker.fast_tasker.application.mapper.TaskerMapper;
 import com.fasttasker.fast_tasker.domain.account.IAccountRepository;
@@ -32,22 +33,22 @@ public class TaskerService {
     }
 
     /**
-     * @param accountId account id
-     * @param profile profile of the tasker
+     * @param request tasker request from client
      */
     @Transactional
-    public TaskerResponse registerTasker(UUID accountId, Profile profile) {
-        Optional<Tasker> taskerOpt = taskerRepository.findByAccountId(accountId);
+    public TaskerResponse registerTasker(TaskerRequest request) {
+        UUID accountId = request.accountId();
 
-        if (taskerOpt.isEmpty()) {
-            throw new TaskerNotFoundException(
-                    "the tasker not found with account id: " + accountId);
-        }
+        Tasker tasker = taskerRepository.findByAccountId(accountId)
+                .orElseThrow(() -> new TaskerNotFoundException(
+                        "the tasker not found with account id: " + accountId));
 
-        Tasker tasker = taskerOpt.get();
+        Profile profile = taskerMapper.toProfileEntity(request.profile());
+
         tasker.setProfile(profile);
 
         taskerRepository.save(tasker);
+
         return taskerMapper.toResponse(tasker);
     }
 
