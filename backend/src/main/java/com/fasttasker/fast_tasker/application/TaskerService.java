@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalOperator;
 
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.UUID;
 
 @Service
@@ -25,7 +24,7 @@ public class TaskerService {
     private final TaskerMapper taskerMapper;
 
 
-    public TaskerService(ITaskerRepository taskerRepository, IAccountRepository accountRepository, ITaskRepository taskRepository, ITaskerFactory taskerFactory, TransactionalOperator transactional, TaskerMapper taskerMapper) {
+    public TaskerService(ITaskerRepository taskerRepository, IAccountRepository accountRepository, ITaskRepository taskRepository, TransactionalOperator transactional, TaskerMapper taskerMapper) {
         this.taskerRepository = taskerRepository;
         this.accountRepository = accountRepository;
         this.taskRepository = taskRepository;
