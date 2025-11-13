@@ -1,7 +1,6 @@
 package com.fasttasker.fast_tasker.application.mapper;
 
-import com.fasttasker.fast_tasker.application.dto.TaskerRequest;
-import com.fasttasker.fast_tasker.application.dto.TaskerResponse;
+import com.fasttasker.fast_tasker.application.dto.tasker.*;
 import com.fasttasker.fast_tasker.domain.tasker.Location;
 import com.fasttasker.fast_tasker.domain.tasker.Profile;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
@@ -39,13 +38,13 @@ public class TaskerMapper {
         var profile = tasker.getProfile();
         var location = profile.getLocation();
 
-        var locationResponse = TaskerResponse.LocationResponse.builder()
+        var locationResponse = LocationResponse.builder()
                 .latitude(location.getLatitude())
                 .longitude(location.getLongitude())
                 .address(location.getAddress())
                 .build();
 
-        var profileResponse = TaskerResponse.ProfileResponse.builder()
+        var profileResponse = ProfileResponse.builder()
                 .photo(profile.getPhoto())
                 .about(profile.getAbout())
                 .reputation(profile.getReputation())
@@ -59,5 +58,21 @@ public class TaskerMapper {
                 .accountId(tasker.getAccountId())
                 .profile(profileResponse)
                 .build();
+    }
+
+    public Profile toProfileEntity(ProfileRequest request) {
+        if (request == null) return null;
+
+        var loc = request.location();
+
+        return new Profile(
+                request.photo(),
+                new Location(loc.latitude(), loc.longitude(), loc.address()),
+                request
+                        .about(),
+                request.reputation(),
+                request.clientReviews(),
+                request.completedTasks()
+                );
     }
 }
