@@ -2,6 +2,7 @@ package com.fasttasker.fast_tasker.application;
 
 import com.fasttasker.fast_tasker.application.dto.AccountResponse;
 import com.fasttasker.fast_tasker.application.dto.RegisterAccountRequest;
+import com.fasttasker.fast_tasker.application.mapper.AccountMapper;
 import com.fasttasker.fast_tasker.domain.account.*;
 import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
 import com.fasttasker.fast_tasker.domain.notification.Notification;
@@ -9,6 +10,7 @@ import com.fasttasker.fast_tasker.domain.notification.NotificationType;
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -21,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,8 +41,30 @@ class AccountServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private AccountMapper accountMapper;
+
     @InjectMocks
     private AccountService accountService;
+
+    @BeforeEach
+    void setUp() {
+
+        // for any account class return fakeResponse if is not null, else then return null
+        // if any test requires the mapper to fail, it can override the behavior
+        when(accountMapper.toResponse(any(Account.class))).thenAnswer(invocation -> {
+            Account accountPassed = invocation.getArgument(0);
+
+            if (accountPassed == null) return null;
+
+            return AccountResponse.builder()
+                    .id(accountPassed.getTaskerId())
+                    .email(accountPassed.getEmail().getValue())
+                    .status(accountPassed.getStatus())
+                    .build();
+
+        });
+    }
 
     @Test
     void shouldRegisterAccountSuccess() {
