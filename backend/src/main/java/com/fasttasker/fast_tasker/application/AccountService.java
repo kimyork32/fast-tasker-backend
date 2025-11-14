@@ -1,10 +1,12 @@
 package com.fasttasker.fast_tasker.application;
 
 import com.fasttasker.fast_tasker.application.dto.AccountResponse;
+import com.fasttasker.fast_tasker.application.dto.LoginResponse;
 import com.fasttasker.fast_tasker.application.dto.RegisterAccountRequest;
 import com.fasttasker.fast_tasker.application.exception.AccountNotFoundException;
 import com.fasttasker.fast_tasker.application.exception.EmailAlreadyExistsException;
 import com.fasttasker.fast_tasker.application.mapper.AccountMapper;
+import com.fasttasker.fast_tasker.config.JwtService;
 import com.fasttasker.fast_tasker.domain.account.*;
 import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
 import com.fasttasker.fast_tasker.domain.notification.Notification;
@@ -38,6 +40,7 @@ public class AccountService {
     private final AccountMapper accountMapper;
 
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     /**
      *
@@ -47,7 +50,7 @@ public class AccountService {
             ITaskerRepository taskerRepository,
             ITaskRepository taskRepository,
             INotificationRepository notificationRepository, AccountMapper accountMapper,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder, JwtService jwtService
     ) {
         this.accountRepository = accountRepository;
         this.taskerRepository = taskerRepository;
@@ -55,6 +58,7 @@ public class AccountService {
         this.notificationRepository = notificationRepository;
         this.accountMapper = accountMapper;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     /**
@@ -130,7 +134,7 @@ public class AccountService {
      * @return
      */
     @Transactional(readOnly = true)
-    public AccountResponse login(String email, String rawPassword) {
+    public LoginResponse login(String email, String rawPassword) {
         Account account = accountRepository.findByEmailValue(email)
                 .orElseThrow(() -> new AccountNotFoundException("login exception: invalid email"));
 
@@ -142,7 +146,9 @@ public class AccountService {
             throw new RuntimeException("your account has been banned");
         }
 
-        return accountMapper.toResponse(account);
+        // return a JWT token
+        String token = jwtService.generateToken(account.getTaskerId());
+        return new LoginResponse(token);
     }
 
     /**

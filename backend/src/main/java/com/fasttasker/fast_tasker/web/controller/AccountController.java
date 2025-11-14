@@ -3,6 +3,7 @@ package com.fasttasker.fast_tasker.web.controller;
 import com.fasttasker.fast_tasker.application.AccountService;
 import com.fasttasker.fast_tasker.application.dto.AccountResponse;
 import com.fasttasker.fast_tasker.application.dto.LoginRequest;
+import com.fasttasker.fast_tasker.application.dto.LoginResponse;
 import com.fasttasker.fast_tasker.application.dto.RegisterAccountRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,8 +50,8 @@ public class AccountController {
      * of the newly created user and  HTTP status code {@code 201 OK}
      */
     @PostMapping("/login")
-    public ResponseEntity<AccountResponse> login(@RequestBody LoginRequest request) {
-        AccountResponse response = accountService.login(request.email(), request.rawPassword());
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        LoginResponse response = accountService.login(request.email(), request.rawPassword());
         return ResponseEntity.ok(response);
     }
 }
