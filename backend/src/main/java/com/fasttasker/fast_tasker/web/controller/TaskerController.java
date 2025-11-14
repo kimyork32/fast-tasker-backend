@@ -39,4 +39,10 @@ public class TaskerController {
         return ResponseEntity.ok(response);
     }
 
+    /*
+    @GetMapping("/user/me")
+    public ResponseEntity<TaskerResponse> getTaskerMe() { // aqui dberia estar el token ccreo
+
+    }
+     */
 }

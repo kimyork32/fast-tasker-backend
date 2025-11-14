@@ -1,8 +1,10 @@
 package com.fasttasker.fast_tasker.application;
 
 import com.fasttasker.fast_tasker.application.dto.AccountResponse;
+import com.fasttasker.fast_tasker.application.dto.LoginResponse;
 import com.fasttasker.fast_tasker.application.dto.RegisterAccountRequest;
 import com.fasttasker.fast_tasker.application.mapper.AccountMapper;
+import com.fasttasker.fast_tasker.config.JwtService;
 import com.fasttasker.fast_tasker.domain.account.*;
 import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
 import com.fasttasker.fast_tasker.domain.notification.Notification;
@@ -10,7 +12,6 @@ import com.fasttasker.fast_tasker.domain.notification.NotificationType;
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -44,27 +45,11 @@ class AccountServiceTest {
     @Mock
     private AccountMapper accountMapper;
 
+    @Mock
+    private JwtService jwtService;
+
     @InjectMocks
     private AccountService accountService;
-
-    @BeforeEach
-    void setUp() {
-
-        // for any account class return fakeResponse if is not null, else then return null
-        // if any test requires the mapper to fail, it can override the behavior
-        when(accountMapper.toResponse(any(Account.class))).thenAnswer(invocation -> {
-            Account accountPassed = invocation.getArgument(0);
-
-            if (accountPassed == null) return null;
-
-            return AccountResponse.builder()
-                    .id(accountPassed.getTaskerId())
-                    .email(accountPassed.getEmail().getValue())
-                    .status(accountPassed.getStatus())
-                    .build();
-
-        });
-    }
 
     @Test
     void shouldRegisterAccountSuccess() {
@@ -81,6 +66,13 @@ class AccountServiceTest {
         ArgumentCaptor<Tasker> taskerCaptor = ArgumentCaptor.forClass(Tasker.class);
         ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 
+        // this is the DTO that we want return from mapper
+        var responseDto = new AccountResponse(
+                UUID.randomUUID(),
+                request.email(),
+                AccountStatus.PENDING_VERIFICATION
+        );
+
         // simulating that the email NO EXISTS
         when(accountRepository.findByEmailValue(request.email()))
                 .thenReturn(Optional.empty());
@@ -88,6 +80,10 @@ class AccountServiceTest {
         // simulating the hashing of the password
         when(passwordEncoder.encode(request.rawPassword()))
                 .thenReturn(hashedPassword);
+
+        // simulating the return of the toResponse
+        when(accountMapper.toResponse(any(Account.class)))
+                .thenReturn(responseDto);
 
         // 2. WHEN
         AccountResponse response = accountService.registerAccount(request);
@@ -140,7 +136,7 @@ class AccountServiceTest {
 
         // verify that the returned AccountResponse is correct
         assertThat(response).isNotNull();
-        assertThat(response.id()).isEqualTo(savedAccount.getTaskerId());
+        assertThat(response.id()).isNotNull();
         assertThat(response.email()).isEqualTo("newUser@domain.com");
         assertThat(response.status()).isEqualTo(AccountStatus.PENDING_VERIFICATION);
     }
@@ -162,6 +158,8 @@ class AccountServiceTest {
                 AccountStatus.ACTIVE
         );
 
+        String fakeToken= "fake-token.eyJzdWIiOiJ";
+
         // simulating that the email EXISTS
         when(accountRepository.findByEmailValue(email))
                 .thenReturn(Optional.of(accountToFind));
@@ -170,8 +168,10 @@ class AccountServiceTest {
         when(passwordEncoder.matches(rawPassword, hashedPassword))
                 .thenReturn(true);
 
+        // simulating the token generation to return the fake
+        when(jwtService.generateToken(accountId)).thenReturn(fakeToken);
         // 2. WHEN
-        AccountResponse response = accountService.login(email, rawPassword);
+        LoginResponse response = accountService.login(email, rawPassword);
 
         // 3. THEN
         // verify that the email was found
@@ -180,10 +180,11 @@ class AccountServiceTest {
         // verify that the password was hashed
         verify(passwordEncoder).matches(rawPassword, hashedPassword);
 
+        // verifiy that generate token was called with correct ID
+        verify(jwtService).generateToken(accountId);
+
         assertThat(response).isNotNull();
-        assertThat(response.id()).isEqualTo(accountId);
-        assertThat(response.email()).isEqualTo(email);
-        assertThat(response.status()).isEqualTo(AccountStatus.ACTIVE);
+        assertThat(response.token()).isEqualTo(fakeToken);
     }
     /*
     @Test

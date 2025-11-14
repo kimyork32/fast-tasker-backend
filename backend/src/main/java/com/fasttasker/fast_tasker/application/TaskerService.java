@@ -11,7 +11,6 @@ import com.fasttasker.fast_tasker.domain.tasker.Profile;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.reactive.TransactionalOperator;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -25,7 +24,7 @@ public class TaskerService {
     private final TaskerMapper taskerMapper;
 
 
-    public TaskerService(ITaskerRepository taskerRepository, IAccountRepository accountRepository, ITaskRepository taskRepository, TransactionalOperator transactional, TaskerMapper taskerMapper) {
+    public TaskerService(ITaskerRepository taskerRepository, IAccountRepository accountRepository, ITaskRepository taskRepository, TaskerMapper taskerMapper) {
         this.taskerRepository = taskerRepository;
         this.accountRepository = accountRepository;
         this.taskRepository = taskRepository;
