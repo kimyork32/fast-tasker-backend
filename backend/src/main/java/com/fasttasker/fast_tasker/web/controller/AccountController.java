@@ -5,8 +5,10 @@ import com.fasttasker.fast_tasker.application.dto.AccountResponse;
 import com.fasttasker.fast_tasker.application.dto.LoginRequest;
 import com.fasttasker.fast_tasker.application.dto.LoginResponse;
 import com.fasttasker.fast_tasker.application.dto.RegisterAccountRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,8 +52,25 @@ public class AccountController {
      * of the newly created user and  HTTP status code {@code 201 OK}
      */
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        LoginResponse response = accountService.login(request.email(), request.rawPassword());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<LoginResponse> login(
+            @RequestBody LoginRequest request,
+            HttpServletResponse servletResponse
+    ) {
+        LoginResponse loginResponse = accountService.login(request.email(), request.rawPassword());
+
+        // adapting this: https://javascript.plainenglish.io/nextjs-authentication-flow-store-jwt-in-cookie-fa6e6c8c0dca
+        // creating the HTTPOnly cookie
+        ResponseCookie cookie = ResponseCookie.from("jwtToken", loginResponse.token())
+                .httpOnly(true) // javascript cannot read it
+                .secure(false) // IMPORTANT: if to use HTTPS in production, set to true
+                .path("/") // available for all routes
+                .maxAge(60 * 60 * 24) // 1 day, this MATCHES with the value of {@code jwt.expiration}
+                                                    // in application.properties
+                .build();
+
+        // add the cookie to the response header
+        servletResponse.addHeader("Set-Cookie", cookie.toString());
+
+        return ResponseEntity.ok(loginResponse);
     }
 }
