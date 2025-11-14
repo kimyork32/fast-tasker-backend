@@ -77,7 +77,7 @@ public class AccountService {
         // it using a secure channel such as HTTPS.
         String hashedPassword = passwordEncoder.encode(request.rawPassword());
 
-        Account account = new Account(
+        var account = new Account(
                 UUID.randomUUID(),
                 new Email(request.email()),
                 new Password(hashedPassword),
@@ -87,13 +87,13 @@ public class AccountService {
         // save account, if any error occurs then rollback
         accountRepository.save(account);
 
-        Location defaultLocation = new Location(
+        var defaultLocation = new Location(
                 0,
                 0,
                 ""
         );
 
-        Profile defaultProfile = new Profile(
+        var defaultProfile = new Profile(
                 "",
                 defaultLocation,
                 "",
@@ -102,7 +102,7 @@ public class AccountService {
                 0
         );
 
-        Tasker tasker = new Tasker(
+        var tasker = new Tasker(
                 UUID.randomUUID(), // probability of generating two identical id: 1 / 2^122
                 account.getTaskerId(),
                 defaultProfile
