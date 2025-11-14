@@ -5,6 +5,7 @@ import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -39,10 +40,14 @@ public class TaskerController {
         return ResponseEntity.ok(response);
     }
 
-    /*
     @GetMapping("/user/me")
-    public ResponseEntity<TaskerResponse> getTaskerMe() { // aqui dberia estar el token ccreo
+    public ResponseEntity<TaskerResponse> getTaskerMe(Authentication authentication) {
+        // first extract the Principal, before casting the object to UUID
+        UUID accountId = (UUID) authentication.getPrincipal();
 
+        // { @see JwtAuthenticationFilter } for explanation
+        TaskerResponse response = taskerService.getByAccountId(accountId);
+
+        return ResponseEntity.ok(response);
     }
-     */
 }
