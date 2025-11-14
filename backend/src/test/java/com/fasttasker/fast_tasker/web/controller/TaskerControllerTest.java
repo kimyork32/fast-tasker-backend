@@ -70,7 +70,7 @@ class TaskerControllerTest {
 
         // 2. WHEN
         mockMvc.perform(
-                get("/api/v1/tasker/me")
+                get("/api/v1/tasker/user/me")
                         .header("Authorization", "Bearer " + validToken)
         )
                 // 3. THEN
