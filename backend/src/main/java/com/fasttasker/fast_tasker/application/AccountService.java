@@ -78,7 +78,7 @@ public class AccountService {
         String hashedPassword = passwordEncoder.encode(request.rawPassword());
 
         var account = new Account(
-                UUID.randomUUID(),
+                UUID.randomUUID(),  // probability of generating two identical id: 1 / 2^122
                 new Email(request.email()),
                 new Password(hashedPassword),
                 AccountStatus.PENDING_VERIFICATION
@@ -105,7 +105,7 @@ public class AccountService {
         );
 
         var tasker = new Tasker(
-                account.getTaskerId(), // probability of generating two identical id: 1 / 2^122
+                account.getTaskerId(),
                 account.getTaskerId(),
                 defaultProfile
         );

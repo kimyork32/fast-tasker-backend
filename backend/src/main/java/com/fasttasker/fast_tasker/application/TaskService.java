@@ -1,10 +1,16 @@
 package com.fasttasker.fast_tasker.application;
 
+import com.fasttasker.fast_tasker.application.dto.task.TaskRequest;
+import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
+import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
+import com.fasttasker.fast_tasker.application.mapper.TaskMapper;
 import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
+import com.fasttasker.fast_tasker.domain.task.Task;
 import com.fasttasker.fast_tasker.domain.task.TaskStatus;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -17,22 +23,29 @@ public class TaskService {
     private final ITaskRepository taskRepository;
     private final ITaskerRepository taskerRepository;
     private final INotificationRepository notificationRepository;
+    private final TaskMapper taskMapper;
 
     public TaskService(
             ITaskRepository taskRepository,
             ITaskerRepository taskerRepository,
-            INotificationRepository notificationRepository
+            INotificationRepository notificationRepository, TaskMapper taskMapper
     ) {
         this.taskRepository = taskRepository;
         this.taskerRepository = taskerRepository;
         this.notificationRepository = notificationRepository;
+        this.taskMapper = taskMapper;
     }
 
     /**
      * 
      */
-    public void createTask() {
-        // TODO implement here
+    @Transactional
+    public TaskResponse createTask(TaskRequest taskRequest) {
+        Task newTask = taskMapper.toEntity(taskRequest);
+        // make a verifications if it needs
+        taskRepository.save(newTask);
+
+        return taskMapper.toResponse(newTask);
     }
 
     /**
@@ -120,4 +133,7 @@ public class TaskService {
         // TODO implement here
     }
 
+    public TaskMapper getTaskMapper() {
+        return taskMapper;
+    }
 }
