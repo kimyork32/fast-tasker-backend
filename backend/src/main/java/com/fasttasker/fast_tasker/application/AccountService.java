@@ -95,6 +95,8 @@ public class AccountService {
 
         var defaultProfile = new Profile(
                 "",
+                "",
+                "",
                 defaultLocation,
                 "",
                 0,

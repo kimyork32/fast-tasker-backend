@@ -15,6 +15,15 @@ import lombok.NoArgsConstructor;
 @Getter
 @EqualsAndHashCode
 public class Profile {
+    /**
+     *
+     */
+    private String firstName;
+
+    /**
+     *
+     */
+    private String lastName;
 
     /**
      * 

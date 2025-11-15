@@ -50,6 +50,8 @@ class TaskerControllerTest {
         );
 
         var mockProfile = new ProfileResponse(
+                "homer",
+                "simpson",
                 "https://amazon.com/photo/235",
                 "about me",
                 4,

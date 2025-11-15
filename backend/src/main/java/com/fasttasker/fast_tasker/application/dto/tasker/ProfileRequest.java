@@ -1,6 +1,8 @@
 package com.fasttasker.fast_tasker.application.dto.tasker;
 
 public record ProfileRequest(
+        String firstName,
+        String lastName,
         String photo,
         String about,
         int reputation,

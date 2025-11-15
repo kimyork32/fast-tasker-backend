@@ -53,6 +53,8 @@ class TaskerServiceTest {
 
         var defaultProfile = new Profile(
                 "",
+                "",
+                "",
                 defaultLocation,
                 "",
                 0,
@@ -82,6 +84,8 @@ class TaskerServiceTest {
         );
 
         var profileRequest = new ProfileRequest(
+                "homer",
+                "simpson",
                 "https://aws-service-s3.com/photo/141454",
                 "about me",
                 4,

@@ -17,6 +17,8 @@ public class TaskerMapper {
         var loc = request.profile().location();
 
         var profile = new Profile(
+                request.profile().firstName(),
+                request.profile().lastName(),
                 request.profile().photo(),
                 new Location(loc.latitude(), loc.longitude(), loc.address()),
                 request.profile().about(),
@@ -45,6 +47,8 @@ public class TaskerMapper {
                 .build();
 
         var profileResponse = ProfileResponse.builder()
+                .firstName(profile.getFirstName())
+                .lastName(profile.getLastName())
                 .photo(profile.getPhoto())
                 .about(profile.getAbout())
                 .reputation(profile.getReputation())
@@ -66,6 +70,8 @@ public class TaskerMapper {
         var loc = request.location();
 
         return new Profile(
+                request.firstName(),
+                request.lastName(),
                 request.photo(),
                 new Location(loc.latitude(), loc.longitude(), loc.address()),
                 request

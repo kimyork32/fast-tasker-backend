@@ -33,6 +33,8 @@ class JpaTaskerRepositoryTest {
         );
 
         Profile profile = new Profile(
+                "homer",
+                "simpson",
                 "https://example.com/photo.png",
                 location,
                 "im tasker expert in plumbing",
@@ -71,13 +73,15 @@ class JpaTaskerRepositoryTest {
         UUID taskerId = UUID.randomUUID();
         UUID accountId = UUID.randomUUID();
 
-        Location location = new Location(
+        var location = new Location(
                 -16.409047,
                 -71.537731,
                 "location random"
         );
 
-        Profile profile = new Profile(
+        var profile = new Profile(
+                "homer",
+                "simpson",
                 "https://example.com/photo.png",
                 location,
                 "im tasker expert in plumbing",
@@ -86,7 +90,7 @@ class JpaTaskerRepositoryTest {
                 10
         );
 
-        Tasker newTasker =  new Tasker(
+        var newTasker =  new Tasker(
                 taskerId,
                 accountId,
                 profile

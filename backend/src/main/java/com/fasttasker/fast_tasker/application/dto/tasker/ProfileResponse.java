@@ -4,6 +4,8 @@ import lombok.Builder;
 
 @Builder
 public record ProfileResponse(
+        String firstName,
+        String lastName,
         String photo,
         String about,
         int reputation,

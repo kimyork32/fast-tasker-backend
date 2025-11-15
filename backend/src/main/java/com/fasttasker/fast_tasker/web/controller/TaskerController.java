@@ -48,6 +48,8 @@ public class TaskerController {
         // { @see JwtAuthenticationFilter } for explanation
         TaskerResponse response = taskerService.getByAccountId(accountId);
 
+        System.out.println(response);
+
         return ResponseEntity.ok(response);
     }
 }
