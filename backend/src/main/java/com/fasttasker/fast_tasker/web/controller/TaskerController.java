@@ -28,7 +28,13 @@ public class TaskerController {
     }
 
     @PutMapping("/register")
-    public ResponseEntity<TaskerResponse> initialRegister(@RequestBody TaskerRequest request) {
+    public ResponseEntity<TaskerResponse> initialRegister(
+            @RequestBody TaskerRequest request,
+            Authentication authentication
+    ) {
+
+        UUID accountId = (UUID) authentication.getPrincipal();
+        request = new TaskerRequest(accountId, request.profile());
 
         TaskerResponse response = taskerService.registerTasker(request);
         return ResponseEntity.ok(response);
