@@ -105,7 +105,7 @@ public class AccountService {
         );
 
         var tasker = new Tasker(
-                UUID.randomUUID(), // probability of generating two identical id: 1 / 2^122
+                account.getTaskerId(), // probability of generating two identical id: 1 / 2^122
                 account.getTaskerId(),
                 defaultProfile
         );
@@ -150,7 +150,7 @@ public class AccountService {
 
         // NOTE: This is inefficient
         Tasker tasker = taskerRepository.findById(account.getTaskerId())
-                .orElseThrow(() -> new RuntimeException("Tasker no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Tasker not found"));
 
         // calculate if the profile is complete.
         // NOTE: This should be factored out
