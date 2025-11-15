@@ -41,7 +41,7 @@ class TaskerControllerTest {
     @Test
     void shouldGetTaskerMeWhenAuthenticated() throws Exception {
         UUID testAccountId = UUID.randomUUID();
-        String validToken = jwtService.generateToken(testAccountId);
+        String validToken = jwtService.generateToken(testAccountId, true);
 
         var mockLocation = new LocationResponse(
                 -13.412453,

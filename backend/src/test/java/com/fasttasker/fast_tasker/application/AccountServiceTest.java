@@ -169,7 +169,7 @@ class AccountServiceTest {
                 .thenReturn(true);
 
         // simulating the token generation to return the fake
-        when(jwtService.generateToken(accountId)).thenReturn(fakeToken);
+        when(jwtService.generateToken(accountId, true)).thenReturn(fakeToken);
         // 2. WHEN
         LoginResponse response = accountService.login(email, rawPassword);
 
@@ -181,7 +181,7 @@ class AccountServiceTest {
         verify(passwordEncoder).matches(rawPassword, hashedPassword);
 
         // verifiy that generate token was called with correct ID
-        verify(jwtService).generateToken(accountId);
+        verify(jwtService).generateToken(accountId, true);
 
         assertThat(response).isNotNull();
         assertThat(response.token()).isEqualTo(fakeToken);
