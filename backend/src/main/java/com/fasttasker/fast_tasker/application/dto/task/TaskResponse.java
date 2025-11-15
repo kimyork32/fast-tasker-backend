@@ -1,7 +1,9 @@
 package com.fasttasker.fast_tasker.application.dto.task;
 
 import com.fasttasker.fast_tasker.application.dto.tasker.LocationResponse;
+import lombok.Builder;
 
+@Builder
 public record TaskResponse(
         String title,
         String description,
