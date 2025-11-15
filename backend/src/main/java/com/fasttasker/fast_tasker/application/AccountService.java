@@ -148,8 +148,19 @@ public class AccountService {
             throw new RuntimeException("your account has been banned");
         }
 
+        // NOTE: This is inefficient
+        Tasker tasker = taskerRepository.findById(account.getTaskerId())
+                .orElseThrow(() -> new RuntimeException("Tasker no encontrado"));
+
+        // calculate if the profile is complete.
+        // NOTE: This should be factored out
+        boolean profileCompleted = tasker.getProfile().getFirstName() != null && !tasker.getProfile().getFirstName().isBlank()
+                && tasker.getProfile().getLastName() != null && !tasker.getProfile().getLastName().isBlank()
+                && tasker.getProfile().getPhoto() != null && !tasker.getProfile().getPhoto().isBlank();
+
+
         // return a JWT token
-        String token = jwtService.generateToken(account.getTaskerId());
+        String token = jwtService.generateToken(account.getTaskerId(), profileCompleted);
         return new LoginResponse(token);
     }
 
