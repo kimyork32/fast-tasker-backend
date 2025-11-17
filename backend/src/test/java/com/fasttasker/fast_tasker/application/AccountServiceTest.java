@@ -11,6 +11,8 @@ import com.fasttasker.fast_tasker.domain.notification.Notification;
 import com.fasttasker.fast_tasker.domain.notification.NotificationType;
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
+import com.fasttasker.fast_tasker.domain.tasker.Location;
+import com.fasttasker.fast_tasker.domain.tasker.Profile;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -151,7 +153,7 @@ class AccountServiceTest {
         String hashedPassword = "hashedPassword-xyz";
         UUID accountId = UUID.randomUUID();
 
-        Account accountToFind = new Account(
+        var accountToFind = new Account(
                 accountId,
                 new Email(email),
                 new Password(hashedPassword),
@@ -159,6 +161,33 @@ class AccountServiceTest {
         );
 
         String fakeToken= "fake-token.eyJzdWIiOiJ";
+
+        var  fakeLocation = new Location(
+                -15.542353,
+                -12.252514,
+                "address fake"
+        );
+
+        var fakeProfile = new Profile(
+                "fakundo",
+                "gonzales",
+                "photo.com",
+                fakeLocation,
+                "about me",
+                3,
+                5,
+                12
+        );
+
+        var taskerSaved = new Tasker(
+                UUID.randomUUID(),
+                accountId,
+                fakeProfile
+        );
+
+        // simulating that the tasker EXISTS
+        when(taskerRepository.findById(accountToFind.getTaskerId()))
+                .thenReturn(Optional.of(taskerSaved));
 
         // simulating that the email EXISTS
         when(accountRepository.findByEmailValue(email))
