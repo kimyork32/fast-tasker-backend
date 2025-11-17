@@ -1,6 +1,7 @@
 package com.fasttasker.fast_tasker.web.controller;
 
 import com.fasttasker.fast_tasker.application.TaskerService;
+import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRegistrationResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
 import com.fasttasker.fast_tasker.config.JwtService;
@@ -22,7 +23,6 @@ public class TaskerController {
 
     private final TaskerService taskerService;
     private final JwtService jwtService;
-    private final String AUTH_COOKIE_NAME = "jwtToken"; // this should be same as proxy.ts token
 
     /**
      * constructor for dependencies injection
@@ -34,29 +34,26 @@ public class TaskerController {
     }
 
     @PutMapping("/register")
-    public ResponseEntity<TaskerResponse> initialRegister(
+    public ResponseEntity<TaskerRegistrationResponse> initialRegister(
             @RequestBody TaskerRequest request,
             Authentication authentication
     ) {
 
         UUID accountId = (UUID) authentication.getPrincipal();
-        request = new TaskerRequest(accountId, request.profile());
-
-        TaskerResponse response = taskerService.registerTasker(request);
-
+        var serviceRequest = new TaskerRequest(accountId, request.profile());
+        TaskerResponse taskerResponse = taskerService.registerTasker(serviceRequest);
         String newToken = jwtService.generateToken(accountId, true); // profileCompleted = true
 
-        ResponseCookie cookie = ResponseCookie.from(AUTH_COOKIE_NAME, newToken)
-                .httpOnly(false)
-                .secure(false) // enable this in production
-                .path("/")
-                .maxAge(60 * 60 * 24) // 1 day
-                .build();
+        // creating DTO with the token
+        var response = new TaskerRegistrationResponse(
+                taskerResponse.id(),
+                taskerResponse.accountId(),
+                taskerResponse.profile(),
+                newToken
+        );
 
         // return profile and new token
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(response);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/user/{userId}")
