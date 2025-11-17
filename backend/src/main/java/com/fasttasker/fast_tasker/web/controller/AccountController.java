@@ -1,12 +1,8 @@
 package com.fasttasker.fast_tasker.web.controller;
 
 import com.fasttasker.fast_tasker.application.AccountService;
-import com.fasttasker.fast_tasker.application.dto.AccountResponse;
-import com.fasttasker.fast_tasker.application.dto.LoginRequest;
-import com.fasttasker.fast_tasker.application.dto.LoginResponse;
-import com.fasttasker.fast_tasker.application.dto.RegisterAccountRequest;
+import com.fasttasker.fast_tasker.application.dto.account.*;
 import com.fasttasker.fast_tasker.config.JwtService;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -45,23 +41,19 @@ public class AccountController {
      * of the newly created user and  HTTP status code {@code 201 Created}
      */
     @PostMapping("/register")
-    public ResponseEntity<AccountResponse> register(@RequestBody RegisterAccountRequest request) {
-        AccountResponse response = accountService.registerAccount(request);
+    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterAccountRequest request) {
+        AccountResponse accountResponse = accountService.registerAccount(request);
 
-        System.out.println("AcountController. register. accountId: " + response.id());
-        String newToken = jwtService.generateToken(response.id(), false); // profileCompleted = false
+        System.out.println("AccountController. register. accountId: " + accountResponse.id());
+        String newToken = jwtService.generateToken(accountResponse.id(), false); // profileCompleted = false
 
-        ResponseCookie cookie = ResponseCookie.from(AUTH_COOKIE_NAME, newToken)
-                .httpOnly(false)
-                .secure(false) // enable this in production
-                .path("/")
-                .maxAge(60 * 10) // 10 minutes
-                .build();
+        var registerResponse = new RegisterResponse(
+                accountResponse.id(),
+                accountResponse.email(),
+                newToken
+        );
 
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(registerResponse);
     }
 
     /**
@@ -72,23 +64,9 @@ public class AccountController {
      */
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
-            @RequestBody LoginRequest request,
-            HttpServletResponse servletResponse
+            @RequestBody LoginRequest request
     ) {
         LoginResponse loginResponse = accountService.login(request.email(), request.rawPassword());
-
-        // adapting this: https://javascript.plainenglish.io/nextjs-authentication-flow-store-jwt-in-cookie-fa6e6c8c0dca
-        // creating the HTTPOnly cookie
-        ResponseCookie cookie = ResponseCookie.from("jwtToken", loginResponse.token())
-                .httpOnly(false) // typescript cannot read it
-                .secure(false) // IMPORTANT: if to use HTTPS in production, set to true
-                .path("/") // available for all routes
-                .maxAge(60 * 60 * 24) // 1 day, this MATCHES with the value of {@code jwt.expiration}
-                                                    // in application.properties
-                .build();
-
-        // add the cookie to the response header
-        servletResponse.addHeader("Set-Cookie", cookie.toString());
 
         return ResponseEntity.ok(loginResponse);
     }
