@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasttasker.fast_tasker.application.AccountService;
 import com.fasttasker.fast_tasker.application.dto.account.AccountResponse;
 import com.fasttasker.fast_tasker.application.dto.account.RegisterAccountRequest;
+import com.fasttasker.fast_tasker.config.JwtService;
 import com.fasttasker.fast_tasker.domain.account.AccountStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -34,6 +36,9 @@ class AccountControllerTest {
     @MockitoBean
     private AccountService accountService;
 
+    @MockitoBean
+    private JwtService jwtService;
+
     @Test
     void shouldRegisterSuccessfully() throws Exception {
         // 1. GIVEN
@@ -51,6 +56,10 @@ class AccountControllerTest {
         when(accountService.registerAccount(any(RegisterAccountRequest.class)))
                 .thenReturn(responseDTO);
 
+        // return any token for any accountId
+        when(jwtService.generateToken(any(UUID.class), any(Boolean.class)))
+                .thenReturn("mocked.jwt.token");
+
         // 2. WHEN & THEN
         mockMvc.perform(
                 post("/api/v1/auth/register")
@@ -59,7 +68,7 @@ class AccountControllerTest {
         )
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(responseDTO.id().toString()))
-                .andExpect(jsonPath("$.email").value("new-user33@domain.com"))
-                .andExpect(jsonPath("$.status").value("PENDING_VERIFICATION"));
+                .andExpect(jsonPath("$.email").value(responseDTO.email())) // now verify the new DTO structure
+                .andExpect(jsonPath("$.token").value(notNullValue())); // this too
     }
 }
