@@ -1,8 +1,8 @@
 package com.fasttasker.fast_tasker.application;
 
-import com.fasttasker.fast_tasker.application.dto.AccountResponse;
-import com.fasttasker.fast_tasker.application.dto.LoginResponse;
-import com.fasttasker.fast_tasker.application.dto.RegisterAccountRequest;
+import com.fasttasker.fast_tasker.application.dto.account.AccountResponse;
+import com.fasttasker.fast_tasker.application.dto.account.LoginResponse;
+import com.fasttasker.fast_tasker.application.dto.account.RegisterAccountRequest;
 import com.fasttasker.fast_tasker.application.exception.AccountNotFoundException;
 import com.fasttasker.fast_tasker.application.exception.EmailAlreadyExistsException;
 import com.fasttasker.fast_tasker.application.mapper.AccountMapper;

@@ -1,4 +1,4 @@
-package com.fasttasker.fast_tasker.application.dto;
+package com.fasttasker.fast_tasker.application.dto.account;
 
 import com.fasttasker.fast_tasker.domain.account.AccountStatus;
 import lombok.Builder;

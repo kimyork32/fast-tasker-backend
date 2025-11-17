@@ -1,4 +1,4 @@
-package com.fasttasker.fast_tasker.application.dto;
+package com.fasttasker.fast_tasker.application.dto.account;
 
 /**
  * DOT for login request

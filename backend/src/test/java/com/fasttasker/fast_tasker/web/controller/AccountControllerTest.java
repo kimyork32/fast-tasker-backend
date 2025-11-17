@@ -2,8 +2,8 @@ package com.fasttasker.fast_tasker.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasttasker.fast_tasker.application.AccountService;
-import com.fasttasker.fast_tasker.application.dto.AccountResponse;
-import com.fasttasker.fast_tasker.application.dto.RegisterAccountRequest;
+import com.fasttasker.fast_tasker.application.dto.account.AccountResponse;
+import com.fasttasker.fast_tasker.application.dto.account.RegisterAccountRequest;
 import com.fasttasker.fast_tasker.domain.account.AccountStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

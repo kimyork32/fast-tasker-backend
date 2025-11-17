@@ -1,6 +1,6 @@
 package com.fasttasker.fast_tasker.application.mapper;
 
-import com.fasttasker.fast_tasker.application.dto.AccountResponse;
+import com.fasttasker.fast_tasker.application.dto.account.AccountResponse;
 import com.fasttasker.fast_tasker.domain.account.Account;
 import org.springframework.stereotype.Component;
 
