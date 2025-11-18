@@ -7,7 +7,5 @@ public record TaskRequest(
         String description,
         int budget,
         LocationRequest location,
-        String taskDate,
-        String status,
-        String posterId
+        String taskDate
 ) {}

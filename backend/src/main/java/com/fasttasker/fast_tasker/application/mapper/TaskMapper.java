@@ -26,8 +26,8 @@ public class TaskMapper {
                 request.budget(),
                 new Location(loc.latitude(), loc.longitude(), loc.address()),
                 LocalDate.parse(request.taskDate()),
-                TaskStatus.valueOf(request.status()),
-                UUID.fromString(request.posterId()),
+                TaskStatus.IN_PROGRESS,
+                new UUID(0L, 0L), // default UUID value
                 new ArrayList<>(),
                 new ArrayList<>()
         );

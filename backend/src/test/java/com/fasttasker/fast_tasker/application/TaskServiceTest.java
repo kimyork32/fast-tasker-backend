@@ -35,7 +35,7 @@ class TaskServiceTest {
         var locationRequest = new LocationRequest(
                 -13.412453,
                 -12.158023,
-                "adress street"
+                "address street"
         );
 
         var taskRequest = new TaskRequest(
@@ -43,13 +43,11 @@ class TaskServiceTest {
                 "description for task",
                 200,
                 locationRequest,
-                LocalDate.parse("2025-11-14").toString(),
-                TaskStatus.ACTIVE.name(),
-                UUID.randomUUID().toString()
+                LocalDate.parse("2025-11-14").toString()
         );
 
         // 2. WHEN
-        TaskResponse taskResponse = taskService.createTask(taskRequest);
+        TaskResponse taskResponse = taskService.createTask(taskRequest, UUID.randomUUID());
 
         // 3. THEN
         // verify the DTO request

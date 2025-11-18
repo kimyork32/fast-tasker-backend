@@ -6,8 +6,6 @@ import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
 import com.fasttasker.fast_tasker.config.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;

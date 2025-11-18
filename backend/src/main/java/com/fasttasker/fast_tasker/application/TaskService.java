@@ -40,9 +40,13 @@ public class TaskService {
      * 
      */
     @Transactional
-    public TaskResponse createTask(TaskRequest taskRequest) {
+    public TaskResponse createTask(TaskRequest taskRequest, UUID posterId) {
         Task newTask = taskMapper.toEntity(taskRequest);
-        // make a verifications if it needs
+
+        // assign the values here, ignoring what comes from the client
+        newTask.setPosterId(posterId);
+        newTask.setStatus(TaskStatus.ACTIVE); // assign the default initial state
+
         taskRepository.save(newTask);
 
         return taskMapper.toResponse(newTask);
