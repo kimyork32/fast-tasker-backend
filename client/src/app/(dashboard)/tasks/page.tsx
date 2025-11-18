@@ -2,12 +2,12 @@
 "use client"; // <-- Convertido a Componente de Cliente
 
 import { useState, useEffect } from 'react';
-import { Task } from '@/lib/types'; // Importa tu tipo
-import { getTasks } from '@/services/task.service'; // ¡Importamos el servicio REAL!
+import { TaskResponse } from '@/lib/types'; // Importa tu tipo
+import { getPublicTasks } from '@/services/task.service'; // ¡Importamos el servicio REAL!
 import { TaskCard } from '@/components/shared/TaskCard'; // Asumiendo que tienes este componente
 
 export default function TasksPage() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<TaskResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,7 +16,7 @@ export default function TasksPage() {
     const loadTasks = async () => {
       try {
         setIsLoading(true);
-        const data = await getTasks(); // Llama al servicio (que usa fetch)
+        const data = await getPublicTasks(); // Llama al servicio (que usa fetch)
         setTasks(data);
       } catch (err) {
         setError((err as Error).message);

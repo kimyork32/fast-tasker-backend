@@ -88,7 +88,7 @@ export default function LoginPage() {
         </p>
       )}
       <p>
-        ¿No tienes cuenta? <Link href="/register">Regístrate</Link>
+        ¿No tienes cuenta? <Link href="/signup">Regístrate</Link>
       </p>
     </div>
   );

@@ -77,19 +77,11 @@ export type TaskRequest = {
   description: string;
   budget: number;
   location: LocationData;
-  taskDate: string; // Enviar como string ISO (ej: "2025-12-31T18:00:00")
-  status: string; // Ej: 'OPEN'
-  posterId: string; // El ID del usuario que la crea
+  taskDate: string;
 };
 
-// Basado en TaskResponse
-export type Task = {
-  // ¡MUY IMPORTANTE! Tu TaskResponse no tenía 'id'.
-  // Es imposible para React manejar listas (keys) o
-  // navegar a /tasks/ID sin un 'id'.
-  // Lo he añadido asumiendo que tu API sí lo devuelve.
-  id: string; // UUID
-  
+export type TaskResponse = {
+  id: string;
   title: string;
   description: string;
   budget: number;

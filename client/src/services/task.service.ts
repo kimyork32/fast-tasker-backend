@@ -1,14 +1,20 @@
 import { apiClient } from '@/lib/apiClient';
-import { Task, TaskRequest } from '@/lib/types';
+import { TaskResponse, TaskRequest } from '@/lib/types';
 
 // Asumiendo que todos tus endpoints de tareas están en /tasks
-const TASK_PREFIX = 'api/v1/tasks';
+const TASK_PREFIX = '/api/v1/tasks';
 
 /**
- * Obtiene todas las tareas.
+ * Obtiene todas las tareas de los taskers.
  */
-export const getTasks = (): Promise<Task[]> => {
-  return apiClient<Task[]>(TASK_PREFIX, {
+export const getPublicTasks = (): Promise<TaskResponse[]> => {
+  return apiClient<TaskResponse[]>(TASK_PREFIX, {
+    method: 'GET',
+  }, true); // withCredentials = true (asumiendo que es una ruta protegida)
+};
+
+export const getMyTasks = (): Promise<TaskResponse[]> => {
+  return apiClient<TaskResponse[]>(TASK_PREFIX, {
     method: 'GET',
   }, true); // withCredentials = true (asumiendo que es una ruta protegida)
 };
@@ -16,8 +22,8 @@ export const getTasks = (): Promise<Task[]> => {
 /**
  * Obtiene una tarea por su ID.
  */
-export const getTaskById = (id: string): Promise<Task> => {
-  return apiClient<Task>(`${TASK_PREFIX}/${id}`, {
+export const getTaskById = (id: string): Promise<TaskResponse> => {
+  return apiClient<TaskResponse>(`${TASK_PREFIX}/${id}`, {
     method: 'GET',
   }, true); // withCredentials = true
 };
@@ -25,9 +31,28 @@ export const getTaskById = (id: string): Promise<Task> => {
 /**
  * Crea una nueva tarea.
  */
-export const createTask = (data: TaskRequest): Promise<Task> => {
-  return apiClient<Task>(TASK_PREFIX, {
+export const createTask = (data: TaskRequest): Promise<TaskResponse> => {
+  return apiClient<TaskResponse>(TASK_PREFIX, {
     method: 'POST',
     body: JSON.stringify(data),
   }, true); // withCredentials = true
+};
+
+/**
+ * actualizar tarea existente
+ */
+export const updateTask = (id: string, data: Partial<TaskRequest>): Promise<TaskResponse> => {
+  return apiClient<TaskResponse>(`${TASK_PREFIX}/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }, true); // withCredentials = true
+};
+
+/**
+ * eliminar tarea existente
+ */
+export const deleteTask = (id: string): Promise<void> => {
+  return apiClient<void>(`${TASK_PREFIX}/${id}`,{
+    method: 'DELETE',
+  }, true);  // withCredentials = true
 };

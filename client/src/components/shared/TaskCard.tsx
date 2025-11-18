@@ -1,9 +1,9 @@
 // src/components/shared/TaskCard.tsx
-import { Task } from '@/lib/types';
+import { TaskResponse } from '@/lib/types';
 import Link from 'next/link';
 
 type TaskCardProps = {
-  task: Task;
+  task: TaskResponse;
 };
 
 export function TaskCard({ task }: TaskCardProps) {
