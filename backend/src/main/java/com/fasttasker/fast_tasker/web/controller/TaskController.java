@@ -42,8 +42,15 @@ public class TaskController {
     }
     
     @GetMapping
-    public ResponseEntity<List<TaskResponse>> getAllActiveTasks() {
+    public ResponseEntity<List<TaskResponse>> getAllPublicActiveTasks() {
         List<TaskResponse> tasks = taskService.listActiveTasks();
         return ResponseEntity.ok(tasks);
+    }
+
+    @GetMapping("/my-tasks")
+    public ResponseEntity<List<TaskResponse>> getAllMyTasks(Authentication authentication) {
+        UUID posterId = (UUID) authentication.getPrincipal();
+        List<TaskResponse> posterTasks = taskService.listTasksByPoster(posterId);
+        return ResponseEntity.ok(posterTasks);
     }
 }

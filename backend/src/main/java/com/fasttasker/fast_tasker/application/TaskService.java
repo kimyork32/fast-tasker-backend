@@ -68,6 +68,17 @@ public class TaskService {
     }
 
     /**
+     * return all tasks created by a specific user (Tasker)
+     */
+    @Transactional(readOnly = true)
+    public List<TaskResponse> listTasksByPoster(UUID posterId) {
+        return taskRepository.findByPosterId(posterId)
+                .stream()
+                .map(taskMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * 
      */
     public void editTask() {
