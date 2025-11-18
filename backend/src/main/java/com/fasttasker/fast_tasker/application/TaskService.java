@@ -55,14 +55,16 @@ public class TaskService {
     }
 
     /**
-     * return all active tasks
+     * return all active (status) tasks
      */
     @Transactional(readOnly = true)
     public List<TaskResponse> listActiveTasks() {
-        return taskRepository.findAll()
-                .stream()
-                .map(taskMapper::toResponse)
-                .collect(Collectors.toList());
+        return taskRepository.findByStatus(TaskStatus.ACTIVE)
+                .stream() // convert to stream
+                .map(taskMapper::toResponse) // It applies a function (toResponse) to each element of
+                                             // the stream and returns a new stream with the results (TaskResponse)
+                .collect(Collectors.toList());  // after processing the stream elements, it reconstructs
+                                                // the result into a concrete collection (List)
     }
 
     /**

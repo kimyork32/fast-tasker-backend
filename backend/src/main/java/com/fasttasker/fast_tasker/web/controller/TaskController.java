@@ -9,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
+
 
 /**
  * task controller
@@ -37,5 +39,11 @@ public class TaskController {
 
         TaskResponse response = taskService.createTask(request, posterId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+    @GetMapping
+    public ResponseEntity<List<TaskResponse>> getAllActiveTasks() {
+        List<TaskResponse> tasks = taskService.listActiveTasks();
+        return ResponseEntity.ok(tasks);
     }
 }
