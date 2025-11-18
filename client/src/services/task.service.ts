@@ -14,7 +14,7 @@ export const getPublicTasks = (): Promise<TaskResponse[]> => {
 };
 
 export const getMyTasks = (): Promise<TaskResponse[]> => {
-  return apiClient<TaskResponse[]>(TASK_PREFIX, {
+  return apiClient<TaskResponse[]>(`${TASK_PREFIX}/my-tasks`, {
     method: 'GET',
   }, true); // withCredentials = true (asumiendo que es una ruta protegida)
 };

@@ -11,10 +11,13 @@ export function Sidebar() {
             <Link href="/dashboard">Dashboard</Link>
           </li>
           <li>
-            <Link href="/tasks">Ver Tareas</Link>
+            <Link href="/tasks">Navegar</Link>
           </li>
           <li>
             <Link href="/tasks/new">Crear Tarea</Link>
+          </li>
+          <li>
+            <Link href="/tasks/my">Ver mis tareas</Link>
           </li>
           <li>
             <Link href="/profile">Mi Perfil</Link>

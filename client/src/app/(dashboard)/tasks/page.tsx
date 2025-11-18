@@ -6,7 +6,7 @@ import { TaskResponse } from '@/lib/types'; // Importa tu tipo
 import { getPublicTasks } from '@/services/task.service'; // ¡Importamos el servicio REAL!
 import { TaskCard } from '@/components/shared/TaskCard'; // Asumiendo que tienes este componente
 
-export default function TasksPage() {
+export default function PublicTasksPage() {
   const [tasks, setTasks] = useState<TaskResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
