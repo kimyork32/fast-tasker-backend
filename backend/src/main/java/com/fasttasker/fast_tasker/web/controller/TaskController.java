@@ -1,17 +1,41 @@
 package com.fasttasker.fast_tasker.web.controller;
 
-import java.io.*;
-import java.util.*;
+import com.fasttasker.fast_tasker.application.TaskService;
+import com.fasttasker.fast_tasker.application.dto.task.TaskRequest;
+import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 /**
- * 
+ * task controller
  */
+@RestController
+@RequestMapping("api/v1/tasks") // Plural, REST conversion
 public class TaskController {
 
+    private final TaskService taskService;
     /**
-     * Default constructor
+     * constructor for dependencies injection
      */
-    public TaskController() {
+    @Autowired
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
     }
 
+    @PostMapping
+    public ResponseEntity<TaskResponse> createTask(
+            @RequestBody TaskRequest request,
+            Authentication authentication
+    ) {
+        // extract posterId from the token
+        UUID posterId = (UUID) authentication.getPrincipal();
+
+        TaskResponse response = taskService.createTask(request, posterId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 }
