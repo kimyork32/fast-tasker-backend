@@ -39,6 +39,11 @@ public class TaskRepositoryImpl implements ITaskRepository {
     }
 
     @Override
+    public List<Task> findByStatus(TaskStatus status) {
+        return jpa.findByStatus(status);
+    }
+
+    @Override
     public void deleteById(UUID id) {
         jpa.deleteById(id);
     }

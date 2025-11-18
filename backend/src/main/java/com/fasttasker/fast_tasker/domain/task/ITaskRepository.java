@@ -19,6 +19,8 @@ public interface ITaskRepository {
 
     Optional<Task> findById(UUID id);
 
+    List<Task> findByStatus(TaskStatus status);
+
     void deleteById(UUID id);
 
     /**

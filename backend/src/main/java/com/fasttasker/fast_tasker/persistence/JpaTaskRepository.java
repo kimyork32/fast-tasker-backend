@@ -19,6 +19,8 @@ public interface JpaTaskRepository extends JpaRepository<Task, UUID> {
 
     List<Task> findByPosterIdAndStatus(UUID posterId, TaskStatus status);
 
+    List<Task> findByStatus(TaskStatus status);
+
     // NOTE: Spring implemented the other methods (query methods conversions)
 
 }

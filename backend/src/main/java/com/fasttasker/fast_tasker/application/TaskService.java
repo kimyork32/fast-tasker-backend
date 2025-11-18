@@ -12,7 +12,9 @@ import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * 
@@ -50,6 +52,17 @@ public class TaskService {
         taskRepository.save(newTask);
 
         return taskMapper.toResponse(newTask);
+    }
+
+    /**
+     * return all active tasks
+     */
+    @Transactional(readOnly = true)
+    public List<TaskResponse> listActiveTasks() {
+        return taskRepository.findAll()
+                .stream()
+                .map(taskMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -113,13 +126,6 @@ public class TaskService {
      * @param taskId
      */
     public void cancelTask(UUID taskId) {
-        // TODO implement here
-    }
-
-    /**
-     * 
-     */
-    public void listActiveTasks() {
         // TODO implement here
     }
 
