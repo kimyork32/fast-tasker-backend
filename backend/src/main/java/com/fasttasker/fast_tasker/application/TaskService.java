@@ -3,7 +3,11 @@ package com.fasttasker.fast_tasker.application;
 import com.fasttasker.fast_tasker.application.dto.task.TaskRequest;
 import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
+import com.fasttasker.fast_tasker.application.exception.AccountNotFoundException;
+import com.fasttasker.fast_tasker.application.exception.EmailAlreadyExistsException;
+import com.fasttasker.fast_tasker.application.exception.TaskNotFoundException;
 import com.fasttasker.fast_tasker.application.mapper.TaskMapper;
+import com.fasttasker.fast_tasker.domain.account.Account;
 import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
 import com.fasttasker.fast_tasker.domain.task.Task;
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -76,6 +81,13 @@ public class TaskService {
                 .stream()
                 .map(taskMapper::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public TaskResponse getTaskById(UUID taskId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("getTask exception: invalid task ID"));
+        return taskMapper.toResponse(task);
     }
 
     /**

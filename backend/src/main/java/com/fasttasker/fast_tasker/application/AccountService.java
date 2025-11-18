@@ -5,6 +5,7 @@ import com.fasttasker.fast_tasker.application.dto.account.LoginResponse;
 import com.fasttasker.fast_tasker.application.dto.account.RegisterAccountRequest;
 import com.fasttasker.fast_tasker.application.exception.AccountNotFoundException;
 import com.fasttasker.fast_tasker.application.exception.EmailAlreadyExistsException;
+import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
 import com.fasttasker.fast_tasker.application.mapper.AccountMapper;
 import com.fasttasker.fast_tasker.config.JwtService;
 import com.fasttasker.fast_tasker.domain.account.*;
@@ -145,12 +146,12 @@ public class AccountService {
         }
 
         if (account.getStatus() == AccountStatus.BANNED) {
-            throw new RuntimeException("your account has been banned");
+            throw new AccountNotFoundException("your account has been banned");
         }
 
         // NOTE: This is inefficient
         Tasker tasker = taskerRepository.findById(account.getTaskerId())
-                .orElseThrow(() -> new RuntimeException("Tasker not found"));
+                .orElseThrow(() -> new TaskerNotFoundException("Tasker not found"));
 
         // calculate if the profile is complete.
         // NOTE: This should be factored out

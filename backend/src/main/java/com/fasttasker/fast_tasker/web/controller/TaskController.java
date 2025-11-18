@@ -53,4 +53,10 @@ public class TaskController {
         List<TaskResponse> posterTasks = taskService.listTasksByPoster(posterId);
         return ResponseEntity.ok(posterTasks);
     }
+
+    @GetMapping("{taskId}")
+    public ResponseEntity<TaskResponse> getTask(@PathVariable ("taskId") UUID taskId) {
+        TaskResponse taskResponse = taskService.getTaskById(taskId);
+        return ResponseEntity.ok(taskResponse);
+    }
 }
