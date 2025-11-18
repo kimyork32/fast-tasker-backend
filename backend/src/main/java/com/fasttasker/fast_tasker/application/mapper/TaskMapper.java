@@ -45,6 +45,7 @@ public class TaskMapper {
                 .build();
 
         return new TaskResponse(
+                task.getId().toString(),
                 task.getTitle(),
                 task.getDescription(),
                 task.getBudget(),
