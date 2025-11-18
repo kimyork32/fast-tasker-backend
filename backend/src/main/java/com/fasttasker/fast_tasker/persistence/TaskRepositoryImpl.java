@@ -29,6 +29,11 @@ public class TaskRepositoryImpl implements ITaskRepository {
     }
 
     @Override
+    public List<Task> findAll() {
+        return jpa.findAll();
+    }
+
+    @Override
     public Optional<Task> findById(UUID id) {
         return jpa.findById(id);
     }

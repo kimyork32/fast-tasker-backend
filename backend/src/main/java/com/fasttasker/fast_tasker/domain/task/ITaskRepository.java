@@ -15,6 +15,8 @@ public interface ITaskRepository {
      */
     List<Task> saveAll(List<Task> tasks);
 
+    List<Task> findAll();
+
     Optional<Task> findById(UUID id);
 
     void deleteById(UUID id);
