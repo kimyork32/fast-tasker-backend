@@ -20,7 +20,7 @@ public class TaskerMapper {
                 request.profile().firstName(),
                 request.profile().lastName(),
                 request.profile().photo(),
-                new Location(loc.latitude(), loc.longitude(), loc.address()),
+                new Location(loc.latitude(), loc.longitude(), loc.address(), loc.zip()),
                 request.profile().about(),
                 request.profile().reputation(),
                 request.profile().clientReviews(),
@@ -73,7 +73,7 @@ public class TaskerMapper {
                 request.firstName(),
                 request.lastName(),
                 request.photo(),
-                new Location(loc.latitude(), loc.longitude(), loc.address()),
+                new Location(loc.latitude(), loc.longitude(), loc.address(), loc.zip()),
                 request
                         .about(),
                 request.reputation(),

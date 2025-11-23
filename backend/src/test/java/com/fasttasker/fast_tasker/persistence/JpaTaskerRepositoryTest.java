@@ -29,7 +29,8 @@ class JpaTaskerRepositoryTest {
         Location location = new Location(
                 -16.409047,
                 -71.537731,
-                "location random"
+                "location random",
+                4141414
         );
 
         Profile profile = new Profile(
@@ -76,7 +77,8 @@ class JpaTaskerRepositoryTest {
         var location = new Location(
                 -16.409047,
                 -71.537731,
-                "location random"
+                "location random",
+                41414141
         );
 
         var profile = new Profile(

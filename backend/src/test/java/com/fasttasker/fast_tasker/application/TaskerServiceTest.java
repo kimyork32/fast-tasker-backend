@@ -48,7 +48,8 @@ class TaskerServiceTest {
         var defaultLocation = new Location(
                 0,
                 0,
-                ""
+                "",
+                0
         );
 
         var defaultProfile = new Profile(
@@ -80,7 +81,8 @@ class TaskerServiceTest {
         var locationRequest = new LocationRequest(
                 -13.412453,
                 -12.158023,
-                "adress street"
+                "address street",
+                4141414
         );
 
         var profileRequest = new ProfileRequest(

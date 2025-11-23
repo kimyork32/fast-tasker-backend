@@ -31,4 +31,9 @@ public class Location {
      */
     private String address;
 
+    /**
+     * zip code of peru
+     */
+    private int zip;
+
 }

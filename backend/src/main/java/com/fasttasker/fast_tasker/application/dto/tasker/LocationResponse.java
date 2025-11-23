@@ -6,6 +6,7 @@ import lombok.Builder;
 public record LocationResponse(
         double latitude,
         double longitude,
-        String address
+        String address,
+        int zip
 ) {
 }

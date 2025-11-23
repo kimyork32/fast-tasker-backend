@@ -165,7 +165,8 @@ class AccountServiceTest {
         var  fakeLocation = new Location(
                 -15.542353,
                 -12.252514,
-                "address fake"
+                "address fake",
+                4141414
         );
 
         var fakeProfile = new Profile(

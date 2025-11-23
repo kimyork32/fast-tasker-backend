@@ -50,7 +50,8 @@ class TaskControllerTest {
         var locationReq = new LocationRequest(
                 -13.412453,
                 -12.158023,
-                "address request"
+                "address request",
+                414144
         );
 
         var taskRequest = new TaskRequest(

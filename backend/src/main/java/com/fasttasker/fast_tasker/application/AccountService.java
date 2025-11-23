@@ -91,7 +91,8 @@ public class AccountService {
         var defaultLocation = new Location(
                 0,
                 0,
-                ""
+                "",
+                0
         );
 
         var defaultProfile = new Profile(

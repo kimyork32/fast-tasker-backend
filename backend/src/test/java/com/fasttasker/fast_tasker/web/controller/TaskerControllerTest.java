@@ -46,7 +46,8 @@ class TaskerControllerTest {
         var mockLocation = new LocationResponse(
                 -13.412453,
                 -12.158023,
-                "adress street"
+                "address street",
+                414141
         );
 
         var mockProfile = new ProfileResponse(
