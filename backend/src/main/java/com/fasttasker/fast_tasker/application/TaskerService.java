@@ -35,8 +35,7 @@ public class TaskerService {
      * @param request tasker request from client
      */
     @Transactional
-    public TaskerResponse registerTasker(TaskerRequest request) {
-        UUID accountId = request.accountId();
+    public TaskerResponse registerTasker(TaskerRequest request, UUID accountId) {
 
         Tasker tasker = taskerRepository.findByAccountId(accountId)
                 .orElseThrow(() -> new TaskerNotFoundException(

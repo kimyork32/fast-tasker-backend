@@ -102,7 +102,7 @@ class TaskerServiceTest {
         );
 
         // 2.  WHEN
-        TaskerResponse response = taskerService.registerTasker(taskerRequest);
+        TaskerResponse response = taskerService.registerTasker(taskerRequest, testAccountId);
 
         // 2. THEN
         // verify the DTO request

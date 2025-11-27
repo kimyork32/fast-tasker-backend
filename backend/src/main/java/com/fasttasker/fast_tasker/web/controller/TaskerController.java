@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 /**
- * 
+ *
  */
 @RestController
 @RequestMapping("api/v1/tasker")
@@ -39,9 +39,8 @@ public class TaskerController {
 
         UUID accountId = (UUID) authentication.getPrincipal();
         var serviceRequest = new TaskerRequest(accountId, request.profile());
-        TaskerResponse taskerResponse = taskerService.registerTasker(serviceRequest);
+        TaskerResponse taskerResponse = taskerService.registerTasker(serviceRequest, accountId);
         String newToken = jwtService.generateToken(accountId, true); // profileCompleted = true
-
         // creating DTO with the token
         var response = new TaskerRegistrationResponse(
                 taskerResponse.id(),

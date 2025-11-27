@@ -44,6 +44,7 @@ public class TaskerMapper {
                 .latitude(location.getLatitude())
                 .longitude(location.getLongitude())
                 .address(location.getAddress())
+                .zip(location.getZip())
                 .build();
 
         var profileResponse = ProfileResponse.builder()
@@ -74,8 +75,7 @@ public class TaskerMapper {
                 request.lastName(),
                 request.photo(),
                 new Location(loc.latitude(), loc.longitude(), loc.address(), loc.zip()),
-                request
-                        .about(),
+                request.about(),
                 request.reputation(),
                 request.clientReviews(),
                 request.completedTasks()
