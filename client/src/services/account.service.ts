@@ -45,6 +45,7 @@ export const getMyProfile = (): Promise<Account> => {
   }, true); // withCredentials = true (¡necesita la cookie 'jwtToken'!)
 };
 export const completeProfile = (data: CompleteProfileRequest): Promise<CompleteProfileResponse> => {
+  console.log(`completeProfile: ${JSON.stringify(data)}`);
   return apiClient<CompleteProfileResponse>(`${USER_PREFIX}/register`, {
     method: 'PUT',
     body: JSON.stringify(data),

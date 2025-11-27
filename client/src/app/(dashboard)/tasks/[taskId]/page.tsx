@@ -62,7 +62,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
         <p><strong>Fecha:</strong> {task.taskDate}</p>
         
         {task.location && (
-            <p><strong>Ubicación:</strong> {task.location.address}, {task.location.city}</p>
+            <p><strong>Ubicación:</strong> {task.location.address}</p>
         )}
       </div>
       <hr />

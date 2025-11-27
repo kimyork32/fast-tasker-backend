@@ -2,12 +2,10 @@
 // (Tus DTOs LocationRequest y LocationResponse no estaban definidos,
 // así que he creado uno genérico basado en el uso)
 export type LocationData = {
+  latitude: number;
+  longitude: number;
   address: string;
-  city: string;
-  country: string;
-  // O podrías usar lat/lng:
-  // latitude: number;
-  // longitude: number;
+  zip: number;
 };
 
 // --- DTOs de Cuenta ---
@@ -51,13 +49,10 @@ export type ProfileData = {
   lastName: string;
   photo?: string;
   about?: string;
-  location: {
-    latitude: number;
-    longitude: number,
-    address: string;
-  };
+  location: LocationData
 };
 
+// --- DTOS de Complete Profile ---
 export type CompleteProfileRequest = {
   profile: ProfileData;
 };
@@ -89,4 +84,11 @@ export type TaskResponse = {
   taskDate: string;
   status: string;
   posterId: string;
+  poster: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    photo?: string;
+  };
+  offerCount: number;
 };

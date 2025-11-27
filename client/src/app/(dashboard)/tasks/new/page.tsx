@@ -1,117 +1,138 @@
-'use client'; 
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+"use client";
+import React, { useState } from 'react';
+import Title from './title/Title';
+import DateStep from './date/Date';
+import Location from './location/Location';
+import Details from './details/Details';
+import Budget from './budget/Budget';
 import { createTask } from '@/services/task.service';
-import { getMyProfile } from '@/services/account.service';
-import { TaskRequest, Account } from '@/lib/types';
+import { useRouter } from 'next/navigation';
 
 export default function NewTaskPage() {
-  const [account, setAccount] = useState<Account | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Estado de carga unificado
+  const [step, setStep] = useState(0);
+  const [title, setTitle] = useState('');
+  const [date, setDate] = useState('');
+  const [location, setLocation] = useState('');
+  const [zip, setZip] = useState(''); // Nuevo estado para el código postal
+  const [details, setDetails] = useState('');
+  const [budget, setBudget] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const router = useRouter();
 
-  // Estados del formulario
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [budget, setBudget] = useState('');
-  const [taskDate, setTaskDate] = useState('');
-  const [address, setAddress] = useState('');
-
-  // Obtener el perfil del usuario para obtener el 'posterId'
-  useEffect(() => {
-    getMyProfile()
-      .then(setAccount)
-      .catch(() => {
-        // Si falla, redirigir a login. El middleware también lo haría, pero esto es más rápido.
-        router.replace('/login');
-      })
-      .finally(() => setIsLoading(false));
-  }, [router]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Handler para crear la tarea
+  const handleCreateTask = async () => {
     setError(null);
-    setSuccessMessage(null);
-
-    if (!account) {
-      setError('No se pudo verificar la identidad del usuario. Por favor, inicie sesión de nuevo.');
-      return;
-    }
-
-    setIsLoading(true); // Inicia el estado de carga
-
     try {
-      const taskRequest: TaskRequest = {
+      // Construir el objeto TaskRequest
+      const taskData = {
         title,
-        description,
-        budget: parseFloat(budget) || 0,
-        taskDate: taskDate,
+        description: details,
+        budget: Number(budget),
         location: {
-          address: address,
-          city: 'Arequipa',
-          country: 'Peru',
-        }
+          latitude: 0,
+          longitude: 0,
+          address: location,
+          zip: Number(zip)
+        },
+        taskDate: date,
       };
-      
-      const newTask = await createTask(taskRequest);
-      
-      setSuccessMessage(`¡Tarea "${newTask.title}" creada! Redirigiendo...`);
-
-      // Redirigir a la página de la nueva tarea después de un breve momento
-      setTimeout(() => {
-        router.push(`/tasks/${newTask.id}`);
-      }, 2000);
-
+      await createTask(taskData);
+      router.push('/dashboard');
     } catch (err) {
       setError((err as Error).message);
-      setIsLoading(false); // Detiene la carga si hay un error
     }
-    // No detenemos la carga en caso de éxito, porque la página va a redirigir
   };
 
-  // Muestra un estado de carga general mientras se obtiene el perfil
-  if (isLoading && !account) {
-    return <div>Cargando tu información...</div>;
-  }
+  const steps = [
+    <Title
+      key="title"
+      title={title}
+      setTitle={setTitle}
+      onNext={() => setStep(1)}
+    />,
+    <DateStep
+      key="date"
+      date={date}
+      setDate={setDate}
+      onBack={() => setStep(0)}
+      onNext={() => setStep(2)}
+    />,
+    <Location
+      key="location"
+      location={location}
+      onBack={() => setStep(1)}
+      onNext={(data) => {
+        setLocation(data.location);
+        setZip(data.zip);
+        setStep(3);
+      }}
+    />,
+    <Details
+      key="details"
+      details={details}
+      setDetails={setDetails}
+      onBack={() => setStep(2)}
+      onNext={() => setStep(4)}
+    />,
+    <Budget
+      key="budget"
+      budget={budget}
+      setBudget={setBudget}
+      onBack={() => setStep(3)}
+      onSubmit={handleCreateTask}
+    />,
+  ];
+
+  const stepLabels = ['Título', 'Fecha', 'Ubicación', 'Detalles', 'Precio'];
 
   return (
-    <div>
-      <h1>Crear Nueva Tarea</h1>
-      <form onSubmit={handleSubmit}>
-        {/* ... campos del formulario ... */}
-        <div>
-          <label htmlFor="title">Título:</label>
-          <input id="title" type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
+    <div className="flex flex-col items-center w-full p-4 md:p-6 bg-gray-50 min-h-[70vh]">
+      <div className="w-full max-w-2xl">
+        <h2 className="text-xl font-bold mb-4">Publica una tarea</h2>
+        <div className="mb-6">
+          <div className="flex items-center">
+            {stepLabels.map((label, index) => (
+              <React.Fragment key={label}>
+                <div
+                  className={`flex flex-col items-center ${index < step ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
+                  onClick={() => {
+                    if (index < step) setStep(index);
+                  }}
+                >
+                  <div
+                    className={`flex items-center justify-center w-6 h-6 rounded-full text-base font-semibold ${
+                      step >= index
+                        ? 'bg-black text-white'
+                        : 'bg-gray-300 text-gray-600'
+                    }`}
+                  >
+                    {index + 1}
+                  </div>
+                  <p
+                    className={`mt-1 text-xs text-center ${
+                      step >= index ? 'font-bold text-black' : 'text-gray-500'
+                    }`}
+                  >
+                    {label}
+                  </p>
+                </div>
+                {index < stepLabels.length - 1 && (
+                  <div
+                    className={`flex-auto border-t-2 transition-colors duration-500 ease-in-out ${
+                      step > index ? 'border-black' : 'border-gray-300'
+                    }`}
+                  ></div>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
         </div>
-        <div>
-          <label htmlFor="description">Descripción:</label>
-          <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} required />
-        </div>
-        <div>
-          <label htmlFor="budget">Presupuesto (S/.):</label>
-          <input id="budget" type="number" value={budget} onChange={(e) => setBudget(e.target.value)} required min="0" />
-        </div>
-        <div>
-          <label htmlFor="taskDate">Fecha y Hora:</label>
-          <input id="taskDate" type="date" value={taskDate} onChange={(e) => setTaskDate(e.target.value)} required />
-        </div>
-        <div>
-          <label htmlFor="address">Dirección:</label>
-          <input id="address" type="text" value={address} onChange={(e) => setAddress(e.target.value)} required />
-        </div>
-
-        {/* Mensajes de estado */}
-        {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-        {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
-
-        {/* El botón se deshabilita durante la carga para evitar envíos múltiples */}
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? 'Publicando...' : 'Publicar Tarea'}
-        </button>
-      </form>
+        <main className="bg-white p-6 rounded-lg shadow-md">
+          {steps[step]}
+          {error && <div className="text-red-500 mt-4">{error}</div>}
+        </main>
+      </div>
     </div>
   );
 }

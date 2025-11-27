@@ -26,7 +26,7 @@ export function LogoutButton() {
     // 3. Redirige al usuario a la página de login.
     // Usamos `replace` en lugar de `push` para que el usuario no pueda
     // volver a la página anterior (protegida) usando el botón "atrás" del navegador.
-    router.replace('/login');
+    router.replace('/');
   };
 
   return <button onClick={handleLogout}>Cerrar Sesión</button>;

@@ -1,36 +1,39 @@
-// src/app/(dashboard)/layout.tsx
-// ¡Este archivo se simplifica MUCHO!
-// Ya no es 'async', no usa 'getServerSession', no usa 'redirect'.
-// El middleware se encarga de la protección.
-
 import React from 'react';
-import { Sidebar } from '@/components/shared/Sidebar';
-import { Navbar } from '@/components/shared/Navbar'; // Importamos el Navbar actualizado
+import { AppSidebar } from "@/components/shared/app-sidebar" // <--- Tu nuevo componente
+import { Navbar } from '@/components/shared/Navbar';
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-
-  // No hay lógica de seguridad aquí.
-  // Si el código llega a este layout,
-  // es porque el middleware ya dio permiso.
-
   return (
-    <div style={{ display: 'flex', height: '100vh' }}>
+    // SidebarProvider maneja todo el contexto del sidebar (mobile, desktop, cookies)
+    <SidebarProvider>
       
-      <Sidebar />
+      {/* 1. El Sidebar de Shadcn */}
+      <AppSidebar />
 
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+      {/* 2. El contenido principal */}
+      {/* SidebarInset es un contenedor especial de shadcn que ajusta el ancho automáticamente */}
+      <main className="w-full flex flex-col h-screen overflow-hidden">
         
-        {/* El Navbar ahora es independiente */}
-        <Navbar />
+        {/* NAVBAR */}
+        {/* Agregamos el SidebarTrigger (Hamburguesa) dentro del Navbar o al lado */}
+        <div className="flex items-center border-b bg-background px-4 py-2">
+            <SidebarTrigger className="mr-2 md:hidden" /> {/* Botón hamburguesa solo móvil */}
+            <div className="flex-1">
+                 <Navbar /> {/* Tu navbar existente */}
+            </div>
+        </div>
 
-        <main style={{ padding: '1rem', flex: 1, overflowY: 'auto' }}>
-          {children} {/* Aquí se renderiza la página (ej: tu profile/page.tsx) */}
-        </main>
-      </div>
-    </div>
+        {/* CONTENIDO SCROLLEABLE */}
+        <div className="flex-1 overflow-y-auto p-6">
+           {children}
+        </div>
+
+      </main>
+    </SidebarProvider>
   );
 }

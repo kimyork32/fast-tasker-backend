@@ -1,95 +1,92 @@
-'use client'; 
+"use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link'; // Importar Link
-import { login } from '@/services/account.service'; // Servicio actualizado
-import { LoginRequest } from '@/lib/types'; // DTO actualizado
-import Cookies from 'js-cookie';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { login } from "@/services/account.service";
+import { LoginRequest } from "@/lib/types";
+import Cookies from "js-cookie";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
-  // --- ESTOS ESTADOS SON LA CLAVE ---
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); // Limpiar errores previos
-
+    setError(null);
     try {
-      // 0. Construir el DTO con los datos de los 'useState'
-      const loginData: LoginRequest = { 
-        email: email, 
-        rawPassword: password 
+      const loginData: LoginRequest = {
+        email,
+        rawPassword: password,
       };
-      
-      // 2. Llamar al servicio
-      // El backend establecerá la cookie HttpOnly si es exitoso
-      const loginResponse = await login(loginData); 
-      
-      // 2.2 guardar token de la respuesta en cookie
-      // middleware podrá leer esta cookie
-      Cookies.set('jwtToken', loginResponse.token, {
-        expires: 1, // cookie expira en 1 dia
-        path: '/' // cookie disponible en todo el sitio
-        // secure: process.env.NODE_ENV == 'production' // opcional si se envia por HTTPS en produccion
-      }); 
-
-      console.log('Login exitoso, token guardado. Redirigiendo a /dashboard...');
-
-      // 3. Redirigir al dashboard
-      // router.push refresca la página, lo que
-      // hace que el proxy/middleware se ejecute con la nueva cookie.
-      router.push('/dashboard'); 
-
+      const loginResponse = await login(loginData);
+      Cookies.set("jwtToken", loginResponse.token, {
+        expires: 1,
+        path: "/",
+      });
+      router.push("/dashboard");
     } catch (err) {
-      // Si el servicio 'login' falla (ej. 401 Unauthorized),
-      // el 'apiClient' lanzará un error que atrapamos aquí.
-      console.error(err);
       setError((err as Error).message);
     }
   };
 
   return (
-    <div>
-      <h1>Iniciar Sesión</h1>
-      
-      {/* --- ESTE ES EL FORMULARIO QUE DEBES TENER --- */}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            id="email"
-            type="email"
-            value={email} // Conectado al estado
-            onChange={(e) => setEmail(e.target.value)} // Actualiza el estado
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Contraseña:</label>
-          <input
-            id="password"
-            type="password"
-            value={password} // Conectado al estado
-            onChange={(e) => setPassword(e.target.value)} // Actualiza el estado
-            required
-          />
-        </div>
-        <button type="submit">Entrar</button>
-      </form>
-      {/* --- FIN DEL FORMULARIO --- */}
-
-      {error && (
-        <p style={{ color: 'red' }}>
-          Error: {error}
-        </p>
-      )}
-      <p>
-        ¿No tienes cuenta? <Link href="/signup">Regístrate</Link>
-      </p>
+    <div className="flex min-h-screen items-center justify-center bg-muted/40">
+      <Card className="mx-auto w-full max-w-sm p-6">
+        <CardHeader>
+          <CardTitle className="text-2xl">Iniciar sesión</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="tu@email.com"
+                autoComplete="email"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Contraseña</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+                autoComplete="current-password"
+              />
+            </div>
+            {error && (
+              <div className="text-sm text-red-500">{error}</div>
+            )}
+            <Button type="submit" className="w-full">Entrar</Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col gap-2">
+          <span className="text-sm text-muted-foreground">
+            ¿No tienes cuenta?{' '}
+            <Link href="/signup" className="underline">Regístrate</Link>
+          </span>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

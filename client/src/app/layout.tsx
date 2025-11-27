@@ -1,5 +1,8 @@
+import { Providers } from './providers';
+import "./globals.css";
+import ConditionalNavbar from '@/components/shared/ConditionalNavbar'
 
-export default function DashboardLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -7,7 +10,10 @@ export default function DashboardLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        {children}
+        <Providers>
+          <ConditionalNavbar />
+          {children}
+        </Providers>
       </body>
     </html>
   );
