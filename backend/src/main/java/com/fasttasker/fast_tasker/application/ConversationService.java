@@ -2,6 +2,8 @@ package com.fasttasker.fast_tasker.application;
 
 import com.fasttasker.fast_tasker.application.dto.conversation.ConversationRequest;
 import com.fasttasker.fast_tasker.application.dto.conversation.ConversationSummary;
+import com.fasttasker.fast_tasker.application.dto.conversation.MessageResponse;
+import com.fasttasker.fast_tasker.application.exception.ConversationNotFountException;
 import com.fasttasker.fast_tasker.application.mapper.ConversationMapper;
 import com.fasttasker.fast_tasker.domain.conversation.Conversation;
 import com.fasttasker.fast_tasker.domain.conversation.IConversationRepository;
@@ -42,16 +44,16 @@ public class ConversationService {
     }
 
     /**
-     * get user's inbox
-     * @param userId user id
+     * get tasker's inbox
+     * @param taskerId user id
      * @return list of conversations
      */
     @Transactional(readOnly = true)
-    public List<ConversationSummary> getUserInbox(UUID userId) {
-        return conversationRepository.findByParticipantId(userId).stream()
+    public List<ConversationSummary> getUserInbox(UUID taskerId) {
+        return conversationRepository.findByParticipantId(taskerId).stream()
                 .map(c -> {
                     // calculate other id
-                    UUID otherId = c.getParticipantA().equals(userId) ? c.getParticipantB() : c.getParticipantA();
+                    UUID otherId = c.getParticipantA().equals(taskerId) ? c.getParticipantB() : c.getParticipantA();
                     // get last message
                     MessageContent lastMessageContent = c.getMessages().getLast().getContent();
                     String snippet = "";
@@ -68,6 +70,20 @@ public class ConversationService {
                             snippet
                     );
                 })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     *  get message history
+     * @param conversationId conversation id
+     * @return list of messages
+     */
+    public List<MessageResponse> getHistory(UUID conversationId) {
+        Conversation c = conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new ConversationNotFountException("Conversation Not Found"));
+
+        return c.getMessages().stream()
+                .map(conversationMapper::toMessageResponse)
                 .collect(Collectors.toList());
     }
 }
