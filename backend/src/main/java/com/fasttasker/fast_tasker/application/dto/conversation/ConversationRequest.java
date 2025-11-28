@@ -4,5 +4,6 @@ import java.util.UUID;
 
 public record ConversationRequest(
         UUID taskId,
-        UUID otherUserId
+        UUID participantA,
+        UUID participantB
 ) {}
