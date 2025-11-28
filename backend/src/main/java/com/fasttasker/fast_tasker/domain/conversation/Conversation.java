@@ -38,7 +38,7 @@ public class Conversation {
     private UUID participantB;
 
     @OneToMany(mappedBy = "conversation", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Message> messages = new ArrayList<>();
+    private List<Message> messages;
 
     @Enumerated(EnumType.STRING)
     private ConversationStatus status;
