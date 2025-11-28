@@ -92,12 +92,12 @@ public class ConversationService {
     }
 
     @Transactional
-    public void processAndSendMessage(MessageRequest messageRequest) {
+    public void processAndSendMessage(MessageRequest messageRequest, UUID senderIdFromToken) {
         Conversation conversation = conversationRepository.findById(messageRequest.conversationId())
                 .orElseThrow(() -> new ConversationNotFountException("Conversation Not Found"));
 
         var messageContent = conversationMapper.toMessageContentEntity(messageRequest.content());
-        conversation.sendMessage(messageRequest.senderId(), messageContent);
+        conversation.sendMessage(senderIdFromToken, messageContent);
 
         // save and notifying
         Conversation savedConversation = conversationRepository.save(conversation);
