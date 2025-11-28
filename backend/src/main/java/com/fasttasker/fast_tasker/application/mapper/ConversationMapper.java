@@ -1,9 +1,6 @@
 package com.fasttasker.fast_tasker.application.mapper;
 
-import com.fasttasker.fast_tasker.application.dto.conversation.ConversationRequest;
-import com.fasttasker.fast_tasker.application.dto.conversation.MessageContentResponse;
-import com.fasttasker.fast_tasker.application.dto.conversation.MessageRequest;
-import com.fasttasker.fast_tasker.application.dto.conversation.MessageResponse;
+import com.fasttasker.fast_tasker.application.dto.conversation.*;
 import com.fasttasker.fast_tasker.domain.conversation.Conversation;
 import com.fasttasker.fast_tasker.domain.conversation.ConversationStatus;
 import com.fasttasker.fast_tasker.domain.conversation.Message;
@@ -27,14 +24,19 @@ public class ConversationMapper {
                 ConversationStatus.OPEN
         );
     }
+    public MessageContent toMessageContentEntity(MessageContentRequest request) {
+        if (request == null) return null;
+
+        return new MessageContent(
+                request.text(),
+                request.attachmentUrl()
+        );
+    }
 
     public Message toMessageEntity(MessageRequest request) {
         if (request == null) return null;
 
-        var messageContent = new MessageContent(
-                request.content().text(),
-                request.content().attachmentUrl()
-        );
+        MessageContent messageContent = toMessageContentEntity(request.content());
 
         return new Message(
                 UUID.randomUUID(), // WARNING: this not is the ID
