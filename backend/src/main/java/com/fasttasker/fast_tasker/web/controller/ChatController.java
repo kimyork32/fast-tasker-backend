@@ -1,13 +1,16 @@
 package com.fasttasker.fast_tasker.web.controller;
 
 import com.fasttasker.fast_tasker.application.ConversationService;
+import com.fasttasker.fast_tasker.application.dto.conversation.ConversationRequest;
 import com.fasttasker.fast_tasker.application.dto.conversation.ConversationSummary;
 import com.fasttasker.fast_tasker.application.dto.conversation.MessageRequest;
+import com.fasttasker.fast_tasker.application.dto.conversation.StartChatRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
@@ -37,10 +40,38 @@ public class ChatController {
         conversationService.processAndSendMessage(messageRequest, senderId);
     }
 
+    /**
+     * Retrieves the user's chat list
+     * @param authentication token
+     * @return list of conversations
+     */
     @GetMapping("/api/v1/conversations/inbox")
     public ResponseEntity<List<ConversationSummary>> getInbox(Authentication authentication) {
         // extract ID of the token
         UUID taskerId = UUID.fromString(authentication.getName());
         return ResponseEntity.ok(conversationService.getUserInbox(taskerId));
+    }
+
+    /**
+     * start a new conversation or securely resume an existing one
+     * @param request request from frontend
+     * @param authentication token
+     * @return conversation id
+     */
+    @GetMapping("api/v1/conversations/start")
+    public ResponseEntity<UUID> startChat(
+            @RequestBody StartChatRequest request,
+            Authentication authentication
+    ) {
+        UUID participantA = UUID.fromString(authentication.getName()); // obtain userId from the token
+        UUID participantB = request.targetUserId();
+
+        ConversationRequest secureRequest = new ConversationRequest(
+                request.taskId(),
+                participantA,
+                participantB
+        );
+
+        return ResponseEntity.ok(conversationService.startConversation(secureRequest));
     }
 }
