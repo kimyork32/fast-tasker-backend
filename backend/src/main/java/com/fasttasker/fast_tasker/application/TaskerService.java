@@ -23,8 +23,8 @@ public class TaskerService {
     private final ITaskRepository taskRepository;
     private final TaskerMapper taskerMapper;
 
-
-    public TaskerService(ITaskerRepository taskerRepository, IAccountRepository accountRepository, ITaskRepository taskRepository, TaskerMapper taskerMapper) {
+    public TaskerService(ITaskerRepository taskerRepository, IAccountRepository accountRepository,
+            ITaskRepository taskRepository, TaskerMapper taskerMapper) {
         this.taskerRepository = taskerRepository;
         this.accountRepository = accountRepository;
         this.taskRepository = taskRepository;
@@ -68,6 +68,7 @@ public class TaskerService {
 
     /**
      * get TaskerResponse by account id
+     * 
      * @param accountId
      * @return
      */
@@ -85,7 +86,7 @@ public class TaskerService {
     }
 
     /**
-     * @param taskerId 
+     * @param taskerId
      * @param taskId
      */
     public void assignTaskToTasker(UUID taskerId, UUID taskId) {
