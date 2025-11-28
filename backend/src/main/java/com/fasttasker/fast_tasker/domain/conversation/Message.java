@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "message")
+@Table(name = "messages")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -16,6 +16,7 @@ import java.util.UUID;
 public class Message {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     /**
@@ -31,8 +32,8 @@ public class Message {
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "text", column = @Column(name = "text", nullable = false)),
-            @AttributeOverride(name = "attachmentUrl", column = @Column(name = "attachmentUrl", nullable = false))
+            @AttributeOverride(name = "text", column = @Column(name = "text")),
+            @AttributeOverride(name = "attachmentUrl", column = @Column(name = "attachmentUrl"))
     })
     private MessageContent content;
 
@@ -46,10 +47,20 @@ public class Message {
     private Instant readAt;
 
     /**
+     * semantic construct
+     */
+    public Message(Conversation conversation, UUID senderId, MessageContent content) {
+        this.conversation = conversation;
+        this.senderId = senderId;
+        this.content = content;
+        this.sentAt = Instant.now();
+    }
+
+    /**
      * mark as read in this time
      */
     public void markAsRead() {
-        if (readAt != null) {
+        if (readAt == null) {
             readAt = Instant.now();
         }
     }
