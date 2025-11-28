@@ -40,5 +40,6 @@ public class Conversation {
     @OneToMany(mappedBy = "conversation", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages = new ArrayList<>();
 
-
+    @Enumerated(EnumType.STRING)
+    private ConversationStatus status;
 }
