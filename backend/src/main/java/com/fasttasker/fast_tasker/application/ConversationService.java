@@ -7,7 +7,6 @@ import com.fasttasker.fast_tasker.application.exception.ConversationNotFountExce
 import com.fasttasker.fast_tasker.application.mapper.ConversationMapper;
 import com.fasttasker.fast_tasker.domain.conversation.Conversation;
 import com.fasttasker.fast_tasker.domain.conversation.IConversationRepository;
-import com.fasttasker.fast_tasker.domain.conversation.Message;
 import com.fasttasker.fast_tasker.domain.conversation.MessageContent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
