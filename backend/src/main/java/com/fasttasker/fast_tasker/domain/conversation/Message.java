@@ -50,6 +50,16 @@ public class Message {
      * semantic construct
      */
     public Message(Conversation conversation, UUID senderId, MessageContent content) {
+        if (conversation == null) {
+            throw new IllegalArgumentException("conversation cannot be null");
+        }
+        if (senderId == null) {
+            throw new IllegalArgumentException("senderId cannot be null");
+        }
+        if (content == null) {
+            throw new IllegalArgumentException("content cannot be null");
+        }
+
         this.conversation = conversation;
         this.senderId = senderId;
         this.content = content;
