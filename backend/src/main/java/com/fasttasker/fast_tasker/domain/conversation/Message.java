@@ -1,10 +1,7 @@
 package com.fasttasker.fast_tasker.domain.conversation;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -15,10 +12,19 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString(exclude = "conversation")
 public class Message {
 
     @Id
     private UUID id;
+
+    /**
+     * add conversation attribute for bidirectional relation with the conversation (father)
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "conversation_id", nullable = false)
+    private Conversation conversation;
+
 
     @Column(name = "sender_id", nullable = false)
     private UUID senderId;
