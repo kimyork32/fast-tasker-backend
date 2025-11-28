@@ -38,8 +38,25 @@ public class Conversation {
     private UUID participantB;
 
     @OneToMany(mappedBy = "conversation", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Message> messages;
+    private List<Message> messages = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private ConversationStatus status;
+
+    public void sendMessage(UUID senderId, MessageContent content) {
+
+        // validations
+        if (this.status == ConversationStatus.CLOSED) {
+            throw new IllegalStateException("cannot send messages in a closed chat");
+        }
+
+        // verify if the participant is the sender
+        if (!senderId.equals(participantA) && !senderId.equals(participantB)) {
+            throw new IllegalArgumentException("the user " + senderId + " is not a participant of this conversation");
+        }
+
+        // create and save message
+        Message newMessage = new Message(this, senderId, content);
+        this.messages.add(newMessage);
+    }
 }
