@@ -3,6 +3,7 @@ package com.fasttasker.fast_tasker.domain.conversation;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,5 +38,7 @@ public class Conversation {
     private UUID participantB;
 
     @OneToMany(mappedBy = "conversation", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Message> messages;
+    private List<Message> messages = new ArrayList<>();
+
+
 }
