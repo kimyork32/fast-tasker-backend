@@ -157,9 +157,9 @@ public class AccountService {
         // calculate if the profile is complete.
         // NOTE: This should be factored out
         boolean profileCompleted = tasker.getProfile().getFirstName() != null && !tasker.getProfile().getFirstName().isBlank()
-                && tasker.getProfile().getLastName() != null && !tasker.getProfile().getLastName().isBlank()
-                && tasker.getProfile().getPhoto() != null && !tasker.getProfile().getPhoto().isBlank();
+                && tasker.getProfile().getLastName() != null && !tasker.getProfile().getLastName().isBlank();
 
+        System.out.println("AccountService. login. profileCompleted: " + profileCompleted);
 
         // return a JWT token
         String token = jwtService.generateToken(account.getTaskerId(), profileCompleted);
