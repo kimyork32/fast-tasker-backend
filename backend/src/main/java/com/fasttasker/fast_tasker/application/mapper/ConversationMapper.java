@@ -39,9 +39,9 @@ public class ConversationMapper {
         MessageContent messageContent = toMessageContentEntity(request.content());
 
         return new Message(
-                UUID.randomUUID(), // WARNING: this not is the ID
+                UUID.randomUUID(), // WARNING: this not is the ID real
                 null,
-                request.senderId(),
+                UUID.randomUUID(), // WARNING: this not is the ID real
                 messageContent,
                 null,
                 null
