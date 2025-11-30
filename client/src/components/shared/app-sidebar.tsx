@@ -17,7 +17,8 @@ import {
   Sparkles,
   BadgeCheck,
   Wallet,
-  Bell
+  Bell,
+  MessageCircle
 } from "lucide-react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
@@ -57,6 +58,7 @@ const navMain = [
   { title: "Explorar Tareas", url: "/tasks", icon: Compass },
   { title: "Crear Tarea", url: "/tasks/new", icon: PlusCircle },
   { title: "Mis Tareas", url: "/tasks/my", icon: CheckSquare },
+  { title: "Chat", url: "/chat", icon: MessageCircle },
   { title: "Mi Perfil", url: "/profile", icon: UserIcon },
 ]
 
@@ -74,6 +76,7 @@ export function AppSidebar() {
     getMyProfile()
       .then((data) => {
         if (mounted) setProfile(data)
+        console.log(`data: ${JSON.stringify(data)}`)
       })
       .catch(() => {
         // ignore errors for now; keep default placeholder
@@ -81,6 +84,7 @@ export function AppSidebar() {
     return () => { mounted = false }
   }, [])
 
+  console.log(`profile: ${JSON.stringify(profile)}`)
   const displayName = profile?.profile?.firstName
     ? `${profile.profile.firstName} ${profile.profile.lastName ?? ''}`
     : profile?.email ?? 'shadcn'
@@ -169,7 +173,7 @@ export function AppSidebar() {
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">{displayName}</span>
-                    <span className="truncate text-xs">{displayEmail}</span>
+                    
                   </div>
                   <ChevronsUpDown className="ml-auto size-4" />
                 </SidebarMenuButton>
@@ -182,19 +186,7 @@ export function AppSidebar() {
                 align="end"
                 sideOffset={4}
               >
-                <DropdownMenuLabel className="p-0 font-normal">
-                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                    <Avatar className="h-8 w-8 rounded-lg">
-                      {photo ? <AvatarImage src={photo} alt={displayName} /> : null}
-                      <AvatarFallback className="rounded-lg"><UserIcon className="h-4 w-4" /></AvatarFallback>
-                    </Avatar>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">{displayName}</span>
-                      <span className="truncate text-xs">{displayEmail}</span>
-                    </div>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
+                
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
                     <Link href="/wallet" className="flex items-center w-full">

@@ -40,6 +40,7 @@ export const register = (data: SignupRequest): Promise<SignupResponse> => {
  * Obtiene el perfil del usuario actualmente logueado.
  */
 export const getMyProfile = (): Promise<Account> => {
+  console.log("getMyProfile called");
   return apiClient<Account>(`${USER_PREFIX}/user/me`, {
     method: 'GET',
   }, true); // withCredentials = true (¡necesita la cookie 'jwtToken'!)

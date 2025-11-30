@@ -92,3 +92,33 @@ export type TaskResponse = {
   };
   offerCount: number;
 };
+
+// --- DTOs de Chat ---
+export interface MessageContent {
+  text?: string;
+  attachmentUrl?: string;
+}
+
+export interface Message {
+  id: string;
+  senderId: string;
+  content: MessageContent;
+  sentAt: string; // ISO String (Instant)
+  isRead: boolean;
+}
+
+export interface ConversationSummary {
+  conversationId: string;
+  taskId: string;
+  otherParticipantId: string;
+  lastMessageSnippet: string;
+}
+
+// Payload para enviar al socket
+export interface SendMessageRequest {
+  conversationId: string;
+  content: {
+    text: string;
+    attachmentUrl: string | null;
+  };
+}
