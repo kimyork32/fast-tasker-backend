@@ -2,8 +2,8 @@
 "use client";
 
 import { useState, useEffect, use } from 'react';
-import { getTaskById } from '@/services/task.service';
-import { TaskResponse } from '@/lib/types';
+import { getTaskById, createOffer, getOffersByTask } from '@/services/task.service';
+import { OfferRequest, OfferProfileResponse, TaskResponse } from '@/lib/types';
 import Link from 'next/link';
 
 type TaskDetailPageProps = {
@@ -20,12 +20,58 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
   // Nuevo Estado para el Modal de Oferta
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
 
+  // estados para las ofertas
+  const [offers, setOffers] = useState<OfferProfileResponse[]>([]);
+  const [isLoadingOffers, setIsLoadingOffers] = useState(false);
+
+  // Estados para el formulario de la oferta
+  const [offerPrice, setOfferPrice] = useState<number>(0);
+  const [offerMessage, setOfferMessage] = useState('');
+
   useEffect(() => {
     getTaskById(taskId)
       .then(setTask)
       .catch(console.error)
       .finally(() => setIsLoading(false));
   }, [taskId]);
+
+  // Cargar ofertas cuando la pestaña de ofertas se activa
+  useEffect(() => {
+    if (activeTab === 'offers' && taskId) {
+      setIsLoadingOffers(true);
+      getOffersByTask(taskId)
+        .then(setOffers)
+        .catch(console.error)
+        .finally(() => setIsLoadingOffers(false));
+    }
+  }, [activeTab, taskId]);
+
+  // Setea el precio inicial cuando el modal se abre y la tarea está cargada
+  useEffect(() => {
+    if (isOfferModalOpen && task?.budget) {
+      setOfferPrice(task.budget);
+    }
+  }, [isOfferModalOpen, task]);
+
+  const handleOfferSubmit = async () => {
+    if (!task) return;
+
+    const offerRequest: OfferRequest = {
+      price: offerPrice,
+      description: offerMessage,
+    };
+
+    try {
+      const newOffer = await createOffer(task.id, offerRequest);
+      setOffers(prevOffers => [newOffer, ...prevOffers]); // 1. Actualiza el estado de ofertas
+      setActiveTab('offers'); // 2. Cambia a la pestaña de ofertas
+      setIsOfferModalOpen(false);
+      // Opcional: podrías querer recargar los datos de la tarea para ver la nueva oferta
+    } catch (error) {
+      console.error("Error al crear la oferta:", error);
+      alert("Hubo un error al enviar tu oferta. Inténtalo de nuevo.");
+    }
+  };
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-gray-100"><div className="w-8 h-8 border-4 border-gray-300 border-t-black rounded-full animate-spin"></div></div>;
   if (!task) return <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-500">No se encontró la tarea.</div>;
@@ -140,7 +186,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
                     activeTab === 'offers' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  Ofertas (0)
+                  Ofertas ({offers.length > 0 ? offers.length : task.offerCount})
                 </button>
                 <button 
                   onClick={() => setActiveTab('questions')}
@@ -154,16 +200,50 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
 
             <div className="px-6 pb-8 min-h-[200px]">
                {activeTab === 'offers' ? (
-                 <div className="flex flex-col items-center justify-center h-full space-y-3 py-8">
-                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100">
-                        <svg className="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>
-                    </div>
-                    <p className="text-gray-500 font-medium">No hay ofertas todavía</p>
-                 </div>
+                 isLoadingOffers ? (
+                   <div className="flex justify-center items-center py-8"><div className="w-6 h-6 border-2 border-gray-200 border-t-black rounded-full animate-spin"></div></div>
+                 ) : offers.length > 0 ? (
+                   <div className="space-y-6">
+                     {offers.filter(op => op && op.offer).map((offerProfile) => (
+                       <div key={offerProfile.offer.id.toString()} className="flex gap-4 p-4 border border-gray-100 rounded-2xl">
+                         <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-500 shrink-0">
+                           {offerProfile.profile?.photo ? (
+                             <img src={offerProfile.profile.photo} alt={`${offerProfile.profile.firstName}`} className="w-full h-full rounded-full object-cover" />
+                           ) : (
+                             <span>
+                               {offerProfile.profile ? `${offerProfile.profile.firstName.charAt(0)}${offerProfile.profile.lastName.charAt(0)}` : '??'}
+                             </span>
+                           )}
+                         </div>
+                         <div className="flex-1">
+                           <div className="flex justify-between items-start">
+                             <div>
+                               <p className="font-bold text-gray-900">
+                                 {offerProfile.profile ? `${offerProfile.profile.firstName} ${offerProfile.profile.lastName}` : 'Usuario Anónimo'}
+                               </p>
+                               <p className="text-sm text-gray-500 mt-1">{offerProfile.offer?.description.toString() || 'El ofertante no incluyó un mensaje.'}</p>
+                             </div>
+                             <div className="text-right shrink-0 pl-4">
+                               <p className="text-xl font-bold text-gray-900">S/. {offerProfile.offer?.price || 'N/A'}</p>
+                               <p className="text-xs text-gray-400">hace 1h</p>
+                             </div>
+                           </div>
+                         </div>
+                       </div>
+                     ))}
+                   </div>
+                 ) : (
+                   <div className="flex flex-col items-center justify-center h-full space-y-3 py-8">
+                     <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100">
+                       <svg className="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>
+                     </div>
+                     <p className="text-gray-500 font-medium">No hay ofertas todavía</p>
+                   </div>
+                 )
                ) : (
                  // --- AQUÍ ESTÁ LA NUEVA SECCIÓN DE PREGUNTAS TIPO COMENTARIO ---
                  <div className="max-w-3xl">
-                    
+                   
                     {/* Caja para escribir pregunta */}
                     <div className="flex gap-4 mb-10">
                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0">YO</div>
@@ -261,7 +341,8 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
                    <label className="block text-xs font-bold text-gray-700 uppercase mb-2">Tu precio (S/.)</label>
                    <input 
                       type="number" 
-                      defaultValue={task?.budget}
+                      value={offerPrice}
+                      onChange={(e) => setOfferPrice(Number(e.target.value))}
                       className="w-full text-3xl font-bold border-b-2 border-gray-200 focus:border-black outline-none py-2 px-1 text-gray-900"
                    />
                 </div>
@@ -269,6 +350,8 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
                 <div>
                    <label className="block text-xs font-bold text-gray-700 uppercase mb-2 mt-4">Mensaje para el cliente</label>
                    <textarea 
+                      value={offerMessage} // Vinculado al estado correcto
+                      onChange={(e) => setOfferMessage(e.target.value)} // Actualiza el estado correcto
                       className="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none min-h-[100px]"
                       placeholder="Hola, me gustaría ayudarte con esto. Tengo experiencia en..."
                    ></textarea>
@@ -277,10 +360,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
                 <div className="pt-4">
                    <button 
                       className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-green-900/10 transition transform active:scale-[0.98]"
-                      onClick={() => {
-                         alert("¡Oferta enviada con éxito!");
-                         setIsOfferModalOpen(false);
-                      }}
+                      onClick={handleOfferSubmit}
                    >
                       Enviar Oferta
                    </button>

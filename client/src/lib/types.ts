@@ -50,7 +50,17 @@ export type ProfileData = {
   photo?: string;
   about?: string;
   location: LocationData
-};
+}
+
+export interface MinimalProfileData {
+  firstName: string;
+  lastName: string;
+  photo?: string;
+  about?: string;
+  reputation: number;
+  clientReviews: number;
+  completedTasks: number;
+}
 
 // --- DTOS de Complete Profile ---
 export type CompleteProfileRequest = {
@@ -91,7 +101,7 @@ export type TaskResponse = {
     photo?: string;
   };
   offerCount: number;
-};
+}
 
 // --- DTOs de Chat ---
 export interface MessageContent {
@@ -121,4 +131,25 @@ export interface SendMessageRequest {
     text: string;
     attachmentUrl: string | null;
   };
+}
+
+// -- DTOs offer ---
+
+export interface OfferRequest {
+  price: number;
+  description: string;
+}
+
+
+export interface OfferResponse {
+  id: String;
+  price: number;
+  description: String;
+  status: String;
+  createAt: String;
+}
+
+export interface OfferProfileResponse {
+  offer: OfferResponse;
+  profile: MinimalProfileData;
 }

@@ -1,5 +1,12 @@
 import { apiClient } from '@/lib/apiClient';
-import { TaskResponse, TaskRequest } from '@/lib/types';
+import { 
+  TaskResponse, 
+  TaskRequest,
+  OfferRequest,
+  OfferResponse,
+  OfferProfileResponse
+
+} from '@/lib/types';
 
 // Asumiendo que todos tus endpoints de tareas están en /tasks
 const TASK_PREFIX = '/api/v1/tasks';
@@ -56,3 +63,22 @@ export const deleteTask = (id: string): Promise<void> => {
     method: 'DELETE',
   }, true);  // withCredentials = true
 };
+
+/**
+ * crear oferta
+ */
+export const createOffer = (taskId: string, data: OfferRequest) : Promise<OfferProfileResponse> => {
+  return apiClient<OfferProfileResponse>(`${TASK_PREFIX}/${taskId}/offers`,{
+    method: 'POST',
+    body: JSON.stringify(data),
+  }, true);
+}
+
+/** 
+ * obteer ofertas por task
+ */
+export const getOffersByTask = (taskId: string) : Promise<OfferProfileResponse[]> => {
+  return apiClient<OfferProfileResponse[]>(`${TASK_PREFIX}/${taskId}/offers`,{
+    method: 'GET',
+  }, true);
+}
