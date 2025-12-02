@@ -1,10 +1,8 @@
 package com.fasttasker.fast_tasker.application.mapper;
 
-import com.fasttasker.fast_tasker.application.dto.task.OfferRequest;
-import com.fasttasker.fast_tasker.application.dto.task.OfferResponse;
-import com.fasttasker.fast_tasker.application.dto.task.TaskRequest;
-import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
+import com.fasttasker.fast_tasker.application.dto.task.*;
 import com.fasttasker.fast_tasker.application.dto.tasker.LocationResponse;
+import com.fasttasker.fast_tasker.application.dto.tasker.MinimalProfileResponse;
 import com.fasttasker.fast_tasker.domain.task.Offer;
 import com.fasttasker.fast_tasker.domain.task.Task;
 import com.fasttasker.fast_tasker.domain.task.TaskStatus;
@@ -59,27 +57,34 @@ public class TaskMapper {
                 .address(location.getAddress())
                 .build();
 
-        return new TaskResponse(
-                task.getId().toString(),
-                task.getTitle(),
-                task.getDescription(),
-                task.getBudget(),
-                locationResponse,
-                task.getTaskDate().toString(),
-                task.getStatus().name(),
-                task.getPosterId().toString()
-        );
+        return TaskResponse.builder()
+                .id(task.getId().toString())
+                .title(task.getTitle())
+                .description(task.getDescription())
+                .budget(task.getBudget())
+                .location(locationResponse)
+                .taskDate(task.getTaskDate().toString())
+                .status(task.getStatus().name())
+                .posterId(task.getPosterId().toString())
+                .build();
     }
 
     public OfferResponse toOfferResponse(Offer offer) {
         if (offer == null) return null;
 
-        return new OfferResponse(
-                offer.getId(),
-                offer.getPrice(),
-                offer.getDescription(),
-                offer.getStatus(),
-                offer.getCreatedAt()
-        );
+        return OfferResponse.builder()
+                .id(offer.getId().toString())
+                .price(offer.getPrice())
+                .description(offer.getDescription())
+                .status(offer.getStatus().name())
+                .createAt(offer.getCreatedAt().toString())
+                .build();
+    }
+
+    public OfferProfileResponse toOfferProfileResponse(
+            OfferResponse offer,
+            MinimalProfileResponse profile
+    ) {
+        return new OfferProfileResponse(offer, profile);
     }
 }
