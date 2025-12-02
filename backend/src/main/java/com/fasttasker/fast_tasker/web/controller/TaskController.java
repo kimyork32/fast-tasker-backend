@@ -72,4 +72,10 @@ public class TaskController {
         OfferResponse offerResponse = taskService.createOffer(offerRequest, taskId, accountId);
         return ResponseEntity.status(HttpStatus.CREATED).body(offerResponse);
     }
+
+    @GetMapping("/{taskId}/offers")
+    public ResponseEntity<List<OfferResponse>> getAllOffersByTask(@PathVariable ("taskId") UUID taskId) {
+        List<OfferResponse> offers = taskService.listOffersByTask(taskId);
+        return ResponseEntity.ok(offers);
+    }
 }
