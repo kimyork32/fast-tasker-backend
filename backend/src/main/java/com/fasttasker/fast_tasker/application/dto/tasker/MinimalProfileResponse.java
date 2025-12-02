@@ -1,9 +1,12 @@
 package com.fasttasker.fast_tasker.application.dto.tasker;
 
+import lombok.Builder;
+
 /**
  * DTO with minimal attributes of the profile, its will send to offer
  * and question
  */
+@Builder
 public record MinimalProfileResponse(
         String firstName,
         String lastName,
