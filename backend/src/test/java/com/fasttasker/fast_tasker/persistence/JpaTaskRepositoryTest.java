@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ class JpaTaskRepositoryTest {
         // created offer
         UUID offerId = UUID.randomUUID();
         UUID bidder =  UUID.randomUUID();
-        LocalDateTime  createdAtOffer = LocalDate.parse("2020-04-21").atStartOfDay();
+        Instant createdAtOffer = Instant.parse("2020-04-21T05:00:00Z");
         Offer newOffer = new Offer(
                 offerId,
                 180,
@@ -82,7 +83,7 @@ class JpaTaskRepositoryTest {
         // created question
         UUID questionId = UUID.randomUUID();
         UUID askingById =  UUID.randomUUID();
-        LocalDateTime askingAtQuestion = LocalDate.parse("2020-04-20").atStartOfDay();
+        Instant askingAtQuestion = Instant.parse("2020-04-21T07:00:00Z");
         Question newQuestion = new Question(
                 questionId,
                 "description for question",
