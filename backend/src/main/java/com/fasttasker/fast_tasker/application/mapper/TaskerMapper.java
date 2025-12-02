@@ -65,6 +65,21 @@ public class TaskerMapper {
                 .build();
     }
 
+    public MinimalProfileResponse toMinimalProfileResponse(Tasker tasker) {
+        if (tasker == null) return null;
+
+        var profile = tasker.getProfile();
+
+        return MinimalProfileResponse.builder()
+                .firstName(profile.getFirstName())
+                .lastName(profile.getLastName())
+                .photo(profile.getPhoto())
+                .reputation(profile.getReputation())
+                .clientReviews(profile.getClientReviews())
+                .completedTasks(profile.getCompletedTasks())
+                .build();
+    }
+
     public Profile toProfileEntity(ProfileRequest request) {
         if (request == null) return null;
 
