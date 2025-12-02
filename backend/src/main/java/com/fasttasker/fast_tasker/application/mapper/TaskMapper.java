@@ -1,6 +1,7 @@
 package com.fasttasker.fast_tasker.application.mapper;
 
 import com.fasttasker.fast_tasker.application.dto.task.OfferRequest;
+import com.fasttasker.fast_tasker.application.dto.task.OfferResponse;
 import com.fasttasker.fast_tasker.application.dto.task.TaskRequest;
 import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.LocationResponse;
@@ -70,4 +71,15 @@ public class TaskMapper {
         );
     }
 
+    public OfferResponse toOfferResponse(Offer offer) {
+        if (offer == null) return null;
+
+        return new OfferResponse(
+                offer.getId(),
+                offer.getPrice(),
+                offer.getDescription(),
+                offer.getStatus(),
+                offer.getCreatedAt()
+        );
+    }
 }
