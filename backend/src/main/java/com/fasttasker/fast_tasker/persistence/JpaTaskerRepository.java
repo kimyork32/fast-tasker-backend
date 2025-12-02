@@ -16,6 +16,4 @@ public interface JpaTaskerRepository extends JpaRepository<Tasker, UUID> {
 
     Optional<Tasker> findByAccountId(UUID accountId);
 
-    List<Tasker> findAllById(List<UUID> ids);
-
 }
