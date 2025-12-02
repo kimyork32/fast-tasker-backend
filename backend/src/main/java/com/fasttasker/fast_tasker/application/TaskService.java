@@ -117,15 +117,15 @@ public class TaskService {
      * @param accountId id of the tasker, find the taskId with this
      */
     @Transactional
-    public OfferResponse createOffer(OfferRequest offerRequest, UUID taskId, UUID accountId) {
-        // find taskerId with the account
+    public OfferProfileResponse createOffer(OfferRequest offerRequest, UUID taskId, UUID accountId) {
+        // find taskerId with the accountId
         Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+                .orElseThrow(() -> new AccountNotFoundException("TaskerService. Account not found"));
         UUID taskerId = account.getTaskerId();
 
         // find task
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("TaskerService. Task not found"));
 
         Offer offer = taskMapper.toOfferEntity(offerRequest);
         // insert values of the offer
@@ -142,7 +142,14 @@ public class TaskService {
         // Find the newly added offer from the saved task entity to ensure we return the persisted state.
         Offer savedOffer = savedTask.getOffers().stream()
                 .filter(o -> o.getId().equals(offer.getId())).findFirst().orElse(offer);
-        return taskMapper.toOfferResponse(savedOffer);
+
+        Tasker tasker = taskerRepository.findById(taskerId)
+                .orElseThrow(() -> new TaskNotFoundException("TaskerService. Tasker not found"));
+
+        MinimalProfileResponse  profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
+        OfferResponse offerResponse = taskMapper.toOfferResponse(offer);
+
+        return taskMapper.toOfferProfileResponse(offerResponse, profileResponse);
     }
 
     /**
