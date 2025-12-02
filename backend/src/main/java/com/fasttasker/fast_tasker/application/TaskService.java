@@ -141,6 +141,21 @@ public class TaskService {
     }
 
     /**
+     * get the list of the offer by taskId
+     * @param taskId task id
+     * @return list of offer
+     */
+    @Transactional(readOnly = true)
+    public List<OfferResponse> listOffersByTask(UUID taskId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found"));
+        // cool
+        return task.getOffers().stream()
+                .map(taskMapper::toOfferResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * @param taskId 
      * @param offerId
      */
