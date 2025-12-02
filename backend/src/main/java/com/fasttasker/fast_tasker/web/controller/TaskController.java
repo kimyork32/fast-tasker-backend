@@ -1,6 +1,8 @@
 package com.fasttasker.fast_tasker.web.controller;
 
 import com.fasttasker.fast_tasker.application.TaskService;
+import com.fasttasker.fast_tasker.application.dto.task.OfferRequest;
+import com.fasttasker.fast_tasker.application.dto.task.OfferResponse;
 import com.fasttasker.fast_tasker.application.dto.task.TaskRequest;
 import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,5 +60,16 @@ public class TaskController {
     public ResponseEntity<TaskResponse> getTask(@PathVariable ("taskId") UUID taskId) {
         TaskResponse taskResponse = taskService.getTaskById(taskId);
         return ResponseEntity.ok(taskResponse);
+    }
+
+    @PostMapping("/{taskId}/offers")
+    public ResponseEntity<OfferResponse> createOffer(
+            @PathVariable UUID taskId,
+            @RequestBody OfferRequest offerRequest,
+            Authentication authentication
+    ) {
+        UUID accountId = (UUID) authentication.getPrincipal();
+        OfferResponse offerResponse = taskService.createOffer(offerRequest, taskId, accountId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(offerResponse);
     }
 }
