@@ -133,7 +133,11 @@ public class TaskService {
         task.getOffers().add(offer);
 
         Task savedTask = taskRepository.save(task);
-        return taskMapper.toOfferResponse(offer);
+
+        // Find the newly added offer from the saved task entity to ensure we return the persisted state.
+        Offer savedOffer = savedTask.getOffers().stream()
+                .filter(o -> o.getId().equals(offer.getId())).findFirst().orElse(offer);
+        return taskMapper.toOfferResponse(savedOffer);
     }
 
     /**
