@@ -2,6 +2,7 @@ package com.fasttasker.fast_tasker.web.controller;
 
 import com.fasttasker.fast_tasker.application.TaskService;
 import com.fasttasker.fast_tasker.application.dto.task.OfferRequest;
+import com.fasttasker.fast_tasker.application.dto.task.OfferProfileResponse;
 import com.fasttasker.fast_tasker.application.dto.task.OfferResponse;
 import com.fasttasker.fast_tasker.application.dto.task.TaskRequest;
 import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
@@ -74,8 +75,8 @@ public class TaskController {
     }
 
     @GetMapping("/{taskId}/offers")
-    public ResponseEntity<List<OfferResponse>> getAllOffersByTask(@PathVariable ("taskId") UUID taskId) {
-        List<OfferResponse> offers = taskService.listOffersByTask(taskId);
+    public ResponseEntity<List<OfferProfileResponse>> getAllOffersByTask(@PathVariable ("taskId") UUID taskId) {
+        List<OfferProfileResponse> offers = taskService.listOffersByTask(taskId);
         return ResponseEntity.ok(offers);
     }
 }
