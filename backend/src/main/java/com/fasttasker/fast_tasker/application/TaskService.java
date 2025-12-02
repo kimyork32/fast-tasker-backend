@@ -1,23 +1,22 @@
 package com.fasttasker.fast_tasker.application;
 
+import com.fasttasker.fast_tasker.application.dto.task.OfferRequest;
 import com.fasttasker.fast_tasker.application.dto.task.TaskRequest;
+import com.fasttasker.fast_tasker.application.dto.task.OfferResponse;
 import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
-import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
 import com.fasttasker.fast_tasker.application.exception.AccountNotFoundException;
-import com.fasttasker.fast_tasker.application.exception.EmailAlreadyExistsException;
 import com.fasttasker.fast_tasker.application.exception.TaskNotFoundException;
 import com.fasttasker.fast_tasker.application.mapper.TaskMapper;
 import com.fasttasker.fast_tasker.domain.account.Account;
+import com.fasttasker.fast_tasker.domain.account.IAccountRepository;
 import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
-import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
-import com.fasttasker.fast_tasker.domain.task.Task;
-import com.fasttasker.fast_tasker.domain.task.TaskStatus;
+import com.fasttasker.fast_tasker.domain.task.*;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -30,16 +29,18 @@ public class TaskService {
     private final ITaskRepository taskRepository;
     private final ITaskerRepository taskerRepository;
     private final INotificationRepository notificationRepository;
+    private final IAccountRepository accountRepository;
     private final TaskMapper taskMapper;
 
     public TaskService(
             ITaskRepository taskRepository,
             ITaskerRepository taskerRepository,
-            INotificationRepository notificationRepository, TaskMapper taskMapper
+            INotificationRepository notificationRepository, IAccountRepository accountRepository, TaskMapper taskMapper
     ) {
         this.taskRepository = taskRepository;
         this.taskerRepository = taskerRepository;
         this.notificationRepository = notificationRepository;
+        this.accountRepository = accountRepository;
         this.taskMapper = taskMapper;
     }
 
@@ -105,13 +106,34 @@ public class TaskService {
     }
 
     /**
-     * @param taskId 
-     * @param taskedId 
-     * @param price 
-     * @param description
+     *
+     * @param offerRequest request of the offer
+     * @param taskId id of the task
+     * @param accountId id of the tasker, find the taskId with this
      */
-    public void createOffer(UUID taskId, UUID taskedId, int price, String description) {
-        // TODO implement here
+    @Transactional
+    public OfferResponse createOffer(OfferRequest offerRequest, UUID taskId, UUID accountId) {
+        // find taskerId with the account
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+        UUID taskerId = account.getTaskerId();
+
+        // find task
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found"));
+
+        Offer offer = taskMapper.toOfferEntity(offerRequest);
+        // insert values of the offer
+        offer.setStatus(OfferStatus.PENDING);
+        offer.setOffertedById(taskerId); // Corrected: Should be the ID of the user making the offer
+        offer.setCreatedAt(Instant.now());
+        offer.setTask(task);
+
+        // add the offer to the task
+        task.getOffers().add(offer);
+
+        Task savedTask = taskRepository.save(task);
+        return taskMapper.toOfferResponse(offer);
     }
 
     /**
