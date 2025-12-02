@@ -64,14 +64,14 @@ public class TaskController {
     }
 
     @PostMapping("/{taskId}/offers")
-    public ResponseEntity<OfferResponse> createOffer(
+    public ResponseEntity<OfferProfileResponse> createOffer(
             @PathVariable UUID taskId,
             @RequestBody OfferRequest offerRequest,
             Authentication authentication
     ) {
         UUID accountId = (UUID) authentication.getPrincipal();
-        OfferResponse offerResponse = taskService.createOffer(offerRequest, taskId, accountId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(offerResponse);
+        OfferProfileResponse offerProfileResponse = taskService.createOffer(offerRequest, taskId, accountId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(offerProfileResponse);
     }
 
     @GetMapping("/{taskId}/offers")
