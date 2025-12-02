@@ -1,23 +1,26 @@
 package com.fasttasker.fast_tasker.application;
 
-import com.fasttasker.fast_tasker.application.dto.task.OfferRequest;
-import com.fasttasker.fast_tasker.application.dto.task.TaskRequest;
-import com.fasttasker.fast_tasker.application.dto.task.OfferResponse;
-import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
+import com.fasttasker.fast_tasker.application.dto.task.*;
+import com.fasttasker.fast_tasker.application.dto.tasker.MinimalProfileResponse;
 import com.fasttasker.fast_tasker.application.exception.AccountNotFoundException;
 import com.fasttasker.fast_tasker.application.exception.TaskNotFoundException;
 import com.fasttasker.fast_tasker.application.mapper.TaskMapper;
+import com.fasttasker.fast_tasker.application.mapper.TaskerMapper;
 import com.fasttasker.fast_tasker.domain.account.Account;
 import com.fasttasker.fast_tasker.domain.account.IAccountRepository;
 import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
 import com.fasttasker.fast_tasker.domain.task.*;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
+import com.fasttasker.fast_tasker.domain.tasker.Tasker;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -31,17 +34,19 @@ public class TaskService {
     private final INotificationRepository notificationRepository;
     private final IAccountRepository accountRepository;
     private final TaskMapper taskMapper;
+    private final TaskerMapper taskerMapper;
 
     public TaskService(
             ITaskRepository taskRepository,
             ITaskerRepository taskerRepository,
-            INotificationRepository notificationRepository, IAccountRepository accountRepository, TaskMapper taskMapper
+            INotificationRepository notificationRepository, IAccountRepository accountRepository, TaskMapper taskMapper, TaskerMapper taskerMapper
     ) {
         this.taskRepository = taskRepository;
         this.taskerRepository = taskerRepository;
         this.notificationRepository = notificationRepository;
         this.accountRepository = accountRepository;
         this.taskMapper = taskMapper;
+        this.taskerMapper = taskerMapper;
     }
 
     /**
@@ -146,13 +151,37 @@ public class TaskService {
      * @return list of offer
      */
     @Transactional(readOnly = true)
-    public List<OfferResponse> listOffersByTask(UUID taskId) {
+    public List<OfferProfileResponse> listOffersByTask(UUID taskId) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("Task not found"));
-        // cool
-        return task.getOffers().stream()
-                .map(taskMapper::toOfferResponse)
-                .collect(Collectors.toList());
+                .orElseThrow(() -> new TaskNotFoundException("listOffersByTask exception: invalid task ID"));
+
+        // get offers from the task
+        List<Offer> offers = task.getOffers();
+
+        if (offers.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // list of tasker ids
+        List<UUID> taskerIds = offers.stream()
+                .map(Offer::getOffertedById)
+                .distinct()
+                .toList();
+
+        // a single consultation, O(1)
+        // map <taskerId, tasker>
+        Map<UUID, Tasker> taskersById = taskerRepository.findAllById(taskerIds).stream()
+                .collect(Collectors.toMap(Tasker::getId, Function.identity()));
+
+        // build list of the offer profile response (contain offer and minimalProfile)
+        return offers.stream()
+                .map(offer -> {
+                    Tasker tasker = taskersById.get(offer.getOffertedById());
+                    MinimalProfileResponse profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
+                    OfferResponse offerResponse = taskMapper.toOfferResponse(offer);
+                    return taskMapper.toOfferProfileResponse(offerResponse, profileResponse);
+                })
+                .toList();
     }
 
     /**
