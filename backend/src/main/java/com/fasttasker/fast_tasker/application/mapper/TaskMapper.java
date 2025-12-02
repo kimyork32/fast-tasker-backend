@@ -37,7 +37,7 @@ public class TaskMapper {
 
     public Offer toOfferEntity(OfferRequest request) {
         return new Offer(
-                UUID.randomUUID(), // this not is the ID real
+                UUID.randomUUID(),
                 request.price(),
                 request.description(),
                 null, // insert status
