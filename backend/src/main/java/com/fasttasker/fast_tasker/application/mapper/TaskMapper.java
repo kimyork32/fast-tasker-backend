@@ -1,8 +1,10 @@
 package com.fasttasker.fast_tasker.application.mapper;
 
+import com.fasttasker.fast_tasker.application.dto.task.OfferRequest;
 import com.fasttasker.fast_tasker.application.dto.task.TaskRequest;
 import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.LocationResponse;
+import com.fasttasker.fast_tasker.domain.task.Offer;
 import com.fasttasker.fast_tasker.domain.task.Task;
 import com.fasttasker.fast_tasker.domain.task.TaskStatus;
 import com.fasttasker.fast_tasker.domain.tasker.Location;
@@ -30,6 +32,18 @@ public class TaskMapper {
                 new UUID(0L, 0L), // default UUID value
                 new ArrayList<>(),
                 new ArrayList<>()
+        );
+    }
+
+    public Offer toOfferEntity(OfferRequest request) {
+        return new Offer(
+                UUID.randomUUID(), // this not is the ID real
+                request.price(),
+                request.description(),
+                null, // insert status
+                null, // insert offerted by id
+                null, // insert  create at
+                null // insert task
         );
     }
 
