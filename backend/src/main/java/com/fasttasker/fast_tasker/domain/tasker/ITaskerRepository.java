@@ -18,4 +18,6 @@ public interface ITaskerRepository {
     List<Tasker> findAll();
 
     Optional<Tasker> findByAccountId(UUID accountId);
+
+    List<Tasker> findAllById(List<UUID> ids);
 }

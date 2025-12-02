@@ -41,4 +41,9 @@ public class TaskerRepositoryImpl implements ITaskerRepository {
     public Optional<Tasker> findByAccountId(UUID accountId) {
         return jpa.findByAccountId(accountId);
     }
+
+    @Override
+    public List<Tasker> findAllById(List<UUID> ids) {
+        return jpa.findAllById(ids);
+    }
 }
