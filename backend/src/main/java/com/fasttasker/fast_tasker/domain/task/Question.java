@@ -3,7 +3,7 @@ package com.fasttasker.fast_tasker.domain.task;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -48,7 +48,7 @@ public class Question {
      * date and time the question was created
      */
     @Column(name = "create", nullable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
 
     /**

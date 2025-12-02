@@ -3,7 +3,7 @@ package com.fasttasker.fast_tasker.domain.task;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -54,7 +54,7 @@ public class Offer {
      * 
      */
     @Column(name = "create_at", nullable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     /**
      *
