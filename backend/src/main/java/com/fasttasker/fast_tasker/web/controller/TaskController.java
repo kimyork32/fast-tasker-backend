@@ -86,4 +86,10 @@ public class TaskController {
         QuestionProfileResponse response = taskService.createQuestion(questionRequest, taskId, accountId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @GetMapping("/{taskId}/questions")
+    public  ResponseEntity<List<QuestionProfileResponse>> getAllQuestionsByTask(@PathVariable ("taskId") UUID taskId) {
+        List<QuestionProfileResponse> questions = taskService.listQuestionsByTask(taskId);
+        return ResponseEntity.ok(questions);
+    }
 }
