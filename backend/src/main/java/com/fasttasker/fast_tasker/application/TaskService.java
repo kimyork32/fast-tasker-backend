@@ -112,6 +112,40 @@ public class TaskService {
         return taskMapper.toTaskCompleteResponse(task, profileResponse);
     }
 
+    @Transactional
+    public QuestionProfileResponse createQuestion(QuestionRequest questionRequest, UUID taskId, UUID accountId) {
+        // find task for the insert question
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("TaskService. createQuestion. Task not found"));
+        Question question = taskMapper.toQuestionEntity(questionRequest);
+        // insert values
+        question.setStatus(QuestionStatus.PENDING);
+        question.setAskedById(accountId);
+        question.setCreatedAt(Instant.now());
+        question.setTask(task);
+
+        // insert question in the task
+        task.getQuestions().add(question);
+
+        // and save
+        Task taskSaved = taskRepository.save(task);
+
+        // check if the questions saved is equal to the questions will be saved
+        // Find the newly added offer from the saved task entity to ensure we return the persisted state.
+        Question savedQuestions = taskSaved.getQuestions().stream()
+                .filter(q -> q.getId().equals(question.getId())).findFirst().orElse(question);
+
+        // create minimalProfile
+        Tasker tasker = taskerRepository.findById(question.getAskedById())
+                .orElseThrow(() -> new TaskerNotFoundException("TaskService. createQuestion. task not found"));
+
+        MinimalProfileResponse profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
+        // create profileResponse
+        QuestionResponse questionResponse = taskMapper.toQuestionResponse(savedQuestions);
+
+        return taskMapper.toQuestionProfileResponse(questionResponse, profileResponse);
+    }
+
     /**
      * 
      */
