@@ -6,5 +6,7 @@ import lombok.Builder;
 @Builder
 public record TaskCompleteResponse(
         TaskResponse task,
-        MinimalProfileResponse profile
+        MinimalProfileResponse profile,
+        int numOffers,
+        int numQuestions
 ) {}
