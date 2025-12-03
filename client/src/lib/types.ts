@@ -94,13 +94,13 @@ export type TaskResponse = {
   taskDate: string;
   status: string;
   posterId: string;
-  poster: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    photo?: string;
-  };
-  offerCount: number;
+}
+
+export type TaskCompleteResponse = {
+  task: TaskResponse;
+  profile: MinimalProfileData;
+  numOffers: number;
+  numQuestions: number;
 }
 
 // --- DTOs de Chat ---

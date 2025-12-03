@@ -2,8 +2,8 @@
 "use client";
 
 import { useState, useEffect, use } from 'react';
-import { getTaskById, createOffer, getOffersByTask } from '@/services/task.service';
-import { OfferRequest, OfferProfileResponse, TaskResponse } from '@/lib/types';
+import { getTaskById, createOffer, getOffersByTask } from '@/services/task.service'; // Asumiendo que estos servicios se han actualizado para devolver la nueva estructura DTO
+import { OfferRequest, OfferProfileResponse, TaskCompleteResponse, TaskResponse, MinimalProfileData, LocationData } from '@/lib/types'; // Añadidos TaskResponse, MinimalProfileData, LocationData
 import Link from 'next/link';
 
 type TaskDetailPageProps = {
@@ -11,9 +11,9 @@ type TaskDetailPageProps = {
 };
 
 export default function TaskDetailPage({ params }: TaskDetailPageProps) {
-  const { taskId } = use(params);
+  const { taskId } = use(params); // taskId sigue siendo el ID en bruto de la URL
 
-  const [task, setTask] = useState<TaskResponse | null>(null);
+  const [taskComplete, setTask] = useState<TaskCompleteResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'offers' | 'questions'>('questions'); // Empiezo en questions para que lo veas
   
@@ -48,13 +48,13 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
 
   // Setea el precio inicial cuando el modal se abre y la tarea está cargada
   useEffect(() => {
-    if (isOfferModalOpen && task?.budget) {
-      setOfferPrice(task.budget);
+    if (isOfferModalOpen && taskComplete?.task.budget) { // Accede al presupuesto desde taskComplete.task
+      setOfferPrice(taskComplete.task.budget);
     }
-  }, [isOfferModalOpen, task]);
+  }, [isOfferModalOpen, taskComplete]);
 
   const handleOfferSubmit = async () => {
-    if (!task) return;
+    if (!taskComplete) return;
 
     const offerRequest: OfferRequest = {
       price: offerPrice,
@@ -62,7 +62,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
     };
 
     try {
-      const newOffer = await createOffer(task.id, offerRequest);
+      const newOffer = await createOffer(taskComplete.task.id, offerRequest); // Pasa taskComplete.task.id
       setOffers(prevOffers => [newOffer, ...prevOffers]); // 1. Actualiza el estado de ofertas
       setActiveTab('offers'); // 2. Cambia a la pestaña de ofertas
       setIsOfferModalOpen(false);
@@ -74,7 +74,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
   };
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-gray-100"><div className="w-8 h-8 border-4 border-gray-300 border-t-black rounded-full animate-spin"></div></div>;
-  if (!task) return <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-500">No se encontró la tarea.</div>;
+  if (!taskComplete) return <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-500">No se encontró la tarea.</div>;
 
   return (
     <>
@@ -85,7 +85,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
         <Link href="/tasks" className="text-sm font-medium text-gray-500 hover:text-black transition flex items-center gap-1">
           ← Volver
         </Link>
-        <span className="text-xs font-mono text-gray-400 uppercase tracking-widest">ID: {taskId.substring(0,8)}...</span>
+        <span className="text-xs font-mono text-gray-400 uppercase tracking-widest">ID: {taskComplete.task?.id.substring(0,8)}...</span> {/* Usa taskComplete.task.id para consistencia */}
       </div>
 
       {/* GRID LAYOUT PRINCIPAL */}
@@ -95,19 +95,19 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
         <div className="md:col-span-8 bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-200/60 flex flex-col justify-between min-h-[200px]">
           <div>
             <div className="flex gap-3 mb-4">
-              <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
-                task.status === 'OPEN' 
+              <span className={`px-3 py-1 rounded-full text-xs font-bold border ${ // Accede al estado desde taskComplete.task
+                taskComplete.task?.status === 'OPEN'
                   ? 'bg-green-50 text-green-700 border-green-200' 
                   : 'bg-gray-50 text-gray-600 border-gray-200'
               }`}>
-                {task.status || 'OPEN'}
+                {taskComplete.task?.status || 'OPEN'}
               </span>
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
                 Limpieza
               </span>
             </div>
             <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-tight">
-              {task.title}
+              {taskComplete.task?.title} {/* Accede al título desde taskComplete.task */}
             </h1>
           </div>
           <div className="mt-6 flex items-center gap-2 text-gray-400 text-sm">
@@ -125,7 +125,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
             <p className="text-gray-400 text-sm font-medium mb-1">Presupuesto</p>
             <div className="text-4xl md:text-5xl font-bold tracking-tighter">
               <span className="text-2xl text-gray-500 align-top mr-1">S/.</span>
-              {task.budget}
+              {taskComplete.task?.budget}
             </div>
           </div>
 
@@ -146,17 +146,17 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
             </div>
             <div>
               <p className="text-xs font-bold text-gray-400 uppercase">Cuándo</p>
-              <p className="font-semibold text-gray-900">{task.taskDate}</p>
+              <p className="font-semibold text-gray-900">{taskComplete.task?.taskDate}</p> {/* Accede a taskDate desde taskComplete.task */}
             </div>
           </div>
-          {task.location && (
+          {taskComplete.task?.location && ( // Accede a la ubicación desde taskComplete.task
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-purple-500 shrink-0">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
               </div>
               <div>
                 <p className="text-xs font-bold text-gray-400 uppercase">Dónde</p>
-                <p className="font-semibold text-gray-900 leading-snug">{task.location.address}</p>
+                <p className="font-semibold text-gray-900 leading-snug">{taskComplete.task.location.address}</p> {/* Accede a la dirección desde taskComplete.task.location */}
               </div>
             </div>
           )}
@@ -166,7 +166,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
         <div className="md:col-span-8 bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-200/60">
           <h3 className="text-xl font-bold text-gray-900 mb-4">Detalles de la tarea</h3>
           <div className="prose prose-slate max-w-none text-gray-600 leading-relaxed">
-            <p className="whitespace-pre-wrap">{task.description}</p>
+            <p className="whitespace-pre-wrap">{taskComplete.task?.description}</p> {/* Accede a la descripción desde taskComplete.task */}
           </div>
           <div className="mt-8">
             <p className="text-sm font-bold text-gray-900 mb-3">Imágenes de referencia</p>
@@ -185,16 +185,16 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
                   className={`flex-1 md:flex-none px-6 py-3 rounded-xl text-sm font-bold transition-all ${
                     activeTab === 'offers' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-700'
                   }`}
-                >
-                  Ofertas ({offers.length > 0 ? offers.length : task.offerCount})
+            > {/* Accede a numOffers desde taskComplete */}
+              Ofertas ({offers.length > 0 ? offers.length : taskComplete.numOffers})
                 </button>
                 <button 
                   onClick={() => setActiveTab('questions')}
                   className={`flex-1 md:flex-none px-6 py-3 rounded-xl text-sm font-bold transition-all ${
                     activeTab === 'questions' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-700'
                   }`}
-                >
-                  Preguntas (3)
+            > {/* Accede a numQuestions desde taskComplete */}
+              Preguntas ({taskComplete.numQuestions})
                 </button>
             </div>
 
@@ -334,7 +334,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
              </button>
 
              <h2 className="text-2xl font-bold text-gray-900 mb-1">Haz tu oferta</h2>
-             <p className="text-gray-500 text-sm mb-6">El presupuesto del cliente es <span className="font-bold text-gray-900">S/. {task?.budget}</span></p>
+             <p className="text-gray-500 text-sm mb-6">El presupuesto del cliente es <span className="font-bold text-gray-900">S/. {taskComplete?.task.budget}</span></p>
 
              <div className="space-y-4">
                 <div>

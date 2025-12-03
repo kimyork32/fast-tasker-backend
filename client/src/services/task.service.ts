@@ -1,9 +1,9 @@
 import { apiClient } from '@/lib/apiClient';
 import { 
   TaskResponse, 
+  TaskCompleteResponse,
   TaskRequest,
   OfferRequest,
-  OfferResponse,
   OfferProfileResponse
 
 } from '@/lib/types';
@@ -29,8 +29,8 @@ export const getMyTasks = (): Promise<TaskResponse[]> => {
 /**
  * Obtiene una tarea por su ID.
  */
-export const getTaskById = (id: string): Promise<TaskResponse> => {
-  return apiClient<TaskResponse>(`${TASK_PREFIX}/${id}`, {
+export const getTaskById = (id: string): Promise<TaskCompleteResponse> => {
+  return apiClient<TaskCompleteResponse>(`${TASK_PREFIX}/${id}`, {
     method: 'GET',
   }, true); // withCredentials = true
 };
