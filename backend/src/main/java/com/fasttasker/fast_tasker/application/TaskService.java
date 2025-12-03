@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -92,8 +89,7 @@ public class TaskService {
 
     @Transactional(readOnly = true)
     public TaskResponse getTaskById(UUID taskId) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("getTask exception: invalid task ID"));
+        Task task = findTask(taskId);
         return taskMapper.toResponse(task);
     }
 
@@ -102,8 +98,7 @@ public class TaskService {
      */
     @Transactional(readOnly = true)
     public TaskCompleteResponse getTaskCompleteById(UUID taskId) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("TaskService. getTaskById exception: invalid task ID"));
+        Task task = findTask(taskId);
         Tasker tasker = taskerRepository.findById(task.getPosterId())
                 .orElseThrow(() -> new TaskerNotFoundException("TaskService. getTaskById exception: invalid tasker ID"));
 
@@ -115,8 +110,7 @@ public class TaskService {
     @Transactional
     public QuestionProfileResponse createQuestion(QuestionRequest questionRequest, UUID taskId, UUID accountId) {
         // find task for the insert question
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("TaskService. createQuestion. Task not found"));
+        Task task = findTask(taskId);
         Question question = taskMapper.toQuestionEntity(questionRequest);
         // insert values
         question.setStatus(QuestionStatus.PENDING);
@@ -149,9 +143,7 @@ public class TaskService {
     @Transactional(readOnly = true)
     public List<QuestionProfileResponse> listQuestionsByTask(UUID taskId) {
         // find task
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("TaskService. listQuestionsByTask. Task not found"));
-
+        Task task = findTask(taskId);
         // get questions from the task
         List<Question> questions = task.getQuestions();
         if (questions.isEmpty()) {
@@ -166,8 +158,7 @@ public class TaskService {
 
         // a single consultation, O(1)
         // map <taskerId, tasker>
-        Map<UUID, Tasker> taskersById = taskerRepository.findAllById(taskerIds).stream()
-                .collect(Collectors.toMap(Tasker::getId, Function.identity()));
+        Map<UUID, Tasker> taskersById = loadTaskersMap(taskerIds);
 
         // build list of the question profile response (contain question and minimalProfile)
         return questions.stream()
@@ -208,8 +199,7 @@ public class TaskService {
         UUID taskerId = account.getTaskerId();
 
         // find task
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("TaskerService. Task not found"));
+        Task task = findTask(taskId);
 
         Offer offer = taskMapper.toOfferEntity(offerRequest);
         // insert values of the offer
@@ -243,8 +233,7 @@ public class TaskService {
      */
     @Transactional(readOnly = true)
     public List<OfferProfileResponse> listOffersByTask(UUID taskId) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("listOffersByTask exception: invalid task ID"));
+        Task task = findTask(taskId);
 
         // get offers from the task
         List<Offer> offers = task.getOffers();
@@ -261,8 +250,7 @@ public class TaskService {
 
         // a single consultation, O(1)
         // map <taskerId, tasker>
-        Map<UUID, Tasker> taskersById = taskerRepository.findAllById(taskerIds).stream()
-                .collect(Collectors.toMap(Tasker::getId, Function.identity()));
+        Map<UUID, Tasker> taskersById = loadTaskersMap(taskerIds);
 
         // build list of the offer profile response (contain offer and minimalProfile)
         return offers.stream()
@@ -331,5 +319,16 @@ public class TaskService {
 
     public TaskMapper getTaskMapper() {
         return taskMapper;
+    }
+
+    // private methods (HELPERS)
+    private Task findTask(UUID taskId) {
+        return taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("TaskService. Task not found"));
+    }
+
+    private Map<UUID, Tasker> loadTaskersMap(List<UUID> ids) {
+        return taskerRepository.findAllById(ids).stream()
+                .collect(Collectors.toMap(Tasker::getId, Function.identity()));
     }
 }
