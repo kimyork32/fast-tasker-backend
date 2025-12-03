@@ -4,6 +4,7 @@ import com.fasttasker.fast_tasker.application.dto.task.*;
 import com.fasttasker.fast_tasker.application.dto.tasker.LocationResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.MinimalProfileResponse;
 import com.fasttasker.fast_tasker.domain.task.Offer;
+import com.fasttasker.fast_tasker.domain.task.Question;
 import com.fasttasker.fast_tasker.domain.task.Task;
 import com.fasttasker.fast_tasker.domain.task.TaskStatus;
 import com.fasttasker.fast_tasker.domain.tasker.Location;
@@ -43,6 +44,19 @@ public class TaskMapper {
                 null, // insert status
                 null, // insert offerted by id
                 null, // insert  create at
+                null // insert task
+        );
+    }
+
+    public Question toQuestionEntity(QuestionRequest request) {
+        if (request == null) return null;
+
+        return new Question(
+                UUID.randomUUID(),
+                request.description(),
+                null, // insert status
+                null, // insert asked by id
+                null, // insert create at
                 null // insert task
         );
     }
@@ -99,5 +113,26 @@ public class TaskMapper {
                 task.getOffers().size(),
                 task.getQuestions().size()
         );
+    }
+
+    public QuestionResponse toQuestionResponse(Question question) {
+        if (question == null) return null;
+
+        return QuestionResponse.builder()
+                .id(question.getId().toString())
+                .description(question.getDescription())
+                .status(question.getStatus().name())
+                .createAt(question.getCreatedAt().toString())
+                .build();
+    }
+
+    public QuestionProfileResponse toQuestionProfileResponse(
+            QuestionResponse question,
+            MinimalProfileResponse profile
+    ) {
+        return QuestionProfileResponse.builder()
+                .question(question)
+                .profile(profile)
+                .build();
     }
 }
