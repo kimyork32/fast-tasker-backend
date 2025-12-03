@@ -146,6 +146,40 @@ public class TaskService {
         return taskMapper.toQuestionProfileResponse(questionResponse, profileResponse);
     }
 
+    @Transactional(readOnly = true)
+    public List<QuestionProfileResponse> listQuestionsByTask(UUID taskId) {
+        // find task
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("TaskService. listQuestionsByTask. Task not found"));
+
+        // get questions from the task
+        List<Question> questions = task.getQuestions();
+        if (questions.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // list of tasker ids
+        List<UUID> taskerIds = questions.stream()
+                .map(Question::getAskedById)
+                .distinct()
+                .toList();
+
+        // a single consultation, O(1)
+        // map <taskerId, tasker>
+        Map<UUID, Tasker> taskersById = taskerRepository.findAllById(taskerIds).stream()
+                .collect(Collectors.toMap(Tasker::getId, Function.identity()));
+
+        // build list of the question profile response (contain question and minimalProfile)
+        return questions.stream()
+                .map(question -> {
+                    Tasker tasker = taskersById.get(question.getAskedById()); // obtain tasker to the map with the ID
+                    MinimalProfileResponse profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
+                    QuestionResponse questionResponse = taskMapper.toQuestionResponse(question);
+                    return taskMapper.toQuestionProfileResponse(questionResponse, profileResponse);
+                })
+                .toList();
+
+    }
     /**
      * 
      */
