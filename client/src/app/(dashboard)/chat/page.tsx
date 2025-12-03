@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import SockJS from 'sockjs-client';
-import { Stomp, CompatClient } from '@stomp/stompjs';
 import { ConversationSummary, Message, SendMessageRequest } from '@/lib/types';
-
-const API_URL = "http://localhost:8080/api";
-const SOCKET_URL = "http://localhost:8080/ws";
+import { 
+  getInbox, 
+  getMessages, 
+  connect, 
+  disconnect, 
+  sendMessage as sendChatMessage 
+} from '@/services/chat.service';
 
 export default function ChatPage() {
   // Estado de la UI
@@ -18,8 +19,6 @@ export default function ChatPage() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null); // Para saber qué mensajes son 'míos'
   const [isConnected, setIsConnected] = useState(false);
 
-  // Referencias (para no perder conexión al re-renderizar)
-  const stompClientRef = useRef<CompatClient | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // 1. Cargar Inbox al iniciar
@@ -31,15 +30,20 @@ export default function ChatPage() {
   useEffect(() => {
     if (activeChatId) {
       // a. Cargar historial antiguo (REST)
-      fetchHistory(activeChatId);
+      fetchMessages(activeChatId);
       
       // b. Conectar al Socket (Real-time)
-      connectWebSocket(activeChatId);
+      connect(
+        activeChatId, 
+        handleNewMessage,
+        setIsConnected
+      );
     }
 
     // Cleanup: Desconectar si cambiamos de chat o salimos
     return () => {
-      disconnectWebSocket();
+      disconnect();
+      setIsConnected(false);
     };
   }, [activeChatId]);
 
@@ -48,77 +52,44 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // --- FUNCIONES API (REST) ---
+  // --- MANEJADORES DE LÓGICA ---
 
   const fetchInbox = async () => {
     try {
-      const res = await axios.get<ConversationSummary[]>(`${API_URL}/conversations/inbox`);
-      setInbox(res.data);
+      const inboxData = await getInbox();
+      setInbox(inboxData);
     } catch (error) {
       console.error("Error cargando inbox:", error);
     }
   };
 
-  const fetchHistory = async (conversationId: string) => {
+  const fetchMessages = async (conversationId: string) => {
     try {
-      const res = await axios.get<Message[]>(`${API_URL}/conversations/${conversationId}/messages`);
-      setMessages(res.data);
+      const history = await getMessages(conversationId);
+      setMessages(history);
       // Inferir el ID del usuario actual si aún no lo tenemos
-      if (!currentUserId && res.data.length > 0) {
-        setCurrentUserId(res.data[0].senderId);
+      if (!currentUserId && history.length > 0) {
+        // Asumimos que el primer mensaje es del otro usuario, para identificar el nuestro
+        // En una app real, esto vendría del perfil del usuario logueado.
+        setCurrentUserId(history[0].senderId === inbox.find(c => c.conversationId === conversationId)?.otherParticipantId 
+          ? 'tu-id-de-usuario-logueado' // Reemplazar con el ID real del usuario
+          : history[0].senderId);
       }
     } catch (error) {
       console.error("Error cargando historial:", error);
     }
   };
 
-  // --- FUNCIONES WEBSOCKET (STOMP) ---
-
-  const connectWebSocket = (conversationId: string) => {
-    // Evitar doble conexión
-    if (stompClientRef.current && stompClientRef.current.connected) return;
-
-    const socket = new SockJS(SOCKET_URL);
-    const client = Stomp.over(socket);
-
-    // Opcional: Desactivar logs de consola del socket
-    // client.debug = () => {}; 
-
-    client.connect({}, () => {
-      setIsConnected(true);
-      stompClientRef.current = client;
-
-      // SUSCRIPCIÓN DINÁMICA: /topic/conversation.{uuid}
-      client.subscribe(`/topic/conversation.${conversationId}`, (payload) => {
-        const newMessage: Message = JSON.parse(payload.body);
-        
-        // Si es el primer mensaje que vemos, podemos usarlo para identificar al usuario actual
-        if (!currentUserId) {
-          setCurrentUserId(newMessage.senderId);
-        }
-
-        // Agregar mensaje recibido al estado
-        setMessages((prev) => [...prev, newMessage]);
-      });
-
-    }, (error: any) => {
-      console.error("Error de conexión STOMP:", error);
-      setIsConnected(false);
-    });
-  };
-
-  const disconnectWebSocket = () => {
-    if (stompClientRef.current) {
-      stompClientRef.current.disconnect();
-      stompClientRef.current = null;
-      setIsConnected(false);
+  const handleNewMessage = (newMessage: Message) => {
+    if (!currentUserId) {
+      setCurrentUserId(newMessage.senderId);
     }
-  };
+    setMessages((prev) => [...prev, newMessage]);
+  }
 
-  const sendMessage = () => {
-    if (!inputText.trim() || !stompClientRef.current || !activeChatId) return;
+  const handleSendMessage = () => {
+    if (!inputText.trim() || !activeChatId) return;
 
-    // Construir payload exacto como lo espera MessageRequest en Java
     const payload: SendMessageRequest = {
       conversationId: activeChatId,
       content: {
@@ -126,10 +97,8 @@ export default function ChatPage() {
         attachmentUrl: null // null si no hay foto
       }
     };
-
-    // ENVIAR: /app/chat.send (Coincide con @MessageMapping)
-    stompClientRef.current.send("/app/chat.send", {}, JSON.stringify(payload));
     
+    sendChatMessage(payload);
     setInputText("");
   };
 
@@ -215,12 +184,12 @@ export default function ChatPage() {
                   type="text"
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Escribe un mensaje..."
                   className="flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                 />
                 <button 
-                  onClick={sendMessage}
+                  onClick={handleSendMessage}
                   disabled={!isConnected}
                   className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition"
                 >
