@@ -4,6 +4,7 @@ import com.fasttasker.fast_tasker.application.dto.task.*;
 import com.fasttasker.fast_tasker.application.dto.tasker.MinimalProfileResponse;
 import com.fasttasker.fast_tasker.application.exception.AccountNotFoundException;
 import com.fasttasker.fast_tasker.application.exception.TaskNotFoundException;
+import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
 import com.fasttasker.fast_tasker.application.mapper.TaskMapper;
 import com.fasttasker.fast_tasker.application.mapper.TaskerMapper;
 import com.fasttasker.fast_tasker.domain.account.Account;
@@ -94,6 +95,22 @@ public class TaskService {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("getTask exception: invalid task ID"));
         return taskMapper.toResponse(task);
+    }
+
+    /**
+     * return task complete (TaskResponse and MinimalProfileResponse)
+     */
+    @Transactional(readOnly = true)
+    public TaskCompleteResponse getTaskCompleteById(UUID taskId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("TaskService. getTaskById exception: invalid task ID"));
+        Tasker tasker = taskerRepository.findById(task.getPosterId())
+                .orElseThrow(() -> new TaskerNotFoundException("TaskService. getTaskById exception: invalid tasker ID"));
+
+        TaskResponse taskResponse = taskMapper.toResponse(task);
+        MinimalProfileResponse profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
+
+        return taskMapper.toTaskCompleteResponse(taskResponse, profileResponse);
     }
 
     /**
