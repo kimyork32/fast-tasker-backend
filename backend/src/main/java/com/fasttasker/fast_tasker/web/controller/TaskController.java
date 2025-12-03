@@ -1,11 +1,7 @@
 package com.fasttasker.fast_tasker.web.controller;
 
 import com.fasttasker.fast_tasker.application.TaskService;
-import com.fasttasker.fast_tasker.application.dto.task.OfferRequest;
-import com.fasttasker.fast_tasker.application.dto.task.OfferProfileResponse;
-import com.fasttasker.fast_tasker.application.dto.task.OfferResponse;
-import com.fasttasker.fast_tasker.application.dto.task.TaskRequest;
-import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
+import com.fasttasker.fast_tasker.application.dto.task.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,9 +54,9 @@ public class TaskController {
     }
 
     @GetMapping("{taskId}")
-    public ResponseEntity<TaskResponse> getTask(@PathVariable ("taskId") UUID taskId) {
-        TaskResponse taskResponse = taskService.getTaskById(taskId);
-        return ResponseEntity.ok(taskResponse);
+    public ResponseEntity<TaskCompleteResponse> getTaskComplete(@PathVariable ("taskId") UUID taskId) {
+        TaskCompleteResponse taskCompleteResponse = taskService.getTaskCompleteById(taskId);
+        return ResponseEntity.ok(taskCompleteResponse);
     }
 
     @PostMapping("/{taskId}/offers")
