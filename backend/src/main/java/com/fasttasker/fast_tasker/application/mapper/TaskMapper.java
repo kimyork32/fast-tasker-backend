@@ -87,4 +87,11 @@ public class TaskMapper {
     ) {
         return new OfferProfileResponse(offer, profile);
     }
+
+    public TaskCompleteResponse toTaskCompleteResponse(
+            TaskResponse task,
+            MinimalProfileResponse profile
+    ) {
+        return new TaskCompleteResponse(task, profile);
+    }
 }
