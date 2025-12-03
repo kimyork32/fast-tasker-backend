@@ -107,10 +107,9 @@ public class TaskService {
         Tasker tasker = taskerRepository.findById(task.getPosterId())
                 .orElseThrow(() -> new TaskerNotFoundException("TaskService. getTaskById exception: invalid tasker ID"));
 
-        TaskResponse taskResponse = taskMapper.toResponse(task);
         MinimalProfileResponse profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
 
-        return taskMapper.toTaskCompleteResponse(taskResponse, profileResponse);
+        return taskMapper.toTaskCompleteResponse(task, profileResponse);
     }
 
     /**

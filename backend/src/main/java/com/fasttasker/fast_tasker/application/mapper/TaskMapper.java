@@ -7,6 +7,7 @@ import com.fasttasker.fast_tasker.domain.task.Offer;
 import com.fasttasker.fast_tasker.domain.task.Task;
 import com.fasttasker.fast_tasker.domain.task.TaskStatus;
 import com.fasttasker.fast_tasker.domain.tasker.Location;
+import com.fasttasker.fast_tasker.domain.tasker.Tasker;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -89,9 +90,14 @@ public class TaskMapper {
     }
 
     public TaskCompleteResponse toTaskCompleteResponse(
-            TaskResponse task,
+            Task task,
             MinimalProfileResponse profile
     ) {
-        return new TaskCompleteResponse(task, profile);
+        return new TaskCompleteResponse(
+                toResponse(task),
+                profile,
+                task.getOffers().size(),
+                task.getQuestions().size()
+        );
     }
 }
