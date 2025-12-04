@@ -2,9 +2,7 @@ package com.fasttasker.fast_tasker.application;
 
 import com.fasttasker.fast_tasker.application.dto.task.*;
 import com.fasttasker.fast_tasker.application.dto.tasker.MinimalProfileResponse;
-import com.fasttasker.fast_tasker.application.exception.AccountNotFoundException;
-import com.fasttasker.fast_tasker.application.exception.TaskNotFoundException;
-import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
+import com.fasttasker.fast_tasker.application.exception.*;
 import com.fasttasker.fast_tasker.application.mapper.TaskMapper;
 import com.fasttasker.fast_tasker.application.mapper.TaskerMapper;
 import com.fasttasker.fast_tasker.domain.account.Account;
@@ -22,7 +20,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * 
+ *
  */
 @Service
 public class TaskService {
@@ -48,11 +46,11 @@ public class TaskService {
     }
 
     /**
-     * 
+     *
      */
     @Transactional
     public TaskResponse createTask(TaskRequest taskRequest, UUID posterId) {
-        Task newTask = taskMapper.toEntity(taskRequest);
+        Task newTask = taskMapper.toTaskEntity(taskRequest);
 
         // assign the values here, ignoring what comes from the client
         newTask.setPosterId(posterId);
@@ -172,7 +170,7 @@ public class TaskService {
 
     }
     /**
-     * 
+     *
      */
     public void editTask() {
         // TODO implement here
@@ -263,8 +261,64 @@ public class TaskService {
                 .toList();
     }
 
+    public AnswerProfileResponse answerQuestion(
+            AnswerRequest answerRequest,
+            UUID taskId,
+            UUID questionId,
+            UUID accountId
+    ) {
+        // find taskerId with the accountId
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new AccountNotFoundException("TaskerService. Account not found"));
+        UUID taskerId = account.getTaskerId();
+
+        // find task
+        Task task = findTask(taskId);
+
+        // find question
+        Question question = task.getQuestions().stream()
+                .filter(q -> q.getId().equals(questionId))
+                .findFirst()
+                .orElseThrow(() -> new QuestionNotFoundException("TaskerService. Question not found"));
+
+        Answer answer = taskMapper.toAnswerEntity(answerRequest);
+
+        // insert values of the answer
+        answer.setQuestionId(questionId);
+        answer.setAnsweredId(taskerId);
+        answer.setCreatedAt(Instant.now());
+        answer.setQuestion(question);
+
+
+
+        // add the answer to the question
+        question.getAnswers().add(answer);
+
+        // save updated task
+        Task taskSaved = taskRepository.save(task);
+
+        Question questionSaved = taskSaved.getQuestions().stream()
+                .filter(q -> q.getId().equals(questionId))
+                .findFirst()
+                .orElseThrow(() -> new QuestionNotFoundException("TaskerService. Question not found"));
+
+        Answer answerSaved = questionSaved.getAnswers().stream()
+                .filter(a -> a.getId().equals(answer.getId()))
+                .findFirst()
+                .orElseThrow(() -> new AnswerNotFoundException("TaskerService. Answer not found"));
+
+        // find tasker
+        Tasker tasker = taskerRepository.findById(taskerId)
+                .orElseThrow(() -> new TaskNotFoundException("TaskerService. Tasker not found"));
+
+        MinimalProfileResponse  profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
+        AnswerResponse answerResponse = taskMapper.toAnswerResponse(answerSaved);
+
+        return taskMapper.toAnswerProfileResponse(answerResponse, profileResponse);
+    }
+
     /**
-     * @param taskId 
+     * @param taskId
      * @param offerId
      */
     public void acceptOffer(UUID taskId, UUID offerId) {
@@ -272,20 +326,11 @@ public class TaskService {
     }
 
     /**
-     * @param taskId 
-     * @param askerId 
+     * @param taskId
+     * @param askerId
      * @param question
      */
     public void askQuestion(UUID taskId, UUID askerId, String question) {
-        // TODO implement here
-    }
-
-    /**
-     * @param taskId 
-     * @param questionId 
-     * @param answer
-     */
-    public void answerQuestion(UUID taskId, UUID questionId, String answer) {
         // TODO implement here
     }
 
