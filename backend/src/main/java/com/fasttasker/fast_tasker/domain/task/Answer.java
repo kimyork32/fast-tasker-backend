@@ -3,6 +3,7 @@ package com.fasttasker.fast_tasker.domain.task;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.util.UUID;
 /**
  * answer of the question
@@ -30,7 +31,7 @@ public class Answer {
     private UUID answeredId;
 
     @Column(name = "created_at", nullable = false)
-    private String createdAt;
+    private Instant createdAt;
 
     @ManyToOne(fetch =  FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false)
