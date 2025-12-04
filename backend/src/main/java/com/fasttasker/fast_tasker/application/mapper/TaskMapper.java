@@ -65,7 +65,7 @@ public class TaskMapper {
         return new Answer(
                 UUID.randomUUID(),
                 request.description(),
-                null, // insert question id
+                UUID.fromString(request.questionId()),
                 null, // insert answered id
                 null, // insert create at
                 null // insert question
