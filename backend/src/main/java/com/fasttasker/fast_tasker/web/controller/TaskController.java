@@ -92,4 +92,16 @@ public class TaskController {
         List<QuestionProfileResponse> questions = taskService.listQuestionsByTask(taskId);
         return ResponseEntity.ok(questions);
     }
+
+    @PostMapping("/{taskId}/answers")
+    public ResponseEntity<AnswerProfileResponse> createAnswer(
+            @PathVariable UUID taskId,
+            @RequestBody AnswerRequest answerRequest,
+            Authentication authentication
+    ) {
+        UUID accountId = (UUID) authentication.getPrincipal();
+        AnswerProfileResponse response = taskService.answerQuestion(answerRequest, taskId, accountId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
 }
