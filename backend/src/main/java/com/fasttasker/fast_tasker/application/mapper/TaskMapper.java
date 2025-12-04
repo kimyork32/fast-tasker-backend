@@ -3,12 +3,8 @@ package com.fasttasker.fast_tasker.application.mapper;
 import com.fasttasker.fast_tasker.application.dto.task.*;
 import com.fasttasker.fast_tasker.application.dto.tasker.LocationResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.MinimalProfileResponse;
-import com.fasttasker.fast_tasker.domain.task.Offer;
-import com.fasttasker.fast_tasker.domain.task.Question;
-import com.fasttasker.fast_tasker.domain.task.Task;
-import com.fasttasker.fast_tasker.domain.task.TaskStatus;
+import com.fasttasker.fast_tasker.domain.task.*;
 import com.fasttasker.fast_tasker.domain.tasker.Location;
-import com.fasttasker.fast_tasker.domain.tasker.Tasker;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -17,7 +13,8 @@ import java.util.UUID;
 
 @Component
 public class TaskMapper {
-    public Task toEntity(TaskRequest request) {
+    // toEntity //////////////////////////////////////
+    public Task toTaskEntity(TaskRequest request) {
         if (request == null) return null;
 
         var loc = request.location();
@@ -62,6 +59,20 @@ public class TaskMapper {
         );
     }
 
+    public Answer toAnswerEntity(AnswerRequest request) {
+        if (request == null) return null;
+
+        return new Answer(
+                UUID.randomUUID(),
+                request.description(),
+                null, // insert question id
+                null, // insert answered id
+                null, // insert create at
+                null // insert question
+        );
+    }
+
+    // toEntity //////////////////////////////////////
     public TaskResponse toResponse(Task task) {
         if (task == null) return null;
 
@@ -133,6 +144,27 @@ public class TaskMapper {
     ) {
         return QuestionProfileResponse.builder()
                 .question(question)
+                .profile(profile)
+                .build();
+    }
+
+    public AnswerResponse toAnswerResponse(Answer answer) {
+        if (answer == null) return null;
+
+        return AnswerResponse.builder()
+                .id(answer.getId().toString())
+                .description(answer.getDescription())
+                .answeredId(answer.getAnsweredId().toString())
+                .createdAt(answer.getCreatedAt().toString())
+                .build();
+    }
+
+    public AnswerProfileResponse toAnswerProfileResponse(
+            AnswerResponse answer,
+            MinimalProfileResponse profile
+    ) {
+        return AnswerProfileResponse.builder()
+                .answer(answer)
                 .profile(profile)
                 .build();
     }
