@@ -264,13 +264,14 @@ public class TaskService {
     public AnswerProfileResponse answerQuestion(
             AnswerRequest answerRequest,
             UUID taskId,
-            UUID questionId,
             UUID accountId
     ) {
         // find taskerId with the accountId
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new AccountNotFoundException("TaskerService. Account not found"));
+
         UUID taskerId = account.getTaskerId();
+        UUID questionId = UUID.fromString(answerRequest.questionId());
 
         // find task
         Task task = findTask(taskId);
