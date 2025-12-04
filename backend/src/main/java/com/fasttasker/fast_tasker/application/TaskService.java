@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -135,7 +136,7 @@ public class TaskService {
         // create profileResponse
         QuestionResponse questionResponse = taskMapper.toQuestionResponse(savedQuestions);
 
-        return taskMapper.toQuestionProfileResponse(questionResponse, profileResponse);
+        return taskMapper.toQuestionProfileResponse(questionResponse, profileResponse, null); // answers are null
     }
 
     @Transactional(readOnly = true)
@@ -150,7 +151,12 @@ public class TaskService {
 
         // list of tasker ids
         List<UUID> taskerIds = questions.stream()
-                .map(Question::getAskedById)
+                .flatMap(question ->
+                        Stream.concat(
+                                Stream.of(question.getAskedById()),
+                                question.getAnswers().stream().map(Answer::getAnsweredId)
+                        )
+                )
                 .distinct()
                 .toList();
 
@@ -164,7 +170,18 @@ public class TaskService {
                     Tasker tasker = taskersById.get(question.getAskedById()); // obtain tasker to the map with the ID
                     MinimalProfileResponse profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
                     QuestionResponse questionResponse = taskMapper.toQuestionResponse(question);
-                    return taskMapper.toQuestionProfileResponse(questionResponse, profileResponse);
+                    List<AnswerProfileResponse> answersResponse = question.getAnswers().stream()
+                            .map(answer -> {
+                                Tasker answerer = taskersById.get(answer.getAnsweredId());
+                                // answererProfileResponse
+                                MinimalProfileResponse apr = taskerMapper.toMinimalProfileResponse(answerer);
+                                // answeredResponse
+                                AnswerResponse ar = taskMapper.toAnswerResponse(answer);
+                                return taskMapper.toAnswerProfileResponse(ar, apr);
+                            })
+                            .toList();
+                    // List<AnswerProfileResponse> answersResponse = taskMapper.toAnswerProfileResponseList(question.getAnswers());
+                    return taskMapper.toQuestionProfileResponse(questionResponse, profileResponse, answersResponse);
                 })
                 .toList();
 
