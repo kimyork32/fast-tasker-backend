@@ -1,4 +1,4 @@
-# plagiarism of airTasker
+# Fast Tasker
 
 ## backend architecture with DDD
 ![DDD uml](docs/images/DDD-uml.png)
@@ -44,12 +44,13 @@ Endpoints
 
 ## Questions
 
-| Action                    | HTTP Method | Endpoint                                 | Description                                            |
-|:--------------------------|:------------|:-----------------------------------------|:-------------------------------------------------------|
-| Ask a question on a task  | POST        | `/tasks/{taskId}/questions`              | Any authenticated user posts a question on a task.     |
-| List questions for a task | GET         | `/tasks/{taskId}/questions`              | Retrieves all questions (and answers) for a task.      |
-| Answer a question         | PUT         | `/tasks/{taskId}/questions/{questionId}` | The task owner posts an answer to a specific question. |
-| Delete a question         | DELETE      | `/tasks/{taskId}/questions/{questionId}` | The user who asked the question can delete it.         |
+| Action                    | HTTP Method | Endpoint                                     | Description                                            |
+|:--------------------------|:------------|:---------------------------------------------|:-------------------------------------------------------|
+| Ask a question on a task  | POST        | `/tasks/{taskId}/questions`                  | Any authenticated user posts a question on a task.     |
+| List questions for a task | GET         | `/tasks/{taskId}/questions`                  | Retrieves all questions (and answers) for a task.      |
+| Answer a question         | POST        | `/tasks/{taskId}/questions/{questionId}/answers` | The task owner posts an answer to a specific question. |
+| Delete a question         | DELETE      | `/tasks/{taskId}/questions/{questionId}`     | The user who asked the question can delete it.         |
+| Delete an answer          | DELETE      | `/tasks/{taskId}/questions/{questionId}/answers/{answerId}` | The task owner can delete their answer.                |
 
 ## Reviews
 
