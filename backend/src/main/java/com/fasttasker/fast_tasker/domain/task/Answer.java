@@ -34,7 +34,7 @@ public class Answer {
     private Instant createdAt;
 
     @ManyToOne(fetch =  FetchType.LAZY)
-    @JoinColumn(name = "question_id", nullable = false)
+    @JoinColumn(name = "question_id", nullable = false, insertable = false, updatable = false)
     @ToString.Exclude
     private Question question;
 }
