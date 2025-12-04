@@ -57,7 +57,8 @@ public class TaskMapper {
                 null, // insert status
                 null, // insert asked by id
                 null, // insert create at
-                null // insert task
+                null, // insert task
+                null // instantiate and add answer list
         );
     }
 

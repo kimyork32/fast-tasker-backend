@@ -90,6 +90,7 @@ class JpaTaskRepositoryTest {
                 QuestionStatus.PENDING,
                 askingById,
                 askingAtQuestion,
+                null,
                 null
         );
 
