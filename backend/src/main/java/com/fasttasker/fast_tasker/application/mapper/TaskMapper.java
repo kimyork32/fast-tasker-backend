@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -140,11 +141,13 @@ public class TaskMapper {
 
     public QuestionProfileResponse toQuestionProfileResponse(
             QuestionResponse question,
-            MinimalProfileResponse profile
+            MinimalProfileResponse profile,
+            List<AnswerProfileResponse> answers
     ) {
         return QuestionProfileResponse.builder()
                 .question(question)
                 .profile(profile)
+                .answers(answers)
                 .build();
     }
 
