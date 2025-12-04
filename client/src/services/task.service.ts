@@ -4,8 +4,9 @@ import {
   TaskCompleteResponse,
   TaskRequest,
   OfferRequest,
-  OfferProfileResponse
-
+  OfferProfileResponse,
+  QuestionRequest,
+  QuestionProfileResponse
 } from '@/lib/types';
 
 // Asumiendo que todos tus endpoints de tareas están en /tasks
@@ -79,6 +80,25 @@ export const createOffer = (taskId: string, data: OfferRequest) : Promise<OfferP
  */
 export const getOffersByTask = (taskId: string) : Promise<OfferProfileResponse[]> => {
   return apiClient<OfferProfileResponse[]>(`${TASK_PREFIX}/${taskId}/offers`,{
+    method: 'GET',
+  }, true);
+}
+
+/**
+ * crear question
+ */
+export const createQuestion = (taskId: string, data: QuestionRequest) : Promise<QuestionProfileResponse> => {
+  return apiClient<QuestionProfileResponse>(`${TASK_PREFIX}/${taskId}/questions`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }, true);
+}
+
+/**
+ * obtener lista de preguntas por taskId
+ */
+export const getQuestionsByTask = (taskId: string) : Promise<QuestionProfileResponse[]> => {
+  return apiClient<QuestionProfileResponse[]>(`${TASK_PREFIX}/${taskId}/questions`, {
     method: 'GET',
   }, true);
 }

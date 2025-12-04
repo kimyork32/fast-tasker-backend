@@ -142,14 +142,53 @@ export interface OfferRequest {
 
 
 export interface OfferResponse {
-  id: String;
+  id: string;
   price: number;
-  description: String;
-  status: String;
-  createAt: String;
+  description: string;
+  status: string;
+  createAt: string;
 }
 
 export interface OfferProfileResponse {
   offer: OfferResponse;
   profile: MinimalProfileData;
+}
+
+// ---DTOs answer ---
+export interface AnswerRequest {
+  questionId: string;
+  description: string;
+}
+
+export interface AnswerResponse {
+  id: string;
+  questionId: string;
+  description: string;
+  status: string;
+  createAt: string;
+}
+
+export interface AnswerProfileResponse {
+  answer: AnswerResponse;
+  profile: MinimalProfileData;
+}
+
+
+// --- DTOs question ---
+
+export interface QuestionRequest {
+  description: string;
+}
+
+export interface QuestionResponse {
+  id: string;
+  description: string;
+  status: string;
+  createAt: string;
+}
+
+export interface QuestionProfileResponse {
+  question: QuestionResponse;
+  profile: MinimalProfileData;
+  answers: AnswerProfileResponse[];
 }

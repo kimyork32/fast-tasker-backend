@@ -5,12 +5,16 @@ import { useState, useEffect, use } from 'react';
 import { 
   getTaskById, 
   createOffer, 
-  getOffersByTask 
+  getOffersByTask,
+  createQuestion,
+  getQuestionsByTask
 } from '@/services/task.service';
 import { 
   OfferRequest, 
   OfferProfileResponse, 
-  TaskCompleteResponse
+  TaskCompleteResponse,
+  QuestionRequest,
+  QuestionProfileResponse
 } from '@/lib/types';
 import Link from 'next/link';
 import { TaskHeader } from '@/components/task/TaskHeader';
@@ -50,7 +54,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
 
   const [taskComplete, setTask] = useState<TaskCompleteResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'offers' | 'questions'>('questions'); // Empiezo en questions para que lo veas
+  const [activeTab, setActiveTab] = useState<'offers' | 'questions'>('questions');
   
   // Nuevo Estado para el Modal de Oferta
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
@@ -62,6 +66,11 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
   // Estados para el formulario de la oferta
   const [offerPrice, setOfferPrice] = useState<number>(0);
   const [offerMessage, setOfferMessage] = useState('');
+
+  // estado para el question
+  const [questions, setQuestions] = useState<QuestionProfileResponse[]>([]);
+  const [questionDescription, setQuestionDescription] = useState('');
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
   useEffect(() => {
     getTaskById(taskId)
@@ -81,13 +90,25 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
     }
   }, [activeTab, taskId]);
 
+  // Cargar preguntas cuando la pestaña de preguntas se activa
+  useEffect(() => {
+    if (activeTab === 'questions' && taskId) {
+      setIsLoadingQuestions(true);
+      getQuestionsByTask(taskId)
+        .then(setQuestions)
+        .catch(console.error)
+        .finally(() => setIsLoadingQuestions(false));
+    }
+  }, [activeTab, taskId])
+
   // Setea el precio inicial cuando el modal se abre y la tarea está cargada
   useEffect(() => {
-    if (isOfferModalOpen && taskComplete?.task.budget) { // Accede al presupuesto desde taskComplete.task
+    if (isOfferModalOpen && taskComplete?.task.budget) {
       setOfferPrice(taskComplete.task.budget);
     }
   }, [isOfferModalOpen, taskComplete]);
 
+    // HANDLE OFFER
   const handleOfferSubmit = async () => {
     if (!taskComplete) return;
 
@@ -97,16 +118,39 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
     };
 
     try {
-      const newOffer = await createOffer(taskComplete.task.id, offerRequest); // Pasa taskComplete.task.id
-      setOffers(prevOffers => [newOffer, ...prevOffers]); // 1. Actualiza el estado de ofertas
-      setActiveTab('offers'); // 2. Cambia a la pestaña de ofertas
+      const newOffer = await createOffer(taskComplete.task.id, offerRequest);
+      setOffers(prevOffers => [newOffer, ...prevOffers]);
+      setActiveTab('offers');
       setIsOfferModalOpen(false);
-      // Opcional: podrías querer recargar los datos de la tarea para ver la nueva oferta
     } catch (error) {
       console.error("Error al crear la oferta:", error);
       alert("Hubo un error al enviar tu oferta. Inténtalo de nuevo.");
     }
   };
+
+  // HANDLE QUESTION
+  const handleQuestionSubmit = async () => {
+    if (!taskComplete) return;
+
+    const questionRequest : QuestionRequest = {
+      description: questionDescription
+    };
+    
+    try {
+      const newQuestion = await createQuestion(taskComplete.task.id, questionRequest);
+      setQuestions(prevQuestions => [newQuestion, ...prevQuestions]);
+      setTask(prevTask => {
+        if (!prevTask) return null;
+        return {
+          ...prevTask,
+          numQuestions: prevTask.numQuestions + 1,
+        };
+      });
+    } catch(error) {
+      console.error("Error al crear la pregunta:", error);
+      alert("Hubo un error al enviar tu pregunta. Inténtalo de nuevo.");
+    }
+  }
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-gray-100"><div className="w-8 h-8 border-4 border-gray-300 border-t-black rounded-full animate-spin"></div></div>;
   if (!taskComplete) return <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-500">No se encontró la tarea.</div>;
@@ -131,8 +175,9 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
           title={taskComplete.task?.title}
           status={taskComplete.task?.status}
           type={taskComplete.task?.type || "Limpieza"} // PONER ETIQUETA
-          publishedAgo={"Publicado hace 2 días"} // PONER TIEMPO DE CREACION
-          views={23} // PONER VISUALIZACIONES
+          publishedAgo={taskComplete.task?.createAt} // PONER TIEMPO DE CREACION
+          // views={taskComplete.task?.views} // PONER VISUALIZACIONES
+          views={23}
         />
 
         {/* 2. BLOQUE PRECIO Y ACCIÓN (Activa el Modal) */}
@@ -156,12 +201,15 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
         {/* 5. BLOQUE TABS / ACTIVIDAD (Comentarios y Preguntas) */}
         <TaskTabs
           offers={offers}
+          questions={questions}
           isLoadingOffers={isLoadingOffers}
-          questions={mockQuestions}
           numOffers={taskComplete.numOffers}
           numQuestions={taskComplete.numQuestions}
           activeTab={activeTab}
+          questionDescription={questionDescription}
           onTabChange={setActiveTab}
+          onQuestionSubmit={handleQuestionSubmit}
+          setQuestionDescription={setQuestionDescription}
         />
 
 

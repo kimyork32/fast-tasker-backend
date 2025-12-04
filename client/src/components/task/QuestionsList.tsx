@@ -1,19 +1,39 @@
 'use client';
 
-interface Question {
-  id: string;
-  author: string;
-  avatarColor?: string;
-  message: string;
-  timestamp: string;
-  answer?: { author: string; message: string; timestamp: string };
-}
+import { 
+  QuestionProfileResponse,
+  AnswerProfileResponse,
+} from "@/lib/types";
 
 interface QuestionsListProps {
-  questions: Question[];
+  questions: QuestionProfileResponse[];
+  questionDescription: string;
+  onSubmit: () => void;
+  setQuestionDescription: (description: string) => void;
 }
 
-export function QuestionsList({ questions }: QuestionsListProps) {
+export function QuestionsList({ 
+  questions,
+  questionDescription,
+  onSubmit,
+  setQuestionDescription
+}: QuestionsListProps) {
+
+  /**
+   * Formatea una fecha ISO (UTC) a una cadena de fecha y hora legible
+   * en la zona horaria local del usuario.
+   * @param isoString La fecha en formato ISO 8601 (ej: "2023-10-27T10:00:00Z").
+   */
+  const formatLocaleDate = (isoString: string) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    const options: Intl.DateTimeFormatOptions = {
+      day: 'numeric', month: 'short', year: 'numeric',
+      hour: 'numeric', minute: '2-digit', hour12: true
+    };
+    return new Intl.DateTimeFormat(navigator.language, options).format(date);
+  };
+
   return (
     <div className="max-w-3xl">
       {/* Caja para escribir pregunta */}
@@ -21,12 +41,17 @@ export function QuestionsList({ questions }: QuestionsListProps) {
         <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0">YO</div>
         <div className="flex-1">
           <textarea
+            value={questionDescription}
+            onChange={(e) => setQuestionDescription(e.target.value)}
             rows={3}
             placeholder="Haz una pregunta pública sobre esta tarea..."
             className="w-full border border-gray-200 rounded-xl p-4 text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none resize-none bg-gray-50"
           ></textarea>
           <div className="flex justify-end mt-2">
-            <button className="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-full hover:bg-blue-700 transition">
+            <button 
+              className="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-full hover:bg-blue-700 transition"
+              onClick={onSubmit}
+            >
               Publicar pregunta
             </button>
           </div>
@@ -35,33 +60,62 @@ export function QuestionsList({ questions }: QuestionsListProps) {
 
       {/* Lista de preguntas */}
       <div className="space-y-8">
-        {questions.map(q => (
-          <div key={q.id} className="flex gap-4 group">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${q.avatarColor || 'bg-gray-200 text-gray-500'}`}>
-              {q.author.slice(0, 2).toUpperCase()}
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-bold text-gray-900 text-sm">{q.author}</span>
-                <span className="text-xs text-gray-400">{q.timestamp}</span>
+        {
+          questions.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full space-y-3 py-8">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100">
+                <svg className="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                </svg>
               </div>
-              <p className="text-gray-700 text-sm leading-relaxed">{q.message}</p>
-
-              {q.answer && (
-                <div className="mt-4 flex gap-3 pl-4 border-l-2 border-gray-100">
-                  <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center text-[10px] font-bold shrink-0">UP</div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-black text-xs px-1.5 py-0.5 bg-gray-100 rounded">Poster</span>
-                      <span className="text-xs text-gray-400">{q.answer.timestamp}</span>
-                    </div>
-                    <p className="text-gray-600 text-sm">{q.answer.message}</p>
-                  </div>
-                </div>
-              )}
+              <p className="text-gray-500 font-medium">No hay preguntas todavía</p>
             </div>
-          </div>
-        ))}
+          ) : (
+            questions.map(q => (
+              <div key={q.question.id} className="flex gap-4 group">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${q.profile.photo || 'bg-gray-200 text-gray-500'}`}>
+                  {`${q.profile.firstName.slice(0, 2)}${q.profile.lastName.slice(0, 2)}`.toUpperCase()}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-bold text-gray-900 text-sm">{`${q.profile.firstName} ${q.profile.lastName}`}</span>
+                    <span className="text-xs text-gray-400">{formatLocaleDate(q.question.createAt)}</span>
+                  </div>
+                  <p className="text-gray-700 text-sm leading-relaxed">{q.question.description}</p>
+
+                  {q.answers != null && q.answers.length > 0 && (
+                    <div className="mt-4 space-y-4">
+                      {q.answers.map((ans) => (
+                         <div 
+                            key={ans.answer.id}
+                            className="flex gap-3 pl-4 border-l-2 border-gray-100"
+                          >
+                        <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+                          {`${ans.profile.firstName.slice(0, 1)}${ans.profile.lastName.slice(0, 1)}`.toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-bold text-black text-xs">
+                              {ans.profile.firstName}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              {formatLocaleDate(ans.answer.createAt)}
+                            </span>
+                          </div>
+
+                          <p className="text-gray-600 text-sm">
+                            {ans.answer.description}
+                          </p>
+                        </div>
+                      </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+          )
+        }  
       </div>
     </div>
   );

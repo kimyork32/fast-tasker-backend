@@ -8,6 +8,21 @@ interface OffersListProps {
 }
 
 export function OffersList({ offers, isLoading }: OffersListProps) {
+  /**
+   * Formatea una fecha ISO (UTC) a una cadena de fecha y hora legible
+   * en la zona horaria local del usuario.
+   * @param isoString La fecha en formato ISO 8601 (ej: "2023-10-27T10:00:00Z").
+   */
+  const formatLocaleDate = (isoString: string) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    const options: Intl.DateTimeFormatOptions = {
+      day: 'numeric', month: 'short', year: 'numeric',
+      hour: 'numeric', minute: '2-digit', hour12: true
+    };
+    return new Intl.DateTimeFormat(navigator.language, options).format(date);
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-8">
@@ -54,7 +69,7 @@ export function OffersList({ offers, isLoading }: OffersListProps) {
               </div>
               <div className="text-right shrink-0 pl-4">
                 <p className="text-xl font-bold text-gray-900">S/. {offerProfile.offer?.price || 'N/A'}</p>
-                <p className="text-xs text-gray-400">hace 1h</p>
+                <p className="text-xs text-gray-400">{formatLocaleDate(offerProfile.offer.createAt)}</p>
               </div>
             </div>
           </div>

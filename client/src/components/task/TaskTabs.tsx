@@ -1,7 +1,7 @@
 'use client';
 
 import { OffersList } from './OffersList';
-import { OfferProfileResponse } from '@/lib/types';
+import { OfferProfileResponse, QuestionProfileResponse } from '@/lib/types';
 import { QuestionsList } from './QuestionsList';
 
 interface Question {
@@ -15,12 +15,15 @@ interface Question {
 
 interface TaskTabsProps {
   offers: OfferProfileResponse[];
+  questions: QuestionProfileResponse[];
   isLoadingOffers: boolean;
-  questions: Question[];
   numOffers: number;
   numQuestions: number;
   activeTab: 'offers' | 'questions';
+  questionDescription: string;
   onTabChange: (tab: 'offers' | 'questions') => void;
+  onQuestionSubmit: () => void;
+  setQuestionDescription: (description: string) => void;
 }
 
 export function TaskTabs({
@@ -30,11 +33,18 @@ export function TaskTabs({
   numOffers,
   numQuestions,
   activeTab,
+  questionDescription,
   onTabChange,
+  onQuestionSubmit,
+  setQuestionDescription
 }: TaskTabsProps) {
   return (
     <div className="md:col-span-12 bg-white rounded-3xl p-2 shadow-sm border border-gray-200/60">
+
+      {/* BOTONES */}
       <div className="flex bg-gray-100 p-1 rounded-2xl w-full md:w-fit mb-6">
+        
+        {/* boton OFERTAS */}
         <button
           onClick={() => onTabChange('offers')}
           className={`flex-1 md:flex-none px-6 py-3 rounded-xl text-sm font-bold transition-all ${
@@ -43,6 +53,8 @@ export function TaskTabs({
         >
           Ofertas ({offers.length > 0 ? offers.length : numOffers})
         </button>
+
+        {/* boton PREGUNTAS */}
         <button
           onClick={() => onTabChange('questions')}
           className={`flex-1 md:flex-none px-6 py-3 rounded-xl text-sm font-bold transition-all ${
@@ -53,11 +65,17 @@ export function TaskTabs({
         </button>
       </div>
 
+      {/* LISTA DE OFERTAS Y PREGUNTAS */}
       <div className="px-6 pb-8 min-h-[200px]">
         {activeTab === 'offers' ? (
           <OffersList offers={offers} isLoading={isLoadingOffers} />
         ) : (
-          <QuestionsList questions={questions} />
+          <QuestionsList 
+            questions={questions} 
+            questionDescription={questionDescription}
+            onSubmit={onQuestionSubmit} 
+            setQuestionDescription={setQuestionDescription}
+          />
         )}
       </div>
     </div>
