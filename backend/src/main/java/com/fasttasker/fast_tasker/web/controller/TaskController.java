@@ -93,7 +93,7 @@ public class TaskController {
         return ResponseEntity.ok(questions);
     }
 
-    @PostMapping("/{taskId}/answers")
+    @PostMapping("/{taskId}/answer")
     public ResponseEntity<AnswerProfileResponse> createAnswer(
             @PathVariable UUID taskId,
             @RequestBody AnswerRequest answerRequest,
