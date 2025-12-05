@@ -84,6 +84,14 @@ public class Task {
     private UUID posterId;
 
     /**
+     * the ID of the tasker assigned to complete this task.
+     * This is null when the task is created (OPEN).
+     * it gets populated when and Offer is accepted
+     */
+    @Column(name = "assigned_tasker_id", nullable = false)
+    private UUID assignedTaskerId;
+
+    /**
      * List of questions posted by Taskers regarding this task.
      * This is the "One" side of the relationship. The 'Question'
      * entity manages the relationship (mappedBy = "task").

@@ -69,8 +69,8 @@ public class TaskerService {
     /**
      * get TaskerResponse by account id
      * 
-     * @param accountId
-     * @return
+     * @param taskerId tasker id
+     * @return taskerResponse
      */
     public TaskerResponse getByAccountId(UUID taskerId) {
         Tasker tasker = taskerRepository.findById(taskerId)
@@ -79,8 +79,8 @@ public class TaskerService {
     }
 
     /**
-     * @param taskerId
-     * @param taskId
+     * @param taskerId taskerId
+     * @param taskId taskerResponse
      */
     public void assignTaskToTasker(UUID taskerId, UUID taskId) {
         // TODO implement here
