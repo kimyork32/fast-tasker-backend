@@ -65,8 +65,8 @@ public class TaskController {
             @RequestBody OfferRequest offerRequest,
             Authentication authentication
     ) {
-        UUID accountId = (UUID) authentication.getPrincipal();
-        OfferProfileResponse offerProfileResponse = taskService.createOffer(offerRequest, taskId, accountId);
+        UUID posterId = (UUID) authentication.getPrincipal();
+        OfferProfileResponse offerProfileResponse = taskService.createOffer(offerRequest, taskId, posterId);
         return ResponseEntity.status(HttpStatus.CREATED).body(offerProfileResponse);
     }
 
@@ -82,8 +82,8 @@ public class TaskController {
             @RequestBody QuestionRequest questionRequest,
             Authentication authentication
     ) {
-        UUID accountId = (UUID) authentication.getPrincipal();
-        QuestionProfileResponse response = taskService.createQuestion(questionRequest, taskId, accountId);
+        UUID taskerId = (UUID) authentication.getPrincipal();
+        QuestionProfileResponse response = taskService.createQuestion(questionRequest, taskId, taskerId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -99,8 +99,8 @@ public class TaskController {
             @RequestBody AnswerRequest answerRequest,
             Authentication authentication
     ) {
-        UUID accountId = (UUID) authentication.getPrincipal();
-        AnswerProfileResponse response = taskService.answerQuestion(answerRequest, taskId, accountId);
+        UUID taskerId = (UUID) authentication.getPrincipal();
+        AnswerProfileResponse response = taskService.answerQuestion(answerRequest, taskId, taskerId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

@@ -107,13 +107,13 @@ public class TaskService {
     }
 
     @Transactional
-    public QuestionProfileResponse createQuestion(QuestionRequest questionRequest, UUID taskId, UUID accountId) {
+    public QuestionProfileResponse createQuestion(QuestionRequest questionRequest, UUID taskId, UUID taskerId) {
         // find task for the insert question
         Task task = findTask(taskId);
         Question question = taskMapper.toQuestionEntity(questionRequest);
         // insert values
         question.setStatus(QuestionStatus.PENDING);
-        question.setAskedById(accountId);
+        question.setAskedById(taskerId);
         question.setCreatedAt(Instant.now());
         question.setTask(task);
 
@@ -204,14 +204,9 @@ public class TaskService {
      *
      * @param offerRequest request of the offer
      * @param taskId id of the task
-     * @param accountId id of the tasker, find the taskId with this
      */
     @Transactional
-    public OfferProfileResponse createOffer(OfferRequest offerRequest, UUID taskId, UUID accountId) {
-        // find taskerId with the accountId
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AccountNotFoundException("TaskerService. Account not found"));
-        UUID taskerId = account.getTaskerId();
+    public OfferProfileResponse createOffer(OfferRequest offerRequest, UUID taskId, UUID taskerId) {
 
         // find task
         Task task = findTask(taskId);
@@ -281,13 +276,8 @@ public class TaskService {
     public AnswerProfileResponse answerQuestion(
             AnswerRequest answerRequest,
             UUID taskId,
-            UUID accountId
+            UUID taskerId
     ) {
-        // find taskerId with the accountId
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AccountNotFoundException("TaskerService. Account not found"));
-
-        UUID taskerId = account.getTaskerId();
         UUID questionId = UUID.fromString(answerRequest.questionId());
 
         // find task

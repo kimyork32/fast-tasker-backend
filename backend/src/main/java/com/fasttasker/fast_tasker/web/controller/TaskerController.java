@@ -62,13 +62,9 @@ public class TaskerController {
     @GetMapping("/user/me")
     public ResponseEntity<TaskerResponse> getTaskerMe(Authentication authentication) {
         // first extract the Principal, before casting the object to UUID
-        UUID accountId = (UUID) authentication.getPrincipal();
-
+        UUID taskerId = (UUID) authentication.getPrincipal();
         // { @see JwtAuthenticationFilter } for explanation
-        TaskerResponse response = taskerService.getByAccountId(accountId);
-
-        System.out.println(response);
-
+        TaskerResponse response = taskerService.getByAccountId(taskerId);
         return ResponseEntity.ok(response);
     }
 }

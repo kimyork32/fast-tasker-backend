@@ -48,7 +48,7 @@ public class ChatController {
     @GetMapping("/api/v1/conversations/inbox")
     public ResponseEntity<List<ConversationSummary>> getInbox(Authentication authentication) {
         // extract ID of the token
-        UUID taskerId = UUID.fromString(authentication.getName());
+        UUID taskerId = (UUID) authentication.getPrincipal();
         return ResponseEntity.ok(conversationService.getUserInbox(taskerId));
     }
 

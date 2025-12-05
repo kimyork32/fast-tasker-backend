@@ -72,16 +72,9 @@ public class TaskerService {
      * @param accountId
      * @return
      */
-    public TaskerResponse getByAccountId(UUID accountId) {
-        Optional<Tasker> taskerOpt = taskerRepository.findByAccountId(accountId);
-
-        if (taskerOpt.isEmpty()) {
-            throw new TaskerNotFoundException(
-                    "the tasker not found with account id: " + accountId);
-        }
-
-        Tasker tasker = taskerOpt.get();
-
+    public TaskerResponse getByAccountId(UUID taskerId) {
+        Tasker tasker = taskerRepository.findById(taskerId)
+                .orElseThrow(() -> new TaskerNotFoundException("TaskerService. getByAccountId. tasker not fount"));
         return taskerMapper.toResponse(tasker);
     }
 
