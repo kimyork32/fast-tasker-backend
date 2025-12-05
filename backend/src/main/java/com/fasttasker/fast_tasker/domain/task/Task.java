@@ -88,7 +88,7 @@ public class Task {
      * This is null when the task is created (OPEN).
      * it gets populated when and Offer is accepted
      */
-    @Column(name = "assigned_tasker_id", nullable = false)
+    @Column(name = "assigned_tasker_id")
     private UUID assignedTaskerId;
 
     /**
