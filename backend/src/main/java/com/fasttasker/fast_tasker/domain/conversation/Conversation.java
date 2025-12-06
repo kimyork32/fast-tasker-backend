@@ -17,6 +17,7 @@ import java.util.UUID;
 @Getter
 @Setter // this no shouldn't be here before it breaks DDD
 @ToString(exclude = "messages") // avoid infinite loop
+@Builder(toBuilder = true)
 public class Conversation {
 
     // NOTE: add semantic constructor (DDD) for validate attributes, and add ID generation (annotation with

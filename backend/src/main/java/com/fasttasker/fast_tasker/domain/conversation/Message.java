@@ -13,6 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString(exclude = "conversation")
+@Builder(toBuilder = true)
 public class Message {
 
     @Id

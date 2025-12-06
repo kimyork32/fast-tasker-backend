@@ -15,14 +15,14 @@ public class ConversationMapper {
     public Conversation toConversationEntity(ConversationRequest request) {
         if (request == null) return null;
 
-        return new Conversation(
-                UUID.randomUUID(),
-                request.taskId(),
-                request.participantA(),
-                request.participantB(),
-                null,
-                ConversationStatus.OPEN
-        );
+        return Conversation.builder()
+                .id(UUID.randomUUID())
+                .taskId(request.taskId())
+                .participantA(request.participantA())
+                .participantB(request.participantB())
+                .status(ConversationStatus.OPEN)
+                .build();
+        // add attribute: messages (List>
     }
     public MessageContent toMessageContentEntity(MessageContentRequest request) {
         if (request == null) return null;
@@ -38,16 +38,14 @@ public class ConversationMapper {
 
         MessageContent messageContent = toMessageContentEntity(request.content());
 
-        return new Message(
-                UUID.randomUUID(), // WARNING: this not is the ID real
-                null,
-                UUID.randomUUID(), // WARNING: this not is the ID real
-                messageContent,
-                null,
-                null
-        );
+        // add attribute: senderId, sentAt, readAt
+        return Message.builder()
+                .id(UUID.randomUUID())
+                .content(messageContent)
+                .build();
     }
 
+    // To response ///////////////////////////////////////////////
     public MessageResponse toMessageResponse(Message message) {
         if (message == null) return null;
 

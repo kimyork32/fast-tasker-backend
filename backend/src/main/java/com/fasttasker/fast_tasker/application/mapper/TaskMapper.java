@@ -18,47 +18,43 @@ public class TaskMapper {
     public Task toTaskEntity(TaskRequest request) {
         if (request == null) return null;
 
-        var loc = request.location();
-
-        return new Task(
-                UUID.randomUUID(),
-                request.title(),
-                request.description(),
-                request.budget(),
-                new Location(loc.latitude(), loc.longitude(), loc.address(), loc.zip()),
-                LocalDate.parse(request.taskDate()),
-                TaskStatus.IN_PROGRESS,
-                null,
-                null,
-                new ArrayList<>(),
-                new ArrayList<>()
-        );
+        return Task.builder()
+                .id(UUID.randomUUID())
+                .title(request.title())
+                .description(request.description())
+                .budget(request.budget())
+                .location(new Location(
+                        request.location().latitude(),
+                        request.location().longitude(),
+                        request.location().address(),
+                        request.location().zip()
+                ))
+                .taskDate(LocalDate.parse(request.taskDate()))
+                .status(TaskStatus.IN_PROGRESS)
+                .build();
+        // insert in this instance: posterId, assignedTaskerId, questions, offers
     }
 
     public Offer toOfferEntity(OfferRequest request) {
-        return new Offer(
-                UUID.randomUUID(),
-                request.price(),
-                request.description(),
-                null, // insert status
-                null, // insert offerted by id
-                null, // insert  create at
-                null // insert task
-        );
+        if (request == null) return null;
+
+        return Offer.builder()
+                .id(UUID.randomUUID())
+                .price(request.price())
+                .description(request.description())
+                .build();
+        // insert in this instance: status, offertedById, createAt, task
     }
 
     public Question toQuestionEntity(QuestionRequest request) {
         if (request == null) return null;
 
-        return new Question(
-                UUID.randomUUID(),
-                request.description(),
-                null, // insert status
-                null, // insert asked by id
-                null, // insert create at
-                null, // insert task
-                null // instantiate and add answer list
-        );
+        return Question.builder()
+                .id(UUID.randomUUID())
+                .description(request.description())
+                .status(QuestionStatus.PENDING)
+                .build();
+        // insert in this instance: status, askedById, createAt, task, answers
     }
 
     public Answer toAnswerEntity(AnswerRequest request) {

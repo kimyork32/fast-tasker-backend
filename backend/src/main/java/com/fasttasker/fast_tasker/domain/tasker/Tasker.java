@@ -17,6 +17,7 @@ import java.util.UUID;
 @Setter
 @ToString
 @EqualsAndHashCode
+@Builder(toBuilder = true)
 public class Tasker {
 
     /**

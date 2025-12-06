@@ -16,6 +16,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
+@Builder(toBuilder = true)
 public class Account {
 
     /**

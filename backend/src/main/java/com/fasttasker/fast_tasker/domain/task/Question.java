@@ -20,6 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
+@Builder(toBuilder = true)
 public class Question {
 
     @Id
@@ -63,5 +64,6 @@ public class Question {
 
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
+    @Builder.Default
     private List<Answer> answers = new ArrayList<>();
 }

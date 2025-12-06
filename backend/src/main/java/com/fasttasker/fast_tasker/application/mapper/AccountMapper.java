@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccountMapper {
 
+    // To response //////////////////////////////////////
     public AccountResponse toResponse(Account account) {
         if (account == null) return null;
 

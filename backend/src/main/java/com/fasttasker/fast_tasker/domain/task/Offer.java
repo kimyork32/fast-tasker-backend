@@ -17,6 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
+@Builder(toBuilder = true)
 public class Offer {
 
     /**

@@ -21,6 +21,7 @@ import java.util.UUID;
 @Setter
 @ToString
 @EqualsAndHashCode(exclude = {"questions", "offers"})
+@Builder(toBuilder = true)
 public class Task {
 
     @Id
