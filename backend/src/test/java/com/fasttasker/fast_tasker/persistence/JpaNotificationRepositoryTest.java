@@ -33,8 +33,7 @@ class JpaNotificationRepositoryTest {
         Notification newNotification = new Notification(
                 uuid,
                 accountId,
-                NotificationType.QUESTION,
-                NotificationStatus.UNREAD
+                NotificationType.QUESTION
         );
 
         // 2. ACT
@@ -63,8 +62,7 @@ class JpaNotificationRepositoryTest {
         Notification newNotification = new Notification(
                 uuid,
                 accountId,
-                NotificationType.QUESTION,
-                NotificationStatus.UNREAD
+                NotificationType.QUESTION
         );
 
         // 2. ACT
@@ -99,8 +97,7 @@ class JpaNotificationRepositoryTest {
         Notification newNotification = new Notification(
                 uuid,
                 accountId,
-                NotificationType.QUESTION,
-                NotificationStatus.UNREAD
+                NotificationType.QUESTION
         );
 
         // 2. ACT
