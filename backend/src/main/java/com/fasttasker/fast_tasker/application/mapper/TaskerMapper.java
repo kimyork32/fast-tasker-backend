@@ -1,5 +1,7 @@
 package com.fasttasker.fast_tasker.application.mapper;
 
+import com.fasttasker.fast_tasker.application.dto.task.AssignTaskerRequest;
+import com.fasttasker.fast_tasker.application.dto.task.AssignTaskerResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.*;
 import com.fasttasker.fast_tasker.domain.tasker.Location;
 import com.fasttasker.fast_tasker.domain.tasker.Profile;
@@ -65,6 +67,24 @@ public class TaskerMapper {
                 .build();
     }
 
+    public Profile toProfileEntity(ProfileRequest request) {
+        if (request == null) return null;
+
+        var loc = request.location();
+
+        return new Profile(
+                request.firstName(),
+                request.lastName(),
+                request.photo(),
+                new Location(loc.latitude(), loc.longitude(), loc.address(), loc.zip()),
+                request.about(),
+                request.reputation(),
+                request.clientReviews(),
+                request.completedTasks()
+        );
+    }
+
+    // TO RESPONSE ////////////////////////////////////////////////////////
     public MinimalProfileResponse toMinimalProfileResponse(Tasker tasker) {
         if (tasker == null) return null;
 
@@ -80,20 +100,12 @@ public class TaskerMapper {
                 .build();
     }
 
-    public Profile toProfileEntity(ProfileRequest request) {
+    public AssignTaskerResponse toAssignTaskerResponse(AssignTaskerRequest request) {
         if (request == null) return null;
 
-        var loc = request.location();
-
-        return new Profile(
-                request.firstName(),
-                request.lastName(),
-                request.photo(),
-                new Location(loc.latitude(), loc.longitude(), loc.address(), loc.zip()),
-                request.about(),
-                request.reputation(),
-                request.clientReviews(),
-                request.completedTasks()
-                );
+        return AssignTaskerResponse.builder()
+                .taskerId(request.taskerId())
+                .taskId(request.taskId())
+                .build();
     }
 }
