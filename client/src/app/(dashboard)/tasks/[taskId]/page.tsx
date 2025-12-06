@@ -16,6 +16,8 @@ import {
   QuestionRequest,
   QuestionProfileResponse
 } from '@/lib/types';
+import Cookies from 'js-cookie'; // Importa para acceder a las cookies en el cliente
+import { jwtDecode } from 'jwt-decode'; // Importa para decodificar el token JWT
 import Link from 'next/link';
 import { TaskHeader } from '@/components/task/TaskHeader';
 import { TaskPricePanel } from '@/components/task/TaskPricePanel';
@@ -23,27 +25,6 @@ import { TaskQuickInfo } from '@/components/task/TaskQuickInfo';
 import { TaskDescription } from '@/components/task/TaskDescription';
 import { OfferModal } from '@/components/task/OfferModal'
 import { TaskTabs } from '@/components/task/TaskTabs'
-
-const mockQuestions = [
-  {
-    id: '1',
-    author: 'Juan Pérez',
-    message: 'Hola, ¿necesitas que lleve mis propios productos de limpieza o tú los proporcionas?',
-    timestamp: 'Hace 5 horas',
-  },
-  {
-    id: '2',
-    author: 'Maria A.',
-    message: '¿Hay estacionamiento disponible en el edificio? Tengo una camioneta grande.',
-    timestamp: 'Hace 1 día',
-    answer: {
-      author: 'Poster',
-      message: 'Sí, hay estacionamiento de visitas en el sótano 1.',
-      timestamp: 'Hace 20 horas',
-    },
-  },
-];
-
 
 type TaskDetailPageProps = {
   params: Promise<{ taskId: string }>;
@@ -56,6 +37,9 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'offers' | 'questions'>('questions');
   
+  // Estado para almacenar el ID del usuario actual
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
   // Nuevo Estado para el Modal de Oferta
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
 
@@ -72,9 +56,29 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
   const [questionDescription, setQuestionDescription] = useState('');
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
+  // Efecto para obtener el ID del usuario actual de la cookie
+  useEffect(() => {
+    const token = Cookies.get('jwtToken');
+    if (token) {
+      try {
+        // Decodifica el token para obtener el payload.
+        // 'sub' (subject) usualmente contiene el ID del usuario.
+        const decodedToken: { sub: string } = jwtDecode(token);
+        const userIdFromToken = decodedToken.sub;
+        setCurrentUserId(userIdFromToken);
+        console.log(`ID de usuario obtenido del token: ${userIdFromToken}`); // Logueamos el valor adirecto
+      } catch (error) {
+        console.error("Error al decodificar el token JWT:", error);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     getTaskById(taskId)
-      .then(setTask)
+      .then(data => {
+        setTask(data);
+        console.log(`ID de usuario del tasker: ${data?.task?.posterId}`);
+      })
       .catch(console.error)
       .finally(() => setIsLoading(false));
   }, [taskId]);
@@ -155,6 +159,9 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-gray-100"><div className="w-8 h-8 border-4 border-gray-300 border-t-black rounded-full animate-spin"></div></div>;
   if (!taskComplete) return <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-500">No se encontró la tarea.</div>;
 
+  // Determinar si el usuario actual es el creador de la tarea
+  const isCreator = currentUserId && taskComplete.task?.posterId === currentUserId;
+
   return (
     <>
     <div className="min-h-screen bg-gray-100 p-4 md:p-8 font-sans">
@@ -180,11 +187,17 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
           views={23}
         />
 
-        {/* 2. BLOQUE PRECIO Y ACCIÓN (Activa el Modal) */}
-        <TaskPricePanel
-          budget={taskComplete.task?.budget || 0}
-          onOpenOfferModal={() => setIsOfferModalOpen(true)}
-        />
+        {/* 2. BLOQUE PRECIO Y ACCIÓN (Activa el Modal) / BOTÓN MODIFICAR */}
+        {isCreator ? (
+          <Link href={`/tasks/${taskId}/edit`} className="md:col-span-4 bg-blue-500 text-white p-4 rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors">
+            Modificar Tarea
+          </Link>
+        ) : (
+          <TaskPricePanel
+            budget={taskComplete.task?.budget || 0}
+            onOpenOfferModal={() => setIsOfferModalOpen(true)}
+          />
+        )}
 
         {/* 3. BLOQUE INFO RÁPIDA */}
         <TaskQuickInfo
@@ -219,16 +232,18 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
     {/* =================================================================
         MODAL FLOTANTE DE OFERTA
        ================================================================= */}
-    <OfferModal
-      isOpen={isOfferModalOpen}
-      budget={taskComplete?.task.budget || 0}
-      offerPrice={offerPrice}
-      offerMessage={offerMessage}
-      setOfferPrice={setOfferPrice}
-      setOfferMessage={setOfferMessage}
-      onClose={() => setIsOfferModalOpen(false)}
-      onSubmit={handleOfferSubmit}
-    />
+    {!isCreator && (
+      <OfferModal
+        isOpen={isOfferModalOpen}
+        budget={taskComplete?.task.budget || 0}
+        offerPrice={offerPrice}
+        offerMessage={offerMessage}
+        setOfferPrice={setOfferPrice}
+        setOfferMessage={setOfferMessage}
+        onClose={() => setIsOfferModalOpen(false)}
+        onSubmit={handleOfferSubmit}
+      />
+    )}
 
     </>
   );
