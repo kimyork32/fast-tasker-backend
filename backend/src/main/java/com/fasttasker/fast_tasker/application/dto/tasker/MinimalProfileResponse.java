@@ -8,6 +8,7 @@ import lombok.Builder;
  */
 @Builder
 public record MinimalProfileResponse(
+        String id,
         String firstName,
         String lastName,
         String photo,

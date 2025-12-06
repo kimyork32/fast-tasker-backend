@@ -73,6 +73,7 @@ public class TaskerMapper {
                 .build();
 
         var profileResponse = ProfileResponse.builder()
+                .id(tasker.getId().toString())
                 .firstName(profile.getFirstName())
                 .lastName(profile.getLastName())
                 .photo(profile.getPhoto())
@@ -97,6 +98,7 @@ public class TaskerMapper {
         var profile = tasker.getProfile();
 
         return MinimalProfileResponse.builder()
+                .id(tasker.getId().toString())
                 .firstName(profile.getFirstName())
                 .lastName(profile.getLastName())
                 .photo(profile.getPhoto())
