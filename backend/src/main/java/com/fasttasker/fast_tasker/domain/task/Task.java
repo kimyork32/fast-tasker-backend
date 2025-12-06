@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -100,7 +101,7 @@ public class Task {
      */
     @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
-    private List<Question> questions;
+    private List<Question> questions = new ArrayList<>();
 
     /**
      * List of offers made by Taskers for this task.
@@ -110,6 +111,6 @@ public class Task {
      */
     @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
-    private List<Offer> offers;
+    private List<Offer> offers = new ArrayList<>();
 
 }
