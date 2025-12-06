@@ -1,6 +1,8 @@
 package com.fasttasker.fast_tasker.web.controller;
 
 import com.fasttasker.fast_tasker.application.TaskerService;
+import com.fasttasker.fast_tasker.application.dto.task.AssignTaskerRequest;
+import com.fasttasker.fast_tasker.application.dto.task.AssignTaskerResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRegistrationResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
@@ -65,6 +67,16 @@ public class TaskerController {
         UUID taskerId = (UUID) authentication.getPrincipal();
         // { @see JwtAuthenticationFilter } for explanation
         TaskerResponse response = taskerService.getByAccountId(taskerId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/assign-tasker")
+    public ResponseEntity<AssignTaskerResponse> assignTasker(
+            Authentication authentication,
+            AssignTaskerRequest request
+    ) {
+        UUID posterId = (UUID) authentication.getPrincipal();
+        AssignTaskerResponse response = taskerService.assignTaskToTasker(request, posterId);
         return ResponseEntity.ok(response);
     }
 }

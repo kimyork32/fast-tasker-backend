@@ -1,11 +1,15 @@
 package com.fasttasker.fast_tasker.application;
 
+import com.fasttasker.fast_tasker.application.dto.task.AssignTaskerRequest;
+import com.fasttasker.fast_tasker.application.dto.task.AssignTaskerResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
+import com.fasttasker.fast_tasker.application.exception.TaskAccessDeniedException;
 import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
 import com.fasttasker.fast_tasker.application.mapper.TaskerMapper;
 import com.fasttasker.fast_tasker.domain.account.IAccountRepository;
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
+import com.fasttasker.fast_tasker.domain.task.Task;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import com.fasttasker.fast_tasker.domain.tasker.Profile;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
@@ -53,6 +57,7 @@ public class TaskerService {
     /**
      * @param taskerId tasker id
      */
+    @Transactional(readOnly = true)
     public TaskerResponse getById(UUID taskerId) {
         Optional<Tasker> taskerOpt = taskerRepository.findById(taskerId);
 
@@ -72,18 +77,30 @@ public class TaskerService {
      * @param taskerId tasker id
      * @return taskerResponse
      */
+    @Transactional(readOnly = true)
     public TaskerResponse getByAccountId(UUID taskerId) {
         Tasker tasker = taskerRepository.findById(taskerId)
                 .orElseThrow(() -> new TaskerNotFoundException("TaskerService. getByAccountId. tasker not fount"));
         return taskerMapper.toResponse(tasker);
     }
 
-    /**
-     * @param taskerId taskerId
-     * @param taskId taskerResponse
-     */
-    public void assignTaskToTasker(UUID taskerId, UUID taskId) {
-        // TODO implement here
+    @Transactional
+    public AssignTaskerResponse assignTaskToTasker(AssignTaskerRequest request, UUID posterId) {
+        UUID taskId = UUID.fromString(request.taskId());
+        UUID taskerId = UUID.fromString(request.taskerId());
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskerNotFoundException("Task not found with id: " + taskId));
+
+        if (!posterId.equals(task.getPosterId())) {
+            throw new TaskAccessDeniedException("User does not have permission to assign this task.");
+        }
+
+        // save tasker how assignTasker in the task
+        task.setAssignedTaskerId(taskerId);
+        taskRepository.save(task);
+
+        return taskerMapper.toAssignTaskerResponse(request);
     }
 
     /**
