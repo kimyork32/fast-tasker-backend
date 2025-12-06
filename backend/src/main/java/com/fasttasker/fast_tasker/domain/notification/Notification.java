@@ -3,7 +3,7 @@ package com.fasttasker.fast_tasker.domain.notification;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -12,8 +12,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "notification")
 @Getter
-@Setter
-@AllArgsConstructor
+@Setter // Consider making entities immutable by removing setters where possible
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
@@ -42,7 +41,7 @@ public class Notification {
     /**
      * date and time the notification was created
      */
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     /**
      * boolean indicator of whether the notification was read
@@ -58,4 +57,29 @@ public class Notification {
     @Column(name = "status", nullable = false)
     private NotificationStatus status;
 
+    @Builder
+    public Notification(UUID id, UUID receiverTaskerId, NotificationType type, NotificationStatus status) {
+        this.id = id;
+        this.receiverTaskerId = receiverTaskerId;
+        this.type = type;
+        this.status = status;
+        this.createdAt = Instant.now();
+        this.isRead = false;
+
+        this.createMessageContent();
+    }
+
+    /**
+     * this method sets the message content based on the notification type.
+     * it is called during object construction to ensure consistency.
+     */
+    public void createMessageContent() {
+        this.message = switch (type) {
+            case NotificationType.QUESTION -> "Tienes una nueva pregunta";
+            case NotificationType.OFFER_ACCEPTED -> "Has aceptado una oferta";
+            case NotificationType.SYSTEM -> "Notificación del sistema";
+            case NotificationType.TASK_COMPLETED -> "Has completado una tarea :)";
+            case NotificationType.NEW_MESSAGE -> "Tienes un nuevo mensaje";
+        };
+    }
 }

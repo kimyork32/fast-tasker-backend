@@ -28,16 +28,12 @@ class JpaNotificationRepositoryTest {
         // 1. ARRANGE
         UUID uuid = UUID.randomUUID();
         UUID accountId = UUID.randomUUID();
-        String message = "test notification";
         LocalDateTime time = LocalDateTime.now();
 
         Notification newNotification = new Notification(
                 uuid,
                 accountId,
                 NotificationType.QUESTION,
-                message,
-                time,
-                false,
                 NotificationStatus.UNREAD
         );
 
@@ -68,9 +64,6 @@ class JpaNotificationRepositoryTest {
                 uuid,
                 accountId,
                 NotificationType.QUESTION,
-                message,
-                time,
-                false,
                 NotificationStatus.UNREAD
         );
 
@@ -107,9 +100,6 @@ class JpaNotificationRepositoryTest {
                 uuid,
                 accountId,
                 NotificationType.QUESTION,
-                message,
-                time,
-                false,
                 NotificationStatus.UNREAD
         );
 

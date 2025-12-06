@@ -119,9 +119,6 @@ public class AccountService {
                 UUID.randomUUID(),
                 account.getTaskerId(),
                 NotificationType.SYSTEM,
-                "¡Bienvenido a FastTasker! Completa tu perfil para empezar.",
-                LocalDateTime.now(),
-                false,
                 NotificationStatus.UNREAD
         );
 

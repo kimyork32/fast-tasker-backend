@@ -40,6 +40,7 @@ class JpaTaskRepositoryTest {
                 date,
                 TaskStatus.ACTIVE,
                 posterId,
+                null,
                 new ArrayList<>(),
                 new ArrayList<>()
         );
@@ -109,6 +110,7 @@ class JpaTaskRepositoryTest {
                 taskDate,
                 TaskStatus.ACTIVE,
                 posterId,
+                null,
                 new ArrayList<>(), // need add offer here
                 new ArrayList<>()
         );
