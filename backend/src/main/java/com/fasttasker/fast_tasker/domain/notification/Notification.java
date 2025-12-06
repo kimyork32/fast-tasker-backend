@@ -58,11 +58,11 @@ public class Notification {
     private NotificationStatus status;
 
     @Builder
-    public Notification(UUID id, UUID receiverTaskerId, NotificationType type, NotificationStatus status) {
+    public Notification(UUID id, UUID receiverTaskerId, NotificationType type) {
         this.id = id;
         this.receiverTaskerId = receiverTaskerId;
         this.type = type;
-        this.status = status;
+        this.status = NotificationStatus.UNREAD;
         this.createdAt = Instant.now();
         this.isRead = false;
 

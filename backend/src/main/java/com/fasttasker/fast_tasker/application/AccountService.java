@@ -118,8 +118,7 @@ public class AccountService {
         Notification welcomeNotification = new Notification(
                 UUID.randomUUID(),
                 account.getTaskerId(),
-                NotificationType.SYSTEM,
-                NotificationStatus.UNREAD
+                NotificationType.SYSTEM
         );
 
         // save notification, if any error occurs then rollback
