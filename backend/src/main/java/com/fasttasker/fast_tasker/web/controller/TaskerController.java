@@ -1,17 +1,21 @@
 package com.fasttasker.fast_tasker.web.controller;
 
+import com.fasttasker.fast_tasker.application.NotificationService;
 import com.fasttasker.fast_tasker.application.TaskerService;
+import com.fasttasker.fast_tasker.application.dto.notification.NotificationResponse;
 import com.fasttasker.fast_tasker.application.dto.task.AssignTaskerRequest;
 import com.fasttasker.fast_tasker.application.dto.task.AssignTaskerResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRegistrationResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
 import com.fasttasker.fast_tasker.config.JwtService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -22,14 +26,16 @@ import java.util.UUID;
 public class TaskerController {
 
     private final TaskerService taskerService;
+    private final NotificationService notificationService;
     private final JwtService jwtService;
 
     /**
      * constructor for dependencies injection
      */
     @Autowired
-    public TaskerController(TaskerService taskerService, JwtService jwtService) {
+    public TaskerController(TaskerService taskerService, NotificationService notificationService, JwtService jwtService) {
         this.taskerService = taskerService;
+        this.notificationService = notificationService;
         this.jwtService = jwtService;
     }
 
@@ -73,10 +79,17 @@ public class TaskerController {
     @PutMapping("/assign-tasker")
     public ResponseEntity<AssignTaskerResponse> assignTasker(
             Authentication authentication,
-            AssignTaskerRequest request
+            @Valid @RequestBody AssignTaskerRequest request
     ) {
         UUID posterId = (UUID) authentication.getPrincipal();
         AssignTaskerResponse response = taskerService.assignTaskToTasker(request, posterId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/notifications")
+    public ResponseEntity<List<NotificationResponse>> getNotificationsByTasker(Authentication authentication) {
+        UUID taskerId = (UUID) authentication.getPrincipal();
+        List<NotificationResponse> notifications = notificationService.getAll(taskerId);
+        return ResponseEntity.ok(notifications);
     }
 }
