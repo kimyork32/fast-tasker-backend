@@ -36,4 +36,9 @@ public class NotificationRepositoryImpl implements INotificationRepository {
     public Optional<Notification> findByReceiverTaskerId(UUID receiverTaskerId) {
         return jpa.findByReceiverTaskerId(receiverTaskerId);
     }
+
+    @Override
+    public List<Notification> findAllByReceiverTaskerId(UUID receiverTaskerId) {
+        return jpa.findAllByReceiverTaskerId(receiverTaskerId);
+    }
 }

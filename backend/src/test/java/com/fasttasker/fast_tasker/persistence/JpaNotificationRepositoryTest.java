@@ -26,13 +26,12 @@ class JpaNotificationRepositoryTest {
     @Test
     void shouldSaveAndFindByAccountId() {
         // 1. ARRANGE
-        UUID uuid = UUID.randomUUID();
         UUID accountId = UUID.randomUUID();
         LocalDateTime time = LocalDateTime.now();
 
         Notification newNotification = new Notification(
-                uuid,
                 accountId,
+                UUID.randomUUID(),
                 NotificationType.QUESTION
         );
 
@@ -40,7 +39,7 @@ class JpaNotificationRepositoryTest {
         // save
         notificationRepository.save(newNotification);
         // find
-        Optional<Notification> notificationFoundOpt = notificationRepository.findById(uuid);
+        Optional<Notification> notificationFoundOpt = notificationRepository.findById(newNotification.getId());
 
         // 3. ASSERT
         assertThat(notificationFoundOpt).isPresent();
@@ -54,14 +53,13 @@ class JpaNotificationRepositoryTest {
     @Test
     void shouldSaveAndFindAll() {
         // 1. ARRANGE
-        UUID uuid = UUID.randomUUID();
         UUID accountId = UUID.randomUUID();
         String message = "test notification";
         LocalDateTime time = LocalDateTime.now();
 
         Notification newNotification = new Notification(
-                uuid,
                 accountId,
+                UUID.randomUUID(),
                 NotificationType.QUESTION
         );
 
@@ -89,14 +87,13 @@ class JpaNotificationRepositoryTest {
     @Test
     void shouldSaveAndFindByReceiverTaskerId() {
         // 1. ARRANGE
-        UUID uuid = UUID.randomUUID();
         UUID accountId = UUID.randomUUID();
         String message = "test notification";
         LocalDateTime time = LocalDateTime.now();
 
         Notification newNotification = new Notification(
-                uuid,
                 accountId,
+                UUID.randomUUID(),
                 NotificationType.QUESTION
         );
 

@@ -14,4 +14,5 @@ public interface INotificationRepository {
 
     Optional<Notification> findByReceiverTaskerId(UUID receiverTaskerId);
 
+    List<Notification> findAllByReceiverTaskerId(UUID receiverTaskerId);
 }
