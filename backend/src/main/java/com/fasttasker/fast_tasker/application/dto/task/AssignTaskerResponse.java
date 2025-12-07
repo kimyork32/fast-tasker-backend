@@ -5,5 +5,6 @@ import lombok.Builder;
 @Builder
 public record AssignTaskerResponse(
         String taskerId,
-        String taskId
+        String taskId,
+        String offerId
 ) {}

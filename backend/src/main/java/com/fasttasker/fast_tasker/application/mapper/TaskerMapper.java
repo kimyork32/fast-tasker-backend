@@ -113,7 +113,7 @@ public class TaskerMapper {
 
         return AssignTaskerResponse.builder()
                 .taskerId(request.taskerId())
-                .taskId(request.taskId())
+                .offerId(request.offerId())
                 .build();
     }
 }

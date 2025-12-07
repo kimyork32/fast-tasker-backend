@@ -8,6 +8,7 @@ import com.fasttasker.fast_tasker.application.exception.TaskAccessDeniedExceptio
 import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
 import com.fasttasker.fast_tasker.application.mapper.TaskerMapper;
 import com.fasttasker.fast_tasker.domain.account.IAccountRepository;
+import com.fasttasker.fast_tasker.domain.notification.NotificationType;
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
 import com.fasttasker.fast_tasker.domain.task.Task;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
@@ -23,14 +24,14 @@ import java.util.UUID;
 public class TaskerService {
 
     private final ITaskerRepository taskerRepository;
-    private final IAccountRepository accountRepository;
     private final ITaskRepository taskRepository;
     private final TaskerMapper taskerMapper;
+    private final NotificationService notificationService;
 
     public TaskerService(ITaskerRepository taskerRepository, IAccountRepository accountRepository,
-            ITaskRepository taskRepository, TaskerMapper taskerMapper) {
+            ITaskRepository taskRepository, TaskerMapper taskerMapper, NotificationService notificationService) {
         this.taskerRepository = taskerRepository;
-        this.accountRepository = accountRepository;
+        this.notificationService = notificationService;
         this.taskRepository = taskRepository;
         this.taskerMapper = taskerMapper;
     }
@@ -88,6 +89,7 @@ public class TaskerService {
     public AssignTaskerResponse assignTaskToTasker(AssignTaskerRequest request, UUID posterId) {
         UUID taskId = UUID.fromString(request.taskId());
         UUID taskerId = UUID.fromString(request.taskerId());
+        UUID offerId = UUID.fromString(request.offerId());
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskerNotFoundException("Task not found with id: " + taskId));
@@ -99,6 +101,14 @@ public class TaskerService {
         // save tasker how assignTasker in the task
         task.setAssignedTaskerId(taskerId);
         taskRepository.save(task);
+
+        notificationService.sendNotification(taskerId, offerId, NotificationType.OFFER_ACCEPTED);
+
+        // asignar a un tasker para hacer un task (COMPLETADO)
+        //notificar a tasker que le asignaron un task (COMPLETADO)
+        // taskerId, notificationType
+        //crear nuevo chat entre poster y tasker
+        //enviar mensaje a poster desde chat de tasker
 
         return taskerMapper.toAssignTaskerResponse(request);
     }

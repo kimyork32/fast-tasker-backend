@@ -51,6 +51,7 @@ class TaskerControllerTest {
         );
 
         var mockProfile = new ProfileResponse(
+                UUID.randomUUID().toString(),
                 "homer",
                 "simpson",
                 "https://amazon.com/photo/235",

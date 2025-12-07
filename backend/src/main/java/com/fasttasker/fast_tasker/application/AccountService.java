@@ -116,8 +116,8 @@ public class AccountService {
         taskerRepository.save(tasker);
 
         Notification welcomeNotification = new Notification(
-                UUID.randomUUID(),
                 account.getTaskerId(),
+                null,
                 NotificationType.SYSTEM
         );
 

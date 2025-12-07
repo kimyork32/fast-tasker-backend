@@ -50,6 +50,12 @@ public class Notification {
     private boolean isRead;
 
     /**
+     * url of the notification target
+     */
+    @Column(name = "target-url")
+    private UUID targetId;
+
+    /**
      * notification status:
      * {READ, UNREAD}
      */
@@ -58,13 +64,14 @@ public class Notification {
     private NotificationStatus status;
 
     @Builder
-    public Notification(UUID id, UUID receiverTaskerId, NotificationType type) {
-        this.id = id;
+    public Notification(UUID receiverTaskerId, UUID targetId, NotificationType type) {
+        this.id = UUID.randomUUID();
         this.receiverTaskerId = receiverTaskerId;
         this.type = type;
         this.status = NotificationStatus.UNREAD;
         this.createdAt = Instant.now();
         this.isRead = false;
+        this.targetId = targetId;
 
         this.createMessageContent();
     }
