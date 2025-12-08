@@ -91,20 +91,26 @@ public class ConversationService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * processes an incoming message and sends it to subscribed WebSocket clients.
+     * @param messageRequest messageRequest the incoming message data containing conversation ID and content
+     * @param senderIdFromToken senderIdFromToken the ID of the authenticated user sending the message
+     */
     @Transactional
     public void processAndSendMessage(MessageRequest messageRequest, UUID senderIdFromToken) {
         Conversation conversation = conversationRepository.findById(messageRequest.conversationId())
                 .orElseThrow(() -> new ConversationNotFountException("Conversation Not Found"));
 
-        var messageContent = conversationMapper.toMessageContentEntity(messageRequest.content());
+        MessageContent messageContent = conversationMapper.toMessageContentEntity(messageRequest.content());
+
+        // save message into the conversation
         conversation.sendMessage(senderIdFromToken, messageContent);
 
-        // save and notifying
+        // save conversation in the db
         Conversation savedConversation = conversationRepository.save(conversation);
 
         // get the last message was created
-        Message newMessage = savedConversation.getMessages()
-                .getLast();
+        Message newMessage = savedConversation.getMessages().getLast();
 
         // convert last message to DTO
         MessageResponse messageResponse = conversationMapper.toMessageResponse(newMessage);
