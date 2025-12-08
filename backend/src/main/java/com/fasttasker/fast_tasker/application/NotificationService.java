@@ -42,7 +42,7 @@ public class NotificationService {
         messagingTemplate.convertAndSendToUser(
                 receiverTaskerId.toString(),
                 "/topic/notifications",
-                savedNotification
+                notificationMapper.toNotificationResponse(savedNotification)
         );
     }
 
