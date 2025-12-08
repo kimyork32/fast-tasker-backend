@@ -23,6 +23,9 @@ interface TaskTabsProps {
   questionDescription: string;
   onTabChange: (tab: 'offers' | 'questions') => void;
   onQuestionSubmit: () => void;
+  isCreator: boolean;
+  taskId: string;
+  onAnswerSubmit: (questionId: string, answerDescription: string) => void;
   setQuestionDescription: (description: string) => void;
 }
 
@@ -35,8 +38,11 @@ export function TaskTabs({
   activeTab,
   questionDescription,
   onTabChange,
+  isCreator,
   onQuestionSubmit,
-  setQuestionDescription
+  setQuestionDescription,  
+  taskId,
+  onAnswerSubmit
 }: TaskTabsProps) {
   return (
     <div className="md:col-span-12 bg-white rounded-3xl p-2 shadow-sm border border-gray-200/60">
@@ -68,13 +74,14 @@ export function TaskTabs({
       {/* LISTA DE OFERTAS Y PREGUNTAS */}
       <div className="px-6 pb-8 min-h-[200px]">
         {activeTab === 'offers' ? (
-          <OffersList offers={offers} isLoading={isLoadingOffers} />
+          <OffersList offers={offers} isLoading={isLoadingOffers} isCreator={isCreator} taskId={taskId} />
         ) : (
           <QuestionsList 
             questions={questions} 
             questionDescription={questionDescription}
-            onSubmit={onQuestionSubmit} 
+            onQuestionSubmit={onQuestionSubmit} 
             setQuestionDescription={setQuestionDescription}
+            onAnswerSubmit={onAnswerSubmit}
           />
         )}
       </div>

@@ -7,14 +7,19 @@ import {
   createOffer, 
   getOffersByTask,
   createQuestion,
-  getQuestionsByTask
+  getQuestionsByTask,
+  createAnswer, // <-- Asegúrate de importar esto desde tu servicio
+  assignTasker
 } from '@/services/task.service';
 import { 
   OfferRequest, 
   OfferProfileResponse, 
   TaskCompleteResponse,
   QuestionRequest,
-  QuestionProfileResponse
+  QuestionProfileResponse,
+  AnswerRequest, // <-- Y también el tipo de la petición
+  AnswerProfileResponse,
+  AssignTaskerRequest
 } from '@/lib/types';
 import Cookies from 'js-cookie'; // Importa para acceder a las cookies en el cliente
 import { jwtDecode } from 'jwt-decode'; // Importa para decodificar el token JWT
@@ -156,11 +161,50 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
     }
   }
 
+  // HANDLE ANSWER
+  const handleAnswerSubmit = async (questionId: string, answerDescription: string) => {
+    if (!answerDescription.trim()) return; // No enviar respuestas vacías
+
+    const answerRequest: AnswerRequest = {
+      questionId: questionId,
+      description: answerDescription,
+    };
+
+    try {
+      // 1. Llama a tu servicio para crear la respuesta. Esto devuelve un `AnswerResponse`.
+      const newAnswerResponse = await createAnswer(taskId, answerRequest);
+
+      // 2. Construye el objeto `AnswerProfileResponse` que el estado espera.
+      //    Necesitamos el perfil del usuario actual. Asumimos que está en `taskComplete.profile`.
+      //    Si no es así, necesitarás obtenerlo de otra fuente.
+      if (!taskComplete?.profile) {
+        throw new Error("No se pudo encontrar el perfil del usuario actual para la respuesta.");
+      }
+
+      const newAnswerForState: AnswerProfileResponse = {
+        answer: newAnswerResponse,
+        profile: taskComplete.profile,
+      };
+
+      // 3. Actualiza el estado local con el objeto correctamente tipado.
+      setQuestions(prevQuestions => prevQuestions.map(q => {
+        if (q.question.id === questionId) {
+          return { ...q, answers: [...(q.answers || []), newAnswerForState] };
+        }
+        return q;
+      }));
+    } catch (error) {
+      console.error("Error al crear la respuesta:", error);
+      alert("Hubo un error al enviar tu respuesta. Inténtalo de nuevo.");
+    }
+  };
+
+
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-gray-100"><div className="w-8 h-8 border-4 border-gray-300 border-t-black rounded-full animate-spin"></div></div>;
   if (!taskComplete) return <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-500">No se encontró la tarea.</div>;
 
   // Determinar si el usuario actual es el creador de la tarea
-  const isCreator = currentUserId && taskComplete.task?.posterId === currentUserId;
+  const isCreator = !!(currentUserId && taskComplete.task?.posterId === currentUserId);
 
   return (
     <>
@@ -221,7 +265,10 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
           activeTab={activeTab}
           questionDescription={questionDescription}
           onTabChange={setActiveTab}
+          taskId={taskId}
+          isCreator={isCreator}
           onQuestionSubmit={handleQuestionSubmit}
+          onAnswerSubmit={handleAnswerSubmit}
           setQuestionDescription={setQuestionDescription}
         />
 

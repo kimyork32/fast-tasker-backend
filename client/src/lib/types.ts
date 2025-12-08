@@ -45,6 +45,7 @@ export interface SignupResponse {
 }
 
 export type ProfileData = {
+  id: string;
   firstName: string;
   lastName: string;
   photo?: string;
@@ -53,6 +54,7 @@ export type ProfileData = {
 }
 
 export interface MinimalProfileData {
+  id: string;
   firstName: string;
   lastName: string;
   photo?: string;
@@ -191,4 +193,27 @@ export interface QuestionProfileResponse {
   question: QuestionResponse;
   profile: MinimalProfileData;
   answers: AnswerProfileResponse[];
+}
+
+// --- DTOs assignTasker ---
+export interface AssignTaskerRequest {
+  taskerId: string;
+  taskId: string;
+  offerId: string;
+}
+
+export interface AssignTaskerResponse {
+  taskerId: String;
+  taskId: String;
+}
+
+// ---DTOs notification ---
+// Define la forma del objeto Notification que viene del backend
+export interface NotificationResponse {
+  id: string; // UUID
+  receiverTaskerId: string; // UUID
+  targetId: string; // UUID (e.g., offerId)
+  type: 'OFFER_ACCEPTED' | 'NEW_MESSAGE' | string; // NotificationType
+  message?: string; // El mensaje se puede construir en el frontend
+  createAt: string; // Instant
 }

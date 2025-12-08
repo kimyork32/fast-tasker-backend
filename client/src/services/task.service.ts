@@ -6,12 +6,16 @@ import {
   OfferRequest,
   OfferProfileResponse,
   QuestionRequest,
-  QuestionProfileResponse
+  QuestionProfileResponse,
+  AnswerResponse,
+  AnswerRequest,
+  AssignTaskerResponse,
+  AssignTaskerRequest
 } from '@/lib/types';
 
 // Asumiendo que todos tus endpoints de tareas están en /tasks
 const TASK_PREFIX = '/api/v1/tasks';
-
+const TASKER_PREFIX = '/api/v1/tasker';
 /**
  * Obtiene todas las tareas de los taskers.
  */
@@ -100,5 +104,25 @@ export const createQuestion = (taskId: string, data: QuestionRequest) : Promise<
 export const getQuestionsByTask = (taskId: string) : Promise<QuestionProfileResponse[]> => {
   return apiClient<QuestionProfileResponse[]>(`${TASK_PREFIX}/${taskId}/questions`, {
     method: 'GET',
+  }, true);
+}
+
+/**
+ * crear answer
+ */
+export const createAnswer = (taskId: string, data: AnswerRequest) : Promise<AnswerResponse> => {
+  return apiClient<AnswerResponse>(`${TASK_PREFIX}/${taskId}/createAnswer`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }, true);
+}
+
+/**
+ * asignar a tasker
+ */
+export const assignTasker = (data: AssignTaskerRequest) : Promise<AssignTaskerResponse> => {
+  return apiClient<AssignTaskerResponse>(`${TASKER_PREFIX}/assign-tasker`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
   }, true);
 }

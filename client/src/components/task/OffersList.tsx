@@ -1,13 +1,34 @@
 'use client';
 
 import { OfferProfileResponse } from '@/lib/types';
+import { AssignTaskerRequest } from '@/lib/types';
+import { assignTasker } from '@/services/task.service';
 
 interface OffersListProps {
   offers: OfferProfileResponse[];
   isLoading: boolean;
+  isCreator: boolean;
+  taskId: string;
 }
 
-export function OffersList({ offers, isLoading }: OffersListProps) {
+
+const handleAssignSubmit = async (taskerId: string, taskId: string, offerId: string) => {
+  const assignTaskerRequest: AssignTaskerRequest= {
+    taskerId: taskerId,
+    taskId: taskId,
+    offerId: offerId
+  };
+  console.log(assignTaskerRequest);
+  try {
+    const newAssignResponse = await assignTasker(assignTaskerRequest);
+    console.log(newAssignResponse);
+    alert("Tarea asignada con éxito")
+  } catch (error) {
+    console.error("Error al asignar tarea:", error);
+  }
+}
+
+export function OffersList({ offers, isLoading, isCreator, taskId }: OffersListProps) {
   /**
    * Formatea una fecha ISO (UTC) a una cadena de fecha y hora legible
    * en la zona horaria local del usuario.
@@ -72,6 +93,16 @@ export function OffersList({ offers, isLoading }: OffersListProps) {
                 <p className="text-xs text-gray-400">{formatLocaleDate(offerProfile.offer.createAt)}</p>
               </div>
             </div>
+            {isCreator && (
+              <div className="mt-4 flex justify-end">
+                <button
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200"
+                  onClick={() => handleAssignSubmit(offerProfile.profile.id, taskId, offerProfile.offer.id)}
+                >
+                  Asignar Tasker
+                </button>
+              </div>
+            )}
           </div>
         </div>
       ))}

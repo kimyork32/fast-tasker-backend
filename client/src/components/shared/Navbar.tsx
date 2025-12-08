@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { NotificationBell } from "./NotificationBell";
 import { Button } from "@/components/ui/button"; // Importar el botón de shadcn/ui
 
 export const AirTaskerLogo = () => {
@@ -50,7 +51,9 @@ export function DashboardNavbar() {
           <p className="font-semibold text-inherit">AirTasker</p>
         </div>
       </div>
-      {/* Aquí podrías añadir elementos del dashboard, como un menú de usuario */}
+      <div className="flex items-center gap-4">
+        <NotificationBell />
+      </div>
     </nav>
   );
 }

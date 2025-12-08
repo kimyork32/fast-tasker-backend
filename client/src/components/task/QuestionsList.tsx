@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { 
   QuestionProfileResponse,
   AnswerProfileResponse,
@@ -7,17 +8,23 @@ import {
 
 interface QuestionsListProps {
   questions: QuestionProfileResponse[];
+  // Props para la caja de "hacer una pregunta"
   questionDescription: string;
-  onSubmit: () => void;
   setQuestionDescription: (description: string) => void;
+  onQuestionSubmit: () => void;
+  // Props para la caja de "responder una pregunta"
+  onAnswerSubmit: (questionId: string, answerDescription: string) => void;
 }
 
 export function QuestionsList({ 
   questions,
   questionDescription,
-  onSubmit,
-  setQuestionDescription
+  setQuestionDescription,
+  onQuestionSubmit,
+  onAnswerSubmit
 }: QuestionsListProps) {
+  const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
+  const [replyDescription, setReplyDescription] = useState('');
 
   /**
    * Formatea una fecha ISO (UTC) a una cadena de fecha y hora legible
@@ -50,7 +57,7 @@ export function QuestionsList({
           <div className="flex justify-end mt-2">
             <button 
               className="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-full hover:bg-blue-700 transition"
-              onClick={onSubmit}
+              onClick={onQuestionSubmit}
             >
               Publicar pregunta
             </button>
@@ -82,6 +89,39 @@ export function QuestionsList({
                     <span className="text-xs text-gray-400">{formatLocaleDate(q.question.createAt)}</span>
                   </div>
                   <p className="text-gray-700 text-sm leading-relaxed">{q.question.description}</p>
+
+                  {/* Botón de Responder y formulario de respuesta */}
+                  <div className="mt-3">
+                    <button 
+                      onClick={() => {
+                        setActiveReplyId(activeReplyId === q.question.id ? null : q.question.id);
+                        setReplyDescription(''); // Limpiar al abrir/cerrar
+                      }}
+                      className="text-xs font-bold text-blue-600 hover:underline"
+                    >
+                      Responder
+                    </button>
+
+                    {activeReplyId === q.question.id && (
+                      <div className="flex gap-4 mt-4">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0 text-xs">YO</div>
+                        <div className="flex-1">
+                          <textarea
+                            value={replyDescription}
+                            onChange={(e) => setReplyDescription(e.target.value)}
+                            rows={2}
+                            placeholder="Escribe tu respuesta..."
+                            className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none resize-none bg-gray-50"
+                          ></textarea>
+                          <div className="flex justify-end mt-2">
+                            <button className="px-5 py-1.5 bg-black text-white text-xs font-bold rounded-full hover:bg-gray-800 transition" onClick={() => onAnswerSubmit(q.question.id, replyDescription)}>
+                              Publicar respuesta
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   {q.answers != null && q.answers.length > 0 && (
                     <div className="mt-4 space-y-4">
