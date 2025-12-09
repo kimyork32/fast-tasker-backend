@@ -21,7 +21,7 @@ export const getInbox = (): Promise<ConversationSummary[]> => {
  * Obtiene el historial de mensajes de una conversación específica.
  */
 export const getMessages = (conversationId: string): Promise<Message[]> => {
-  return apiClient<Message[]>(`${API_PREFIX}/${conversationId}/messages`, {
+  return apiClient<Message[]>(`/api/v1/conversations/${conversationId}/messages`, {
     method: 'GET',
   }, true);
 };
@@ -46,10 +46,17 @@ export const connect = (
 
   // Desactivar logs de STOMP en la consola
   stompClient.debug = () => {};
+  
+  const token = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith('jwtToken='))?.split('=')[1];
+  const headers = {
+    Authorization: `Bearer ${token}`,
+  };
 
-  stompClient.connect({}, () => {
+
+  stompClient.connect(headers, () => {
     onConnectionChange(true);
     stompClient?.subscribe(`/topic/conversation.${conversationId}`, (payload) => {
+      console.log("Nuevo mensaje recibido del WebSocket:", payload.body);
       const newMessage: Message = JSON.parse(payload.body);
       onMessageReceived(newMessage);
     });
@@ -73,6 +80,9 @@ export const disconnect = (): void => {
  * Envía un mensaje a través del WebSocket.
  */
 export const sendMessage = (payload: SendMessageRequest): void => {
+
+  console.log("sendMessage called");
+  
   if (!stompClient || !stompClient.connected) return;
-  stompClient.send("/app/chat.send", {}, JSON.stringify(payload));
+  stompClient.send("/app/chat/.send", {}, JSON.stringify(payload));
 };

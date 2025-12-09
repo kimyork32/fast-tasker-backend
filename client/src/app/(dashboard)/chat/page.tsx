@@ -9,14 +9,16 @@ import {
   disconnect, 
   sendMessage as sendChatMessage 
 } from '@/services/chat.service';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function ChatPage() {
+  const { user: currentUser, loading: authLoading } = useAuth();
   // Estado de la UI
   const [inbox, setInbox] = useState<ConversationSummary[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null); // Para saber qué mensajes son 'míos'
+  // El currentUserId ahora viene del hook useAuth
   const [isConnected, setIsConnected] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -67,25 +69,15 @@ export default function ChatPage() {
     try {
       const history = await getMessages(conversationId);
       setMessages(history);
-      // Inferir el ID del usuario actual si aún no lo tenemos
-      if (!currentUserId && history.length > 0) {
-        // Asumimos que el primer mensaje es del otro usuario, para identificar el nuestro
-        // En una app real, esto vendría del perfil del usuario logueado.
-        setCurrentUserId(history[0].senderId === inbox.find(c => c.conversationId === conversationId)?.otherParticipantId 
-          ? 'tu-id-de-usuario-logueado' // Reemplazar con el ID real del usuario
-          : history[0].senderId);
-      }
     } catch (error) {
       console.error("Error cargando historial:", error);
     }
   };
 
   const handleNewMessage = (newMessage: Message) => {
-    if (!currentUserId) {
-      setCurrentUserId(newMessage.senderId);
-    }
     setMessages((prev) => [...prev, newMessage]);
-  }
+  };
+
 
   const handleSendMessage = () => {
     if (!inputText.trim() || !activeChatId) return;
@@ -104,24 +96,20 @@ export default function ChatPage() {
 
   // --- RENDERIZADO ---
 
+  if (authLoading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        Cargando tu información de usuario...
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full bg-gray-100 -m-6"> {/* Ocupa el 100% del padre y anula el p-6 del layout */}
       
       {/* SIDEBAR (INBOX) */}
       <div className="w-1/3 bg-white border-r border-gray-300 overflow-y-auto">
         <div className="p-4 bg-gray-200 font-bold">Mis Conversaciones</div>
-        <ul>
-          {inbox.map((chat) => (
-            <li 
-              key={chat.conversationId}
-              onClick={() => setActiveChatId(chat.conversationId)}
-              className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${activeChatId === chat.conversationId ? 'bg-blue-50' : ''}`}
-            >
-              <div className="font-semibold text-gray-800">Usuario: {chat.otherParticipantId.substring(0, 8)}...</div>
-              <div className="text-sm text-gray-500 truncate">{chat.lastMessageSnippet}</div>
-            </li>
-          ))}
-        </ul>
         {inbox.length > 0 ? (
           <ul>
             {inbox.map((chat) => (
@@ -155,7 +143,7 @@ export default function ChatPage() {
             {/* MENSAJES */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((msg) => {
-                const isMe = msg.senderId === currentUserId;
+                const isMe = msg.senderId === currentUser?.id;
                 return (
                   <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-xs md:max-w-md p-3 rounded-lg shadow ${isMe ? 'bg-blue-600 text-white rounded-br-none' : 'bg-white text-gray-800 rounded-bl-none border'}`}>
