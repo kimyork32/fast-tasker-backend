@@ -39,6 +39,8 @@ public class Conversation {
     private UUID participantB;
 
     @OneToMany(mappedBy = "conversation", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default // if the messages field is not explicitly set when using the builder, then
+                    // you must use the default value
     private List<Message> messages = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)

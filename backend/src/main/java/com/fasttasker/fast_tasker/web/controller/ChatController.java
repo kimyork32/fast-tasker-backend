@@ -1,19 +1,15 @@
 package com.fasttasker.fast_tasker.web.controller;
 
 import com.fasttasker.fast_tasker.application.ConversationService;
-import com.fasttasker.fast_tasker.application.dto.conversation.ConversationRequest;
-import com.fasttasker.fast_tasker.application.dto.conversation.ConversationSummary;
-import com.fasttasker.fast_tasker.application.dto.conversation.MessageRequest;
-import com.fasttasker.fast_tasker.application.dto.conversation.StartChatRequest;
+import com.fasttasker.fast_tasker.application.dto.conversation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -73,5 +69,11 @@ public class ChatController {
         );
 
         return ResponseEntity.ok(conversationService.startConversation(secureRequest));
+    }
+
+    @GetMapping("api/v1/conversations/{conversationId}/messages")
+    public ResponseEntity<List<MessageResponse>> getMessages(@PathVariable UUID conversationId) {
+        List<MessageResponse> response = conversationService.getHistory(conversationId);
+        return ResponseEntity.ok(response);
     }
 }

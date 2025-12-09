@@ -112,7 +112,7 @@ public class AccountService {
                 defaultProfile
         );
 
-        // save account, if any error occurs then rollback
+        // save tasker, if any error occurs then rollback
         taskerRepository.save(tasker);
 
         Notification welcomeNotification = new Notification(

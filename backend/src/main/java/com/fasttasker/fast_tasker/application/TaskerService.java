@@ -1,5 +1,8 @@
 package com.fasttasker.fast_tasker.application;
 
+import com.fasttasker.fast_tasker.application.dto.conversation.ConversationRequest;
+import com.fasttasker.fast_tasker.application.dto.conversation.MessageContentRequest;
+import com.fasttasker.fast_tasker.application.dto.conversation.MessageRequest;
 import com.fasttasker.fast_tasker.application.dto.task.AssignTaskerRequest;
 import com.fasttasker.fast_tasker.application.dto.task.AssignTaskerResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
@@ -27,13 +30,15 @@ public class TaskerService {
     private final ITaskRepository taskRepository;
     private final TaskerMapper taskerMapper;
     private final NotificationService notificationService;
+    private final ConversationService conversationService;
 
-    public TaskerService(ITaskerRepository taskerRepository, IAccountRepository accountRepository,
-            ITaskRepository taskRepository, TaskerMapper taskerMapper, NotificationService notificationService) {
+    public TaskerService(ITaskerRepository taskerRepository, ITaskRepository taskRepository, TaskerMapper taskerMapper,
+                         NotificationService notificationService, ConversationService conversationService) {
         this.taskerRepository = taskerRepository;
         this.notificationService = notificationService;
         this.taskRepository = taskRepository;
         this.taskerMapper = taskerMapper;
+        this.conversationService = conversationService;
     }
 
     /**
@@ -102,13 +107,23 @@ public class TaskerService {
         task.setAssignedTaskerId(taskerId);
         taskRepository.save(task);
 
+        // notifying of the tasker that the task has been assigned
         notificationService.sendNotification(taskerId, offerId, NotificationType.OFFER_ACCEPTED);
+        var conversationRequest = new ConversationRequest(
+                taskId,
+                posterId,
+                taskerId
+        );
 
-        // asignar a un tasker para hacer un task (COMPLETADO)
-        //notificar a tasker que le asignaron un task (COMPLETADO)
-        // taskerId, notificationType
-        //crear nuevo chat entre poster y tasker
-        //enviar mensaje a poster desde chat de tasker
+        // create a new conversation between the poster and the tasker
+        UUID conversationId = conversationService.startConversation(conversationRequest);
+
+        // poster sends a message to the tasker
+        var messageRequest = new MessageRequest(
+                conversationId,
+                new MessageContentRequest("Hola, te he asignado una tarea :)", null)
+        );
+        conversationService.processAndSendMessage(messageRequest, posterId);
 
         return taskerMapper.toAssignTaskerResponse(request);
     }
