@@ -82,9 +82,18 @@ public class ConversationService {
      * @param conversationId conversation id
      * @return list of messages
      */
-    public List<MessageResponse> getHistory(UUID conversationId) {
+    @Transactional(readOnly = true)
+    public List<MessageResponse> getHistory(UUID conversationId, UUID requesterId) {
         Conversation c = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new ConversationNotFountException("Conversation Not Found"));
+
+        // verify that the user requesting the history is a participant in the conversation
+        boolean isParticipant = c.getParticipantA().equals(requesterId) || c.getParticipantB().equals(requesterId);
+        if (!isParticipant) {
+            // throw an exception that will be handled to return a 403 Forbidden or 404 Not Found
+            // using ConversationNotFoundException prevents leaking information that the conversation exists
+            throw new ConversationNotFountException("Conversation not found or access denied");
+        }
 
         return c.getMessages().stream()
                 .map(conversationMapper::toMessageResponse)

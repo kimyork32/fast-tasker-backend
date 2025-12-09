@@ -72,8 +72,13 @@ public class ChatController {
     }
 
     @GetMapping("api/v1/conversations/{conversationId}/messages")
-    public ResponseEntity<List<MessageResponse>> getMessages(@PathVariable UUID conversationId) {
-        List<MessageResponse> response = conversationService.getHistory(conversationId);
+    public ResponseEntity<List<MessageResponse>> getMessages(
+            @PathVariable UUID conversationId,
+            Authentication authentication
+    ) {
+        // Extract the user ID from the token to ensure authorization
+        UUID requesterId = (UUID) authentication.getPrincipal();
+        List<MessageResponse> response = conversationService.getHistory(conversationId, requesterId);
         return ResponseEntity.ok(response);
     }
 }
