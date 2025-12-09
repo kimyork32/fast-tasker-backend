@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ConversationSummary, Message, SendMessageRequest } from '@/lib/types';
+import { ConversationSummary, Message, SendMessageRequest, ChatProfileResponse } from '@/lib/types';
 import { 
   getInbox, 
   getMessages, 
@@ -10,12 +10,14 @@ import {
   sendMessage as sendChatMessage 
 } from '@/services/chat.service';
 import { useAuth } from '@/hooks/useAuth';
+import { UserIcon } from 'lucide-react';
 
 export default function ChatPage() {
   const { user: currentUser, loading: authLoading } = useAuth();
   // Estado de la UI
   const [inbox, setInbox] = useState<ConversationSummary[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const [activeParticipant, setActiveParticipant] = useState<ChatProfileResponse | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   // El currentUserId ahora viene del hook useAuth
@@ -31,6 +33,10 @@ export default function ChatPage() {
   // 2. Manejar conexión al seleccionar un chat
   useEffect(() => {
     if (activeChatId) {
+      // Encontrar el participante activo para mostrar en la UI
+      const currentConversation = inbox.find(c => c.conversationId === activeChatId);
+      setActiveParticipant(currentConversation?.profile ?? null);
+
       // a. Cargar historial antiguo (REST)
       fetchMessages(activeChatId);
       
@@ -46,6 +52,7 @@ export default function ChatPage() {
     return () => {
       disconnect();
       setIsConnected(false);
+      setActiveParticipant(null);
     };
   }, [activeChatId]);
 
@@ -115,11 +122,24 @@ export default function ChatPage() {
             {inbox.map((chat) => (
               <li 
                 key={chat.conversationId}
-                onClick={() => setActiveChatId(chat.conversationId)}
-                className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${activeChatId === chat.conversationId ? 'bg-blue-50' : ''}`}
+                onClick={() => setActiveChatId(chat.conversationId)} // Al hacer clic, actualizamos el chat activo
+                className={`flex items-center p-4 border-b cursor-pointer hover:bg-gray-50 transition-colors ${activeChatId === chat.conversationId ? 'bg-blue-50' : ''}`}
               >
-                <div className="font-semibold text-gray-800">Usuario: {chat.otherParticipantId.substring(0, 8)}...</div>
-                <div className="text-sm text-gray-500 truncate">{chat.lastMessageSnippet}</div>
+                {chat.profile.photo ? (
+                  <img 
+                    src={chat.profile.photo} 
+                    alt={`Foto de ${chat.profile.firstName}`}
+                    className="w-12 h-12 rounded-full mr-4 object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full mr-4 bg-gray-300 flex items-center justify-center">
+                    <UserIcon className="w-8 h-8 text-black" />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <div className="font-semibold text-gray-800">{chat.profile.firstName} {chat.profile.lastName}</div>
+                  <p className="text-sm text-gray-500 truncate">{chat.lastMessageSnippet}</p>
+                </div>
               </li>
             ))}
           </ul>
@@ -136,7 +156,22 @@ export default function ChatPage() {
           <>
             {/* HEADER */}
             <div className="p-4 bg-white border-b flex justify-between items-center shadow-sm">
-              <h2 className="font-bold text-lg">Chat ID: {activeChatId.substring(0, 8)}...</h2>
+              <div className="flex items-center">
+                {activeParticipant?.photo ? (
+                  <img 
+                    src={activeParticipant.photo} 
+                    alt={`Foto de ${activeParticipant.firstName}`}
+                    className="w-10 h-10 rounded-full mr-3 object-cover"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full mr-3 bg-gray-300 flex items-center justify-center">
+                    <UserIcon className="w-6 h-6 text-black" />
+                  </div>
+                )}
+                <h2 className="font-bold text-lg text-gray-800">
+                  {activeParticipant ? `${activeParticipant.firstName} ${activeParticipant.lastName}` : 'Cargando...'}
+                </h2>
+              </div>
               <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} title={isConnected ? "Conectado" : "Desconectado"}></div>
             </div>
 

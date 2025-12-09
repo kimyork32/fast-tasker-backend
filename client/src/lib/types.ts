@@ -64,6 +64,12 @@ export interface MinimalProfileData {
   completedTasks: number;
 }
 
+export interface ChatProfileResponse {
+  firstName: string;
+  lastName: string;
+  photo?: string;
+}
+
 // --- DTOS de Complete Profile ---
 export type CompleteProfileRequest = {
   profile: ProfileData;
@@ -124,6 +130,7 @@ export interface ConversationSummary {
   taskId: string;
   otherParticipantId: string;
   lastMessageSnippet: string;
+  profile: ChatProfileResponse;
 }
 
 // Payload para enviar al socket
