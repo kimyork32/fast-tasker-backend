@@ -4,12 +4,17 @@ import com.fasttasker.fast_tasker.application.dto.conversation.ConversationReque
 import com.fasttasker.fast_tasker.application.dto.conversation.ConversationSummary;
 import com.fasttasker.fast_tasker.application.dto.conversation.MessageRequest;
 import com.fasttasker.fast_tasker.application.dto.conversation.MessageResponse;
+import com.fasttasker.fast_tasker.application.dto.tasker.ChatProfileResponse;
 import com.fasttasker.fast_tasker.application.exception.ConversationNotFountException;
+import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
 import com.fasttasker.fast_tasker.application.mapper.ConversationMapper;
+import com.fasttasker.fast_tasker.application.mapper.TaskerMapper;
 import com.fasttasker.fast_tasker.domain.conversation.Conversation;
 import com.fasttasker.fast_tasker.domain.conversation.IConversationRepository;
 import com.fasttasker.fast_tasker.domain.conversation.Message;
 import com.fasttasker.fast_tasker.domain.conversation.MessageContent;
+import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
+import com.fasttasker.fast_tasker.domain.tasker.Tasker;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +28,16 @@ public class ConversationService {
     private final IConversationRepository conversationRepository;
     private final ConversationMapper conversationMapper;
     private final SimpMessagingTemplate messagingTemplate;
+    private final TaskerMapper taskerMapper;
+    private final ITaskerRepository taskerRepository;
 
-    public ConversationService(IConversationRepository conversationRepository, ConversationMapper conversationMapper, SimpMessagingTemplate messagingTemplate) {
+    public ConversationService(IConversationRepository conversationRepository, ConversationMapper conversationMapper,
+                               SimpMessagingTemplate messagingTemplate, TaskerMapper taskerMapper, ITaskerRepository taskerRepository) {
         this.conversationRepository = conversationRepository;
         this.conversationMapper = conversationMapper;
         this.messagingTemplate = messagingTemplate;
+        this.taskerMapper = taskerMapper;
+        this.taskerRepository = taskerRepository;
     }
 
     /**
@@ -57,22 +67,23 @@ public class ConversationService {
         return conversationRepository.findByParticipantId(taskerId).stream()
                 .map(c -> {
                     // calculate other id
-                    UUID otherId = c.getParticipantA().equals(taskerId) ? c.getParticipantB() : c.getParticipantA();
+                    UUID otherId = c.otherParticipantId(taskerId);
+
                     // get last messageContent
                     MessageContent lastMessageContent = c.getMessages().getLast().getContent();
-                    String snippet = "";
-                    if (lastMessageContent.getText() != null) {
-                        snippet = lastMessageContent.getText();
-                    }
-                    else if (lastMessageContent.getAttachmentUrl() != null) {
-                        snippet = "Foto";
-                    }
-                    return new ConversationSummary(
-                            c.getId(),
-                            c.getTaskId(),
-                            otherId,
-                            snippet
-                    );
+
+                    // build profile of the tasker for chat
+                    Tasker tasker = taskerRepository.findById(otherId)
+                            .orElseThrow(() -> new TaskerNotFoundException("Tasker not found"));
+                    ChatProfileResponse profile = taskerMapper.toChatProfileResponse(tasker);
+
+                    return ConversationSummary.builder()
+                            .conversationId(c.getId())
+                            .taskId(c.getTaskId())
+                            .otherParticipantId(otherId)
+                            .lastMessageSnippet(lastMessageContent.snippet())
+                            .profile(profile)
+                            .build();
                 })
                 .collect(Collectors.toList());
     }

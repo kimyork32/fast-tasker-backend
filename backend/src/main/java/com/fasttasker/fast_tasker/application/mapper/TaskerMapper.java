@@ -116,4 +116,14 @@ public class TaskerMapper {
                 .offerId(request.offerId())
                 .build();
     }
+
+    public ChatProfileResponse toChatProfileResponse(Tasker tasker) {
+        if (tasker == null) return null;
+
+        return ChatProfileResponse.builder()
+                .firstName(tasker.getProfile().getFirstName())
+                .lastName(tasker.getProfile().getLastName())
+                .photo(tasker.getProfile().getPhoto())
+                .build();
+    }
 }

@@ -62,4 +62,11 @@ public class Conversation {
         Message newMessage = new Message(this, senderId, content);
         this.messages.add(newMessage);
     }
+
+    public UUID otherParticipantId(UUID taskerId) {
+        if (participantA.equals(taskerId)) {
+            return  participantB;
+        }
+        return participantA;
+    }
 }

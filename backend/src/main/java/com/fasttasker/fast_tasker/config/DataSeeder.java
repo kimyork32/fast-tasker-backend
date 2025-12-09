@@ -1,6 +1,5 @@
 package com.fasttasker.fast_tasker.config;
 
-
 import com.fasttasker.fast_tasker.application.AccountService;
 import com.fasttasker.fast_tasker.application.TaskService;
 import com.fasttasker.fast_tasker.application.TaskerService;
@@ -14,9 +13,6 @@ import com.fasttasker.fast_tasker.application.dto.tasker.ProfileRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
 import com.fasttasker.fast_tasker.domain.account.*;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
-import com.fasttasker.fast_tasker.domain.tasker.Location;
-import com.fasttasker.fast_tasker.domain.tasker.Profile;
-import com.fasttasker.fast_tasker.domain.tasker.Tasker;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

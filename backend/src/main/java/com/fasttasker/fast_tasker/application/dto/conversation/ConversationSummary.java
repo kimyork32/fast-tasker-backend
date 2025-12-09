@@ -1,5 +1,6 @@
 package com.fasttasker.fast_tasker.application.dto.conversation;
 
+import com.fasttasker.fast_tasker.application.dto.tasker.ChatProfileResponse;
 import lombok.Builder;
 
 import java.util.UUID;
@@ -9,5 +10,6 @@ public record ConversationSummary(
         UUID conversationId,
         UUID taskId,
         UUID otherParticipantId,
-        String lastMessageSnippet
+        String lastMessageSnippet,
+        ChatProfileResponse profile
 ) {}
