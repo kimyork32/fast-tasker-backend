@@ -70,7 +70,7 @@ class AccountServiceTest {
 
         // this is the DTO that we want return from mapper
         var responseDto = new AccountResponse(
-                UUID.randomUUID(),
+                UUID.randomUUID().toString(),
                 request.email(),
                 AccountStatus.PENDING_VERIFICATION
         );

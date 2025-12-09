@@ -36,7 +36,7 @@ public class TaskerMapper {
 
         return Tasker.builder()
                 .id(UUID.randomUUID())
-                .accountId(request.accountId())
+                .accountId(UUID.fromString(request.accountId()))
                 .profile(profile)
                 .build();
     }

@@ -4,14 +4,14 @@ import com.fasttasker.fast_tasker.application.AccountService;
 import com.fasttasker.fast_tasker.application.dto.account.*;
 import com.fasttasker.fast_tasker.config.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 /**
  * 
@@ -45,7 +45,7 @@ public class AccountController {
         AccountResponse accountResponse = accountService.registerAccount(request);
 
         System.out.println("AccountController. register. accountId: " + accountResponse.id());
-        String newToken = jwtService.generateToken(accountResponse.id(), false); // profileCompleted = false
+        String newToken = jwtService.generateToken(UUID.fromString(accountResponse.id()), false); // profileCompleted = false
 
         var registerResponse = new RegisterResponse(
                 accountResponse.id(),

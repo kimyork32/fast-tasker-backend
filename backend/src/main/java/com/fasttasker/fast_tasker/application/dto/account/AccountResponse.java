@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Builder
 public record AccountResponse(
-        UUID id,
+        String id,
         String email,
         AccountStatus status
 ) {}

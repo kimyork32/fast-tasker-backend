@@ -97,12 +97,12 @@ class TaskerServiceTest {
         );
 
         var taskerRequest = new TaskerRequest(
-                testAccountId,
+                testAccountId.toString(),
                 profileRequest
         );
 
         // 2.  WHEN
-        TaskerResponse response = taskerService.registerTasker(taskerRequest, testAccountId);
+        TaskerResponse response = taskerService.registerTasker(taskerRequest);
 
         // 2. THEN
         // verify the DTO request

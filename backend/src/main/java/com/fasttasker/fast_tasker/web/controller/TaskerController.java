@@ -46,8 +46,8 @@ public class TaskerController {
     ) {
 
         UUID accountId = (UUID) authentication.getPrincipal();
-        var serviceRequest = new TaskerRequest(accountId, request.profile());
-        TaskerResponse taskerResponse = taskerService.registerTasker(serviceRequest, accountId);
+        var serviceRequest = new TaskerRequest(accountId.toString(), request.profile());
+        TaskerResponse taskerResponse = taskerService.registerTasker(serviceRequest);
         String newToken = jwtService.generateToken(accountId, true); // profileCompleted = true
         // creating DTO with the token
         var response = new TaskerRegistrationResponse(

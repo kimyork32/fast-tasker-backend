@@ -48,7 +48,7 @@ class AccountControllerTest {
         );
 
         var responseDTO = new AccountResponse(
-                UUID.randomUUID(),
+                UUID.randomUUID().toString(),
                 "new-user33@domain.com",
                 AccountStatus.PENDING_VERIFICATION
         );
