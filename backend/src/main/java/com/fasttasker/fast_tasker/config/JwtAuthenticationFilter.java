@@ -57,27 +57,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        try {
-            // 4. Validar token JWT
-            if (jwtService.isTokenValid(token)) {
-                UUID accountId = jwtService.extractAccountId(token);
+        // 4. Validar token JWT
+        if (jwtService.isTokenValid(token)) {
+            UUID accountId = jwtService.extractAccountId(token);
 
-                if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                    var authToken = new UsernamePasswordAuthenticationToken(
-                            accountId,
-                            null,
-                            Collections.emptyList()
-                    );
+                var authToken = new UsernamePasswordAuthenticationToken(
+                        accountId,
+                        null,
+                        Collections.emptyList()
+                );
 
-                    authToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
-                    );
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
 
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
-        } catch (Exception ignored) {}
+        }
 
         filterChain.doFilter(request, response);
     }

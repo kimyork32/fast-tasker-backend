@@ -8,6 +8,8 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.core.Authentication;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,7 +25,8 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
     }
 
     @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel) {
+    @Nullable
+    public Message<?> preSend(@NonNull Message<?> message, @NonNull MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
         // 1. Guard Clause: Only intercept CONNECT commands.
@@ -54,8 +57,7 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
         } catch (Exception e) {
             // This will catch any errors from jwtService (e.g., expired token, malformed token).
             log.error("WebSocket authentication failed: {}", e.getMessage());
-            // Optionally, you could throw an exception here to reject the connection.
-            // For example: throw new MessageDeliveryException("Invalid token");
+            // Optionally, you could throw an exception here to reject the connection
         }
 
         return message;

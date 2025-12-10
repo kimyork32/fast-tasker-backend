@@ -17,10 +17,10 @@ import java.util.function.Function;
 public class JwtService {
 
     @Value("${jwt.secret}")
-    private String SECRET_KEY;
+    private String secretKey;
 
     @Value("${jwt.expiration}")
-    private long EXPIRATION_TIME;
+    private long expirationTime;
 
     /**
      * Genera un nuevo token JWT para un ID de cuenta.
@@ -30,7 +30,7 @@ public class JwtService {
                 .subject(accountId.toString()) // ¡Aquí guardamos el ID!
                 .claim("profileCompleted", completedProfile) // claim = extra information
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .expiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSigningKey(), Jwts.SIG.HS256)
                 .compact();
     }
@@ -77,7 +77,7 @@ public class JwtService {
     }
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

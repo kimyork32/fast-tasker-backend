@@ -13,8 +13,8 @@ public class ConversationRepositoryImpl implements IConversationRepository {
 
     private final JpaConversationRepository jpa;
 
-    public ConversationRepositoryImpl(JpaConversationRepository jpaConversationRepository, JpaConversationRepository jpaConversationRepository1) {
-        this.jpa = jpaConversationRepository1;
+    public ConversationRepositoryImpl(JpaConversationRepository jpaConversationRepository) {
+        this.jpa = jpaConversationRepository;
     }
 
     @Override
