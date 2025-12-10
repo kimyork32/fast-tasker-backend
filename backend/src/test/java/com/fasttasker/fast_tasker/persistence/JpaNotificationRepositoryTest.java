@@ -2,7 +2,6 @@ package com.fasttasker.fast_tasker.persistence;
 
 import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
 import com.fasttasker.fast_tasker.domain.notification.Notification;
-import com.fasttasker.fast_tasker.domain.notification.NotificationStatus;
 import com.fasttasker.fast_tasker.domain.notification.NotificationType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,7 +25,6 @@ class JpaNotificationRepositoryTest {
     void shouldSaveAndFindByAccountId() {
         // 1. ARRANGE
         UUID accountId = UUID.randomUUID();
-        LocalDateTime time = LocalDateTime.now();
 
         Notification newNotification = new Notification(
                 accountId,
@@ -54,8 +51,6 @@ class JpaNotificationRepositoryTest {
     void shouldSaveAndFindAll() {
         // 1. ARRANGE
         UUID accountId = UUID.randomUUID();
-        String message = "test notification";
-        LocalDateTime time = LocalDateTime.now();
 
         Notification newNotification = new Notification(
                 accountId,
@@ -71,16 +66,11 @@ class JpaNotificationRepositoryTest {
 
         // 3. ASSERT
         assertThat(foundNotifications)
-                .withFailMessage("the array found is empty")
-                .isNotEmpty();
-
-        assertThat(foundNotifications)
-                .withFailMessage("the array found does not have the expected size (size=1)")
+                .isNotEmpty()
                 .hasSize(1);
 
         Notification foundNotification = foundNotifications.getFirst();
         assertThat(foundNotification)
-                .withFailMessage("the found notification is not equal to expected")
                 .isEqualTo(newNotification);
     }
 
@@ -88,8 +78,6 @@ class JpaNotificationRepositoryTest {
     void shouldSaveAndFindByReceiverTaskerId() {
         // 1. ARRANGE
         UUID accountId = UUID.randomUUID();
-        String message = "test notification";
-        LocalDateTime time = LocalDateTime.now();
 
         Notification newNotification = new Notification(
                 accountId,

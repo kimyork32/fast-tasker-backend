@@ -119,12 +119,4 @@ class TaskerServiceTest {
         assertThat(taskerInBd.getProfile().getPhoto()).isEqualTo(profileRequest.photo());
 
     }
-
-    @Test
-    void getById() {
-    }
-
-    @Test
-    void getByAccountId() {
-    }
 }

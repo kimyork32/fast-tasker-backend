@@ -3,16 +3,12 @@ package com.fasttasker.fast_tasker.application;
 import com.fasttasker.fast_tasker.application.dto.task.TaskRequest;
 import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.LocationRequest;
-import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
-import com.fasttasker.fast_tasker.domain.task.Task;
-import com.fasttasker.fast_tasker.domain.task.TaskStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,9 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TaskServiceTest {
     @Autowired
     private TaskService taskService;
-
-    @Autowired
-    private ITaskRepository taskRepository;
 
     @Test
     void shouldSaveTaskSuccess() {

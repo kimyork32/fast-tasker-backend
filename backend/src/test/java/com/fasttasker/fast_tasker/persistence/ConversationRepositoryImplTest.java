@@ -51,8 +51,9 @@ class ConversationRepositoryImplTest {
         Optional<Conversation> result = repository.findById(id);
 
         // 3. ASSERT
-        assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(conversation);
+        assertThat(result)
+        .isPresent()
+        .contains(conversation);
         verify(jpa).findById(id);
     }
 
@@ -67,8 +68,9 @@ class ConversationRepositoryImplTest {
         Optional<Conversation> result = repository.findByTaskId(taskId);
 
         // 3. ASSERT
-        assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(conversation);
+        assertThat(result)
+                .isPresent()
+                .contains(conversation);
         verify(jpa).findByTaskId(taskId);
     }
 
