@@ -11,29 +11,22 @@ import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.LocationRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.ProfileRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
-import com.fasttasker.fast_tasker.domain.account.*;
-import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
 @Component
+@Profile("!test") // no execute this component where profile is test
 public class DataSeeder implements CommandLineRunner {
 
-    private final ITaskerRepository taskerRepository;
-    private final IAccountRepository accountRepository;
     private final TaskService taskService;
-    private final PasswordEncoder passwordEncoder;
     private final AccountService accountService;
     private final TaskerService taskerService;
 
-    public DataSeeder(ITaskerRepository userRepository, IAccountRepository accountRepository, TaskService taskService, PasswordEncoder passwordEncoder, AccountService accountService, TaskerService taskerService) {
-        this.taskerRepository = userRepository;
-        this.accountRepository = accountRepository;
+    public DataSeeder(TaskService taskService, AccountService accountService, TaskerService taskerService) {
         this.taskService = taskService;
-        this.passwordEncoder = passwordEncoder;
         this.accountService = accountService;
         this.taskerService = taskerService;
     }

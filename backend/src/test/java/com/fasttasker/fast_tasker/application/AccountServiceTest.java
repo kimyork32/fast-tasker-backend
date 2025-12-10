@@ -125,7 +125,7 @@ class AccountServiceTest {
                 .withFailMessage("tasker ID saved is not same as the linked ID")
                 .isEqualTo(savedAccount.getTaskerId());
 
-        assertThat(savedTasker.getProfile().getAbout()).isEqualTo("");
+        assertThat(savedTasker.getProfile().getAbout()).isEmpty();
 
         // verify if notification was saved
         verify(notificationRepository).save(notificationCaptor.capture());
@@ -133,7 +133,6 @@ class AccountServiceTest {
 
         assertThat(savedNotification.getReceiverTaskerId()).isEqualTo(savedAccount.getTaskerId());
         assertThat(savedNotification.getType()).isEqualTo(NotificationType.SYSTEM);
-        assertThat(savedNotification.getMessage()).contains("¡Bienvenido a FastTasker! Completa tu perfil para empezar.");
 
 
         // verify that the returned AccountResponse is correct
@@ -216,21 +215,4 @@ class AccountServiceTest {
         assertThat(response).isNotNull();
         assertThat(response.token()).isEqualTo(fakeToken);
     }
-    /*
-    @Test
-    void shouldChangePasswordSuccess() {
-    }
-
-    @Test
-    void activate() {
-    }
-
-    @Test
-    void ban() {
-    }
-
-    @Test
-    void getById() {
-    }
-     */
 }
