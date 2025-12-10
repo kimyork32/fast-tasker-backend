@@ -2,6 +2,7 @@ package com.fasttasker.fast_tasker.persistence;
 
 import com.fasttasker.fast_tasker.domain.task.*;
 import com.fasttasker.fast_tasker.domain.tasker.Location;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -10,13 +11,13 @@ import org.springframework.context.annotation.FilterType;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = TaskRepositoryImpl.class))
 class JpaTaskRepositoryTest {
 
@@ -55,9 +56,6 @@ class JpaTaskRepositoryTest {
                 .isPresent();
 
         Task foundTask = foundTaskOpt.get();
-
-        System.out.println(newTask.toString());
-        System.out.println(foundTask.toString());
 
         assertThat(foundTask)
                 .withFailMessage("the task found IS NOT same as the expected one")
@@ -133,9 +131,6 @@ class JpaTaskRepositoryTest {
                 .isPresent();
 
         Task foundTask = foundTaskOpt.get();
-
-        System.out.println("new task: " + newTask.toString());
-        System.out.println("found task: " + foundTask.toString());
 
         assertThat(foundTask)
                 .withFailMessage("the task found IS NOT same as the expected one")

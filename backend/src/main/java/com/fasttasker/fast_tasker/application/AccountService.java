@@ -5,6 +5,7 @@ import com.fasttasker.fast_tasker.application.dto.account.LoginResponse;
 import com.fasttasker.fast_tasker.application.dto.account.RegisterAccountRequest;
 import com.fasttasker.fast_tasker.application.exception.AccountNotFoundException;
 import com.fasttasker.fast_tasker.application.exception.EmailAlreadyExistsException;
+import com.fasttasker.fast_tasker.application.exception.PasswordIncorrectException;
 import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
 import com.fasttasker.fast_tasker.application.mapper.AccountMapper;
 import com.fasttasker.fast_tasker.config.JwtService;
@@ -20,6 +21,7 @@ import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import com.fasttasker.fast_tasker.domain.tasker.Location;
 import com.fasttasker.fast_tasker.domain.tasker.Profile;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +33,7 @@ import java.util.UUID;
 /**
  *
  */
+@Slf4j
 @Service
 public class AccountService {
 
@@ -155,7 +158,7 @@ public class AccountService {
         boolean profileCompleted = tasker.getProfile().getFirstName() != null && !tasker.getProfile().getFirstName().isBlank()
                 && tasker.getProfile().getLastName() != null && !tasker.getProfile().getLastName().isBlank();
 
-        System.out.println("AccountService. login. profileCompleted: " + profileCompleted);
+        log.info("profileCompleted: {}", profileCompleted);
 
         // return a JWT token
         String token = jwtService.generateToken(account.getTaskerId(), profileCompleted);
@@ -170,7 +173,7 @@ public class AccountService {
         Account account = findAccountById(accountId);
 
         if (!passwordEncoder.matches(oldPass, account.getPasswordHash().getValue())) {
-            throw new RuntimeException("the password has been incorrect");
+            throw new PasswordIncorrectException("the password has been incorrect");
         }
 
         String newHashedPassword = passwordEncoder.encode(newPass);
