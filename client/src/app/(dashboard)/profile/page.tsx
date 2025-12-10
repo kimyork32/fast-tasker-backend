@@ -60,7 +60,7 @@ export default function Profile() {
                  <span className="text-gray-400 font-normal">(1 reseña)</span>
               </div>
             </div>
-
+            {/*             
             <div className="border-t border-gray-100 pt-6">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Insignias</h3>
               <ul className="space-y-3">
@@ -77,7 +77,7 @@ export default function Profile() {
                   <span>Móvil (No verificado)</span>
                 </li>
               </ul>
-            </div>
+            </div> */}
           </aside>
 
           {/* COLUMNA DERECHA (Contenido) */}
@@ -106,7 +106,7 @@ export default function Profile() {
               <div className="flex flex-wrap gap-2">
                 <span className="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600">Limpieza</span>
                 <span className="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600">Mudanzas</span>
-                <button className="px-4 py-2 border border-dashed border-gray-300 rounded-full text-sm text-gray-400 hover:border-gray-400 hover:text-gray-600 transition">+ Agregar</button>
+                {/* <button className="px-4 py-2 border border-dashed border-gray-300 rounded-full text-sm text-gray-400 hover:border-gray-400 hover:text-gray-600 transition">+ Agregar</button> */}
               </div>
             </div>
 
