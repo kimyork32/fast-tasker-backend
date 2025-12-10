@@ -1,6 +1,8 @@
 package com.fasttasker.fast_tasker.persistence;
 
 import com.fasttasker.fast_tasker.domain.conversation.Conversation;
+import com.fasttasker.fast_tasker.persistence.jpa.JpaConversationRepository;
+import com.fasttasker.fast_tasker.persistence.repository.ConversationRepositoryImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

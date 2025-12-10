@@ -2,6 +2,7 @@ package com.fasttasker.fast_tasker.persistence;
 
 import com.fasttasker.fast_tasker.domain.task.*;
 import com.fasttasker.fast_tasker.domain.tasker.Location;
+import com.fasttasker.fast_tasker.persistence.repository.TaskRepositoryImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

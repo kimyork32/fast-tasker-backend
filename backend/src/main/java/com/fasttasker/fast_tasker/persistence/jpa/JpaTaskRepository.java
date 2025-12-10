@@ -1,4 +1,4 @@
-package com.fasttasker.fast_tasker.persistence;
+package com.fasttasker.fast_tasker.persistence.jpa;
 
 import com.fasttasker.fast_tasker.domain.task.Task;
 import com.fasttasker.fast_tasker.domain.task.TaskStatus;

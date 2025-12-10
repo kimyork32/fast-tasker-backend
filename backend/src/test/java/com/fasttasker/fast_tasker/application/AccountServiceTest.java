@@ -4,11 +4,11 @@ import com.fasttasker.fast_tasker.application.dto.account.AccountResponse;
 import com.fasttasker.fast_tasker.application.dto.account.LoginResponse;
 import com.fasttasker.fast_tasker.application.dto.account.RegisterAccountRequest;
 import com.fasttasker.fast_tasker.application.mapper.AccountMapper;
+import com.fasttasker.fast_tasker.application.service.AccountService;
+import com.fasttasker.fast_tasker.application.service.NotificationService;
 import com.fasttasker.fast_tasker.config.JwtService;
 import com.fasttasker.fast_tasker.domain.account.*;
-import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
 import com.fasttasker.fast_tasker.domain.notification.NotificationType;
-import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import com.fasttasker.fast_tasker.domain.tasker.Location;
 import com.fasttasker.fast_tasker.domain.tasker.Profile;
@@ -39,18 +39,11 @@ class AccountServiceTest {
     @Mock
     private ITaskerRepository taskerRepository;
     @Mock
-    private ITaskRepository taskRepository;
-    @Mock
-    private INotificationRepository notificationRepository;
-    @Mock
     private PasswordEncoder passwordEncoder;
-
     @Mock
     private AccountMapper accountMapper;
-
     @Mock
     private JwtService jwtService;
-
     @Mock
     private NotificationService notificationService;
 

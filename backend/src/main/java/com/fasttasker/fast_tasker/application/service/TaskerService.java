@@ -1,4 +1,4 @@
-package com.fasttasker.fast_tasker.application;
+package com.fasttasker.fast_tasker.application.service;
 
 import com.fasttasker.fast_tasker.application.dto.conversation.ConversationRequest;
 import com.fasttasker.fast_tasker.application.dto.conversation.MessageContentRequest;
@@ -10,7 +10,6 @@ import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
 import com.fasttasker.fast_tasker.application.exception.TaskAccessDeniedException;
 import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
 import com.fasttasker.fast_tasker.application.mapper.TaskerMapper;
-import com.fasttasker.fast_tasker.domain.account.IAccountRepository;
 import com.fasttasker.fast_tasker.domain.notification.NotificationType;
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
 import com.fasttasker.fast_tasker.domain.task.Task;

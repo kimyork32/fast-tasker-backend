@@ -1,7 +1,7 @@
 package com.fasttasker.fast_tasker.web.controller;
 
-import com.fasttasker.fast_tasker.application.NotificationService;
-import com.fasttasker.fast_tasker.application.TaskerService;
+import com.fasttasker.fast_tasker.application.service.NotificationService;
+import com.fasttasker.fast_tasker.application.service.TaskerService;
 import com.fasttasker.fast_tasker.application.dto.notification.NotificationResponse;
 import com.fasttasker.fast_tasker.application.dto.task.AssignTaskerRequest;
 import com.fasttasker.fast_tasker.application.dto.task.AssignTaskerResponse;

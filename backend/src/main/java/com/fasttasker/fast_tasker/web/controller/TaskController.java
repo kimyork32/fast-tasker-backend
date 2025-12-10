@@ -1,6 +1,6 @@
 package com.fasttasker.fast_tasker.web.controller;
 
-import com.fasttasker.fast_tasker.application.TaskService;
+import com.fasttasker.fast_tasker.application.service.TaskService;
 import com.fasttasker.fast_tasker.application.dto.task.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

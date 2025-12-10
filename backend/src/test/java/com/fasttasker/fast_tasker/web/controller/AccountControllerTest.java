@@ -1,7 +1,7 @@
 package com.fasttasker.fast_tasker.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasttasker.fast_tasker.application.AccountService;
+import com.fasttasker.fast_tasker.application.service.AccountService;
 import com.fasttasker.fast_tasker.application.dto.account.AccountResponse;
 import com.fasttasker.fast_tasker.application.dto.account.RegisterAccountRequest;
 import com.fasttasker.fast_tasker.config.JwtService;

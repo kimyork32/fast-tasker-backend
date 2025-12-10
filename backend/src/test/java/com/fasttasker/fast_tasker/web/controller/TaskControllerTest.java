@@ -1,7 +1,7 @@
 package com.fasttasker.fast_tasker.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasttasker.fast_tasker.application.TaskService;
+import com.fasttasker.fast_tasker.application.service.TaskService;
 import com.fasttasker.fast_tasker.application.dto.task.TaskRequest;
 import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.LocationRequest;

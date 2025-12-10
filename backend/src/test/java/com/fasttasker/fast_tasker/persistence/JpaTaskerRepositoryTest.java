@@ -4,6 +4,7 @@ import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import com.fasttasker.fast_tasker.domain.tasker.Location;
 import com.fasttasker.fast_tasker.domain.tasker.Profile;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
+import com.fasttasker.fast_tasker.persistence.repository.TaskerRepositoryImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

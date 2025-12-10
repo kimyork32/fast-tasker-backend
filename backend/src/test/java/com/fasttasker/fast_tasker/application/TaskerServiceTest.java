@@ -4,6 +4,7 @@ import com.fasttasker.fast_tasker.application.dto.tasker.LocationRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.ProfileRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
+import com.fasttasker.fast_tasker.application.service.TaskerService;
 import com.fasttasker.fast_tasker.domain.account.IAccountRepository;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import com.fasttasker.fast_tasker.domain.tasker.Location;

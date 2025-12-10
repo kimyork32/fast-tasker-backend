@@ -1,6 +1,6 @@
 package com.fasttasker.fast_tasker.web.controller;
 
-import com.fasttasker.fast_tasker.application.ConversationService;
+import com.fasttasker.fast_tasker.application.service.ConversationService;
 import com.fasttasker.fast_tasker.application.dto.conversation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;

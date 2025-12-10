@@ -1,7 +1,8 @@
-package com.fasttasker.fast_tasker.persistence;
+package com.fasttasker.fast_tasker.persistence.repository;
 
 import com.fasttasker.fast_tasker.domain.conversation.Conversation;
 import com.fasttasker.fast_tasker.domain.conversation.IConversationRepository;
+import com.fasttasker.fast_tasker.persistence.jpa.JpaConversationRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.fasttasker.fast_tasker.web.controller;
 
-import com.fasttasker.fast_tasker.application.TaskerService;
+import com.fasttasker.fast_tasker.application.service.TaskerService;
 import com.fasttasker.fast_tasker.application.dto.tasker.LocationResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.ProfileResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;

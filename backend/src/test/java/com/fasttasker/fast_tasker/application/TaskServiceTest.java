@@ -3,6 +3,7 @@ package com.fasttasker.fast_tasker.application;
 import com.fasttasker.fast_tasker.application.dto.task.TaskRequest;
 import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.LocationRequest;
+import com.fasttasker.fast_tasker.application.service.TaskService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

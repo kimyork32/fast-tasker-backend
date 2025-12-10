@@ -3,6 +3,7 @@ package com.fasttasker.fast_tasker.persistence;
 import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
 import com.fasttasker.fast_tasker.domain.notification.Notification;
 import com.fasttasker.fast_tasker.domain.notification.NotificationType;
+import com.fasttasker.fast_tasker.persistence.repository.NotificationRepositoryImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

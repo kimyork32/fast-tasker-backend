@@ -1,6 +1,7 @@
 package com.fasttasker.fast_tasker.persistence;
 
 import com.fasttasker.fast_tasker.domain.account.*;
+import com.fasttasker.fast_tasker.persistence.repository.AccountRepositoryImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

@@ -1,8 +1,9 @@
-package com.fasttasker.fast_tasker.persistence;
+package com.fasttasker.fast_tasker.persistence.repository;
 
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
 import com.fasttasker.fast_tasker.domain.task.Task;
 import com.fasttasker.fast_tasker.domain.task.TaskStatus;
+import com.fasttasker.fast_tasker.persistence.jpa.JpaTaskRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

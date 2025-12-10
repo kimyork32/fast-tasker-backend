@@ -1,4 +1,4 @@
-package com.fasttasker.fast_tasker.application;
+package com.fasttasker.fast_tasker.application.service;
 
 import com.fasttasker.fast_tasker.application.dto.conversation.ConversationRequest;
 import com.fasttasker.fast_tasker.application.dto.conversation.ConversationSummary;

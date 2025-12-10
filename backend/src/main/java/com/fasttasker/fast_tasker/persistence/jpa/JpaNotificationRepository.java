@@ -1,4 +1,4 @@
-package com.fasttasker.fast_tasker.persistence;
+package com.fasttasker.fast_tasker.persistence.jpa;
 
 import com.fasttasker.fast_tasker.domain.notification.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;

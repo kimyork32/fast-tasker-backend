@@ -1,6 +1,6 @@
 package com.fasttasker.fast_tasker.web.controller;
 
-import com.fasttasker.fast_tasker.application.AccountService;
+import com.fasttasker.fast_tasker.application.service.AccountService;
 import com.fasttasker.fast_tasker.application.dto.account.*;
 import com.fasttasker.fast_tasker.config.JwtService;
 import lombok.extern.slf4j.Slf4j;

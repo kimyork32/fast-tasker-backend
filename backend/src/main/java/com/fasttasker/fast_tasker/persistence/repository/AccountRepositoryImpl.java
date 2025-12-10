@@ -1,7 +1,8 @@
-package com.fasttasker.fast_tasker.persistence;
+package com.fasttasker.fast_tasker.persistence.repository;
 
 import com.fasttasker.fast_tasker.domain.account.Account;
 import com.fasttasker.fast_tasker.domain.account.IAccountRepository;
+import com.fasttasker.fast_tasker.persistence.jpa.JpaAccountRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;

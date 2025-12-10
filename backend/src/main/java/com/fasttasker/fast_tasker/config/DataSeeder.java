@@ -1,8 +1,8 @@
 package com.fasttasker.fast_tasker.config;
 
-import com.fasttasker.fast_tasker.application.AccountService;
-import com.fasttasker.fast_tasker.application.TaskService;
-import com.fasttasker.fast_tasker.application.TaskerService;
+import com.fasttasker.fast_tasker.application.service.AccountService;
+import com.fasttasker.fast_tasker.application.service.TaskService;
+import com.fasttasker.fast_tasker.application.service.TaskerService;
 import com.fasttasker.fast_tasker.application.dto.account.AccountResponse;
 import com.fasttasker.fast_tasker.application.dto.account.RegisterAccountRequest;
 import com.fasttasker.fast_tasker.application.dto.task.OfferRequest;
