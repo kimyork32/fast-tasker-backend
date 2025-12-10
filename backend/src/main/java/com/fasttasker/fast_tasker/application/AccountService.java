@@ -10,23 +10,17 @@ import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
 import com.fasttasker.fast_tasker.application.mapper.AccountMapper;
 import com.fasttasker.fast_tasker.config.JwtService;
 import com.fasttasker.fast_tasker.domain.account.*;
-import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
-import com.fasttasker.fast_tasker.domain.notification.Notification;
-import com.fasttasker.fast_tasker.domain.notification.NotificationStatus;
 import com.fasttasker.fast_tasker.domain.notification.NotificationType;
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
 import com.fasttasker.fast_tasker.domain.task.Task;
 import com.fasttasker.fast_tasker.domain.task.TaskStatus;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
-import com.fasttasker.fast_tasker.domain.tasker.Location;
-import com.fasttasker.fast_tasker.domain.tasker.Profile;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,8 +34,8 @@ public class AccountService {
     private final IAccountRepository accountRepository;
     private final ITaskerRepository taskerRepository;
     private final ITaskRepository taskRepository;
-    private final INotificationRepository notificationRepository;
     private final AccountMapper accountMapper;
+    private final NotificationService notificationService;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -53,13 +47,13 @@ public class AccountService {
             IAccountRepository accountRepository,
             ITaskerRepository taskerRepository,
             ITaskRepository taskRepository,
-            INotificationRepository notificationRepository, AccountMapper accountMapper,
+            AccountMapper accountMapper, NotificationService notificationService,
             PasswordEncoder passwordEncoder, JwtService jwtService
     ) {
         this.accountRepository = accountRepository;
         this.taskerRepository = taskerRepository;
         this.taskRepository = taskRepository;
-        this.notificationRepository = notificationRepository;
+        this.notificationService = notificationService;
         this.accountMapper = accountMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -91,41 +85,13 @@ public class AccountService {
         // save account, if any error occurs then rollback
         accountRepository.save(account);
 
-        var defaultLocation = new Location(
-                0,
-                0,
-                "",
-                0
-        );
-
-        var defaultProfile = new Profile(
-                "",
-                "",
-                "",
-                defaultLocation,
-                "",
-                0,
-                0,
-                0
-        );
-
-        var tasker = new Tasker(
-                account.getTaskerId(),
-                account.getTaskerId(),
-                defaultProfile
-        );
+        var defaultTasker = Tasker.createWithoutProfile(account.getTaskerId());
 
         // save tasker, if any error occurs then rollback
-        taskerRepository.save(tasker);
+        taskerRepository.save(defaultTasker);
 
-        Notification welcomeNotification = new Notification(
-                account.getTaskerId(),
-                null,
-                NotificationType.SYSTEM
-        );
-
-        // save notification, if any error occurs then rollback
-        notificationRepository.save(welcomeNotification);
+        // notifying of the tasker that your account has been created
+        notificationService.sendNotification(defaultTasker.getId(), null, NotificationType.SYSTEM);
 
         return accountMapper.toResponse(account);
     }

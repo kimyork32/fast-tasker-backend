@@ -53,11 +53,17 @@ public class Tasker {
         if (accountId == null) {
             throw new IllegalArgumentException("accountId cannot be null");
         }
-        if (profile == null) {
-            throw new IllegalArgumentException("profile cannot be null");
-        }
         this.id = UUID.randomUUID();
         this.accountId = accountId;
         this.profile = profile;
+    }
+
+    // obliques language (DDD)
+    public static Tasker createWithoutProfile(UUID accountId) {
+        return new Tasker(accountId, null);
+    }
+
+    public void updateProfile(Profile newProfile) {
+        this.profile = newProfile;
     }
 }

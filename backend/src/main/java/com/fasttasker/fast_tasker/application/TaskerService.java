@@ -53,7 +53,7 @@ public class TaskerService {
 
         Profile profile = taskerMapper.toProfileEntity(request.profile());
 
-        tasker.setProfile(profile);
+        tasker.updateProfile(profile);
 
         taskerRepository.save(tasker);
 
