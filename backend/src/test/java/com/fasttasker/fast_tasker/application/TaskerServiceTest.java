@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -28,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest
 @Transactional // for each test, make rollback
+@ActiveProfiles("test")
 class TaskerServiceTest {
 
     @Autowired
@@ -53,8 +55,8 @@ class TaskerServiceTest {
         );
 
         var defaultProfile = new Profile(
-                "",
-                "",
+                "Default",
+                "User",
                 "",
                 defaultLocation,
                 "",

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = TaskRepositoryImpl.class))
+@ActiveProfiles("test")
 class JpaTaskRepositoryTest {
 
     @Autowired
@@ -28,7 +30,7 @@ class JpaTaskRepositoryTest {
     void shouldSaveAndFindYouTaskById() {
         // 1. ARRANGE
         UUID id = UUID.randomUUID();
-        Location location = new Location(122.1212, 4242.4242, "address location", 4141414);
+        Location location = new Location(12.1212, 42.4242, "address location", 4141414);
         LocalDate date = LocalDate.parse("2020-04-20");
         UUID posterId = UUID.randomUUID();
 
@@ -95,7 +97,7 @@ class JpaTaskRepositoryTest {
 
         // created task
         UUID taskId = UUID.randomUUID();
-        Location location = new Location(122.1212, 4242.4242, "address location", 414141);
+        Location location = new Location(12.1212, 42.4242, "address location", 414141);
         LocalDate taskDate = LocalDate.parse("2020-04-20");
         UUID posterId = UUID.randomUUID();
 

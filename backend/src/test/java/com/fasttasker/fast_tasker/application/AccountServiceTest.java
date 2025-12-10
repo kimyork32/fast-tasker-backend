@@ -7,7 +7,6 @@ import com.fasttasker.fast_tasker.application.mapper.AccountMapper;
 import com.fasttasker.fast_tasker.config.JwtService;
 import com.fasttasker.fast_tasker.domain.account.*;
 import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
-import com.fasttasker.fast_tasker.domain.notification.Notification;
 import com.fasttasker.fast_tasker.domain.notification.NotificationType;
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
@@ -27,6 +26,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -50,92 +51,54 @@ class AccountServiceTest {
     @Mock
     private JwtService jwtService;
 
+    @Mock
+    private NotificationService notificationService;
+
     @InjectMocks
     private AccountService accountService;
 
     @Test
     void shouldRegisterAccountSuccess() {
         // 1. GIVEN
-        // input DTO
         var request = new RegisterAccountRequest(
                 "newUser@domain.com",
                 "password123456"
         );
         String hashedPassword = "hashedPassword-xyz";
-
-        // captures to verify saved objects
-        ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
-        ArgumentCaptor<Tasker> taskerCaptor = ArgumentCaptor.forClass(Tasker.class);
-        ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-
-        // this is the DTO that we want return from mapper
         var responseDto = new AccountResponse(
                 UUID.randomUUID().toString(),
                 request.email(),
                 AccountStatus.PENDING_VERIFICATION
         );
 
-        // simulating that the email NO EXISTS
-        when(accountRepository.findByEmailValue(request.email()))
-                .thenReturn(Optional.empty());
+        ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
+        ArgumentCaptor<Tasker> taskerCaptor = ArgumentCaptor.forClass(Tasker.class);
 
-        // simulating the hashing of the password
-        when(passwordEncoder.encode(request.rawPassword()))
-                .thenReturn(hashedPassword);
-
-        // simulating the return of the toResponse
-        when(accountMapper.toResponse(any(Account.class)))
-                .thenReturn(responseDto);
+        when(accountRepository.findByEmailValue(request.email())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(request.rawPassword())).thenReturn(hashedPassword);
+        when(accountMapper.toResponse(any(Account.class))).thenReturn(responseDto);
 
         // 2. WHEN
         AccountResponse response = accountService.registerAccount(request);
 
         // 3. THEN
-        // verify that the email was found
         verify(accountRepository).findByEmailValue("newUser@domain.com");
-
-        // verify that the password was hashed
         verify(passwordEncoder).encode(request.rawPassword());
 
-        // verify that account was saved
         verify(accountRepository).save(accountCaptor.capture());
         Account savedAccount = accountCaptor.getValue();
+        assertThat(savedAccount.getEmail().getValue()).isEqualTo(request.email());
+        assertThat(savedAccount.getPasswordHash().getValue()).isEqualTo(hashedPassword);
+        assertThat(savedAccount.getStatus()).isEqualTo(AccountStatus.PENDING_VERIFICATION);
+        assertThat(savedAccount.getTaskerId()).isNotNull();
 
-        assertThat(savedAccount.getEmail().getValue())
-                .withFailMessage("Email value is not equal")
-                .isEqualTo(request.email());
-
-        assertThat(savedAccount.getPasswordHash().getValue())
-                .withFailMessage("hashed password value is not equal")
-                .isEqualTo(hashedPassword);
-
-        assertThat(savedAccount.getStatus())
-                .withFailMessage("Status is not equal")
-                .isEqualTo(AccountStatus.PENDING_VERIFICATION);
-
-        assertThat(savedAccount.getTaskerId())
-                .withFailMessage("no ID was generated for Tasker")
-                .isNotNull();
-
-        // verify that Tasker was saved
         verify(taskerRepository).save(taskerCaptor.capture());
         Tasker savedTasker = taskerCaptor.getValue();
+        assertThat(savedTasker.getAccountId()).isEqualTo(savedAccount.getTaskerId());
+        assertThat(savedTasker.getProfile()).isNull();
 
-        assertThat(savedTasker.getAccountId())
-                .withFailMessage("tasker ID saved is not same as the linked ID")
-                .isEqualTo(savedAccount.getTaskerId());
+        verify(notificationService).sendNotification(eq(savedTasker.getId()), isNull(), eq(NotificationType.SYSTEM));
 
-        assertThat(savedTasker.getProfile().getAbout()).isEmpty();
-
-        // verify if notification was saved
-        verify(notificationRepository).save(notificationCaptor.capture());
-        Notification savedNotification = notificationCaptor.getValue();
-
-        assertThat(savedNotification.getReceiverTaskerId()).isEqualTo(savedAccount.getTaskerId());
-        assertThat(savedNotification.getType()).isEqualTo(NotificationType.SYSTEM);
-
-
-        // verify that the returned AccountResponse is correct
         assertThat(response).isNotNull();
         assertThat(response.id()).isNotNull();
         assertThat(response.email()).isEqualTo("newUser@domain.com");
