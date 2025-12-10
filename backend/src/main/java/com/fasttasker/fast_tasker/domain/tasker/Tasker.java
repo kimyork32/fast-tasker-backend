@@ -17,23 +17,19 @@ import java.util.UUID;
 @Setter
 @ToString
 @EqualsAndHashCode
-@Builder(toBuilder = true)
 public class Tasker {
 
-    /**
-     * 
-     */
     @Id
     private UUID id;
 
     /**
-     * 
+     * ID of the account linked to the tasker
      */
     @Column(name = "account_id", unique = true, nullable = false)
     private UUID accountId;
 
     /**
-     * 
+     * profile data
      */
     @Embedded
     @AttributeOverrides({
@@ -52,27 +48,16 @@ public class Tasker {
     })
     private Profile profile;
 
-    // private List<Task> tasks; DELETED: i removed it because it breaks a fundamental rule of DDD called the Aggregates Rule
-
-    /**
-     * 
-     */
-    public void addTask() {
-        // TODO implement here
+    @Builder(toBuilder = true)
+    public Tasker(UUID accountId, Profile profile) {
+        if (accountId == null) {
+            throw new IllegalArgumentException("accountId cannot be null");
+        }
+        if (profile == null) {
+            throw new IllegalArgumentException("profile cannot be null");
+        }
+        this.id = UUID.randomUUID();
+        this.accountId = accountId;
+        this.profile = profile;
     }
-
-    /**
-     * 
-     */
-    public void getActiveTasks() {
-        // TODO implement here
-    }
-
-    /**
-     * 
-     */
-    public void getHistory() {
-        // TODO implement here
-    }
-
 }

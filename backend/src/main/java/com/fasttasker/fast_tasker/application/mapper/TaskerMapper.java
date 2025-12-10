@@ -42,7 +42,6 @@ public class TaskerMapper {
         var profile = toProfileEntity(request.profile());
 
         return Tasker.builder()
-                .id(UUID.randomUUID())
                 .accountId(UUID.fromString(request.accountId()))
                 .profile(profile)
                 .build();
