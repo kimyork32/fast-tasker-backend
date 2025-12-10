@@ -13,26 +13,33 @@ import java.util.UUID;
 @Component
 public class TaskerMapper {
 
+    // To entity ////////////////////////////////////////
+    public Profile toProfileEntity(ProfileRequest request) {
+        if (request == null) return null;
+
+        var loc = request.location();
+
+        return Profile.builder()
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .photo(request.photo())
+                .location(Location.builder()
+                        .latitude(loc.latitude())
+                        .longitude(loc.longitude())
+                        .address(loc.address())
+                        .zip(loc.zip())
+                        .build())
+                .about(request.about())
+                .reputation(request.reputation())
+                .clientReviews(request.clientReviews())
+                .completedTasks(request.completedTasks())
+                .build();
+    }
+
     public Tasker toTaskerEntity(TaskerRequest request) {
         if (request == null) return null;
 
-        var location = new Location(
-                request.profile().location().latitude(),
-                request.profile().location().longitude(),
-                request.profile().location().address(),
-                request.profile().location().zip()
-        );
-
-        var profile = Profile.builder()
-                .firstName(request.profile().firstName())
-                .lastName(request.profile().lastName())
-                .photo(request.profile().photo())
-                .about(request.profile().about())
-                .reputation(request.profile().reputation())
-                .clientReviews(request.profile().clientReviews())
-                .completedTasks(request.profile().completedTasks())
-                .location(location)
-                .build();
+        var profile = toProfileEntity(request.profile());
 
         return Tasker.builder()
                 .id(UUID.randomUUID())
@@ -40,24 +47,6 @@ public class TaskerMapper {
                 .profile(profile)
                 .build();
     }
-
-    public Profile toProfileEntity(ProfileRequest request) {
-        if (request == null) return null;
-
-        var loc = request.location();
-
-        return new Profile(
-                request.firstName(),
-                request.lastName(),
-                request.photo(),
-                new Location(loc.latitude(), loc.longitude(), loc.address(), loc.zip()),
-                request.about(),
-                request.reputation(),
-                request.clientReviews(),
-                request.completedTasks()
-        );
-    }
-
     // To response ////////////////////////////////////////
     public TaskerResponse toResponse(Tasker tasker) {
         if (tasker == null) return null;

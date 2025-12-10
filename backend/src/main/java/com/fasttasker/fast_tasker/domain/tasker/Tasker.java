@@ -40,7 +40,7 @@ public class Tasker {
             @AttributeOverride(name = "firstName", column = @Column(name = "first_name", length = 60)),
             @AttributeOverride(name = "lastName", column = @Column(name = "last_name", length = 60)),
             @AttributeOverride(name = "photo", column = @Column(name = "profile_photo_url", length = 255)),
-            @AttributeOverride(name = "about", column = @Column(name = "profile_about", length = 500)),
+            @AttributeOverride(name = "about", column = @Column(name = "profile_about", length = 200)),
             @AttributeOverride(name = "reputation", column = @Column(name = "profile_reputation")),
             @AttributeOverride(name = "clientReviews", column = @Column(name = "profile_client_reviews")),
             @AttributeOverride(name = "completedTasks", column = @Column(name = "profile_completed_tasks")),

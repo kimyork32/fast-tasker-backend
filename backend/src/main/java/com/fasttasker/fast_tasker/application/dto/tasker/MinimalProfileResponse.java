@@ -12,7 +12,7 @@ public record MinimalProfileResponse(
         String firstName,
         String lastName,
         String photo,
-        int reputation,
+        float reputation,
         int clientReviews,
         int completedTasks
 ) {}

@@ -9,7 +9,7 @@ public record ProfileResponse(
         String lastName,
         String photo,
         String about,
-        int reputation,
+        float reputation,
         int clientReviews,
         int completedTasks,
         LocationResponse location
