@@ -1,19 +1,23 @@
 package com.fasttasker.fast_tasker.web.controller;
 
 import com.fasttasker.fast_tasker.application.service.TaskerService;
+import com.fasttasker.fast_tasker.application.service.NotificationService;
 import com.fasttasker.fast_tasker.application.dto.tasker.LocationResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.ProfileResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
 import com.fasttasker.fast_tasker.config.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 
+import java.util.Collections;
 import java.util.UUID;
 
 import static org.mockito.Mockito.when;
@@ -21,13 +25,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 
 /**
  * integration test
  */
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(TaskerController.class)
+@Import(JwtService.class)
 @ActiveProfiles("test")
 class TaskerControllerTest {
 
@@ -40,10 +45,12 @@ class TaskerControllerTest {
     @MockBean
     private TaskerService taskerService;
 
+    @MockBean
+    private NotificationService notificationService;
+
     @Test
     void shouldGetTaskerMeWhenAuthenticated() throws Exception {
         UUID testAccountId = UUID.randomUUID();
-        String validToken = jwtService.generateToken(testAccountId, true);
 
         var mockLocation = new LocationResponse(
                 -13.412453,
@@ -74,10 +81,12 @@ class TaskerControllerTest {
         when(taskerService.getByAccountId(testAccountId))
                 .thenReturn(mockResponse);
 
+        Authentication auth = new UsernamePasswordAuthenticationToken(testAccountId, null, Collections.emptyList());
+
         // 2. WHEN
         mockMvc.perform(
                 get("/api/v1/tasker/user/me")
-                        .header("Authorization", "Bearer " + validToken)
+                        .with(authentication(auth))
         )
                 // 3. THEN
                 .andExpect(status().isOk())

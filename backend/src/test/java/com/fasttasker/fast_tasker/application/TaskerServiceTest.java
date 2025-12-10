@@ -4,45 +4,58 @@ import com.fasttasker.fast_tasker.application.dto.tasker.LocationRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.ProfileRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
+import com.fasttasker.fast_tasker.application.dto.tasker.ProfileResponse;
+import com.fasttasker.fast_tasker.application.mapper.TaskerMapper;
+import com.fasttasker.fast_tasker.application.service.ConversationService;
+import com.fasttasker.fast_tasker.application.service.NotificationService;
 import com.fasttasker.fast_tasker.application.service.TaskerService;
-import com.fasttasker.fast_tasker.domain.account.IAccountRepository;
+import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import com.fasttasker.fast_tasker.domain.tasker.Location;
 import com.fasttasker.fast_tasker.domain.tasker.Profile;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
- * integration test for TaskerServiceTest
- *
- * NOTE:
- * for integration test, use @SpringBootTest. Recommended if u use H2
- * for unit test, use @ExtendWith(MockitoExtension.class) and use mockito
+ * Unit test for TaskerService
  */
-@SpringBootTest
-@Transactional // for each test, make rollback
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 class TaskerServiceTest {
 
-    @Autowired
-    private TaskerService taskerService;
-
-    @Autowired
+    @Mock
     private ITaskerRepository taskerRepository;
 
-    @Autowired
-    private IAccountRepository accountRepository;
+    @Mock
+    private ITaskRepository taskRepository;
+
+    @Mock
+    private TaskerMapper taskerMapper;
+
+    @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private ConversationService conversationService;
+
+    @InjectMocks
+    private TaskerService taskerService;
 
     private UUID testAccountId;
+    private Tasker tasker;
 
     @BeforeEach
     void setUp() {
@@ -66,14 +79,11 @@ class TaskerServiceTest {
                 0
         );
 
-        var tasker = new Tasker(
+        tasker = new Tasker(
                 UUID.randomUUID(),
                 testAccountId,
                 defaultProfile
         );
-
-        taskerRepository.save(tasker);
-
     }
 
     @Test
@@ -104,6 +114,23 @@ class TaskerServiceTest {
                 profileRequest
         );
 
+        // Mocking Repository behavior
+        when(taskerRepository.findByAccountId(testAccountId)).thenReturn(Optional.of(tasker));
+
+        // Mocking Mapper behavior
+        // 1. toProfileEntity
+        var newLocation = new Location(locationRequest.latitude(), locationRequest.longitude(), locationRequest.address(), locationRequest.zip());
+        var newProfile = new Profile(profileRequest.firstName(), profileRequest.lastName(), profileRequest.photo(), newLocation, profileRequest.about(), profileRequest.reputation(), profileRequest.clientReviews(), profileRequest.completedTasks());
+        when(taskerMapper.toProfileEntity(any())).thenReturn(newProfile);
+
+        // 2. toResponse
+        TaskerResponse mockResponse = mock(TaskerResponse.class);
+        ProfileResponse mockProfileResponse = mock(ProfileResponse.class);
+        when(taskerMapper.toResponse(any())).thenReturn(mockResponse);
+        when(mockResponse.profile()).thenReturn(mockProfileResponse);
+        when(mockProfileResponse.about()).thenReturn(profileRequest.about());
+        when(mockProfileResponse.photo()).thenReturn(profileRequest.photo());
+
         // 2.  WHEN
         TaskerResponse response = taskerService.registerTasker(taskerRequest);
 
@@ -113,13 +140,10 @@ class TaskerServiceTest {
         assertThat(response.profile().about()).isEqualTo(profileRequest.about());
         assertThat(response.profile().photo()).isEqualTo(profileRequest.photo());
 
-        // verify that the data was saved in the bd
-        Tasker taskerInBd = taskerRepository.findByAccountId(testAccountId).get();
+        // verify that save was called
+        verify(taskerRepository).save(tasker);
 
-        assertThat(taskerInBd).isNotNull();
-        assertThat(taskerInBd.getProfile()).isNotNull();
-        assertThat(taskerInBd.getProfile().getAbout()).isEqualTo(profileRequest.about());
-        assertThat(taskerInBd.getProfile().getPhoto()).isEqualTo(profileRequest.photo());
-
+        // verify that the object state was updated
+        assertThat(tasker.getProfile().getAbout()).isEqualTo(profileRequest.about());
     }
 }
