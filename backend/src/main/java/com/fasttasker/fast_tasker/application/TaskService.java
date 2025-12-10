@@ -5,9 +5,6 @@ import com.fasttasker.fast_tasker.application.dto.tasker.MinimalProfileResponse;
 import com.fasttasker.fast_tasker.application.exception.*;
 import com.fasttasker.fast_tasker.application.mapper.TaskMapper;
 import com.fasttasker.fast_tasker.application.mapper.TaskerMapper;
-import com.fasttasker.fast_tasker.domain.account.Account;
-import com.fasttasker.fast_tasker.domain.account.IAccountRepository;
-import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
 import com.fasttasker.fast_tasker.domain.task.*;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
@@ -28,20 +25,16 @@ public class TaskService {
 
     private final ITaskRepository taskRepository;
     private final ITaskerRepository taskerRepository;
-    private final INotificationRepository notificationRepository;
-    private final IAccountRepository accountRepository;
     private final TaskMapper taskMapper;
     private final TaskerMapper taskerMapper;
 
     public TaskService(
             ITaskRepository taskRepository,
             ITaskerRepository taskerRepository,
-            INotificationRepository notificationRepository, IAccountRepository accountRepository, TaskMapper taskMapper, TaskerMapper taskerMapper
+            TaskMapper taskMapper, TaskerMapper taskerMapper
     ) {
         this.taskRepository = taskRepository;
         this.taskerRepository = taskerRepository;
-        this.notificationRepository = notificationRepository;
-        this.accountRepository = accountRepository;
         this.taskMapper = taskMapper;
         this.taskerMapper = taskerMapper;
     }
@@ -71,7 +64,7 @@ public class TaskService {
                 .stream() // convert to stream
                 .map(taskMapper::toResponse) // It applies a function (toResponse) to each element of
                                              // the stream and returns a new stream with the results (TaskResponse)
-                .collect(Collectors.toList());  // after processing the stream elements, it reconstructs
+                .toList();  // after processing the stream elements, it reconstructs
                                                 // the result into a concrete collection (List)
     }
 
@@ -83,7 +76,7 @@ public class TaskService {
         return taskRepository.findByPosterId(posterId)
                 .stream()
                 .map(taskMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -180,7 +173,6 @@ public class TaskService {
                                 return taskMapper.toAnswerProfileResponse(ar, apr);
                             })
                             .toList();
-                    // List<AnswerProfileResponse> answersResponse = taskMapper.toAnswerProfileResponseList(question.getAnswers());
                     return taskMapper.toQuestionProfileResponse(questionResponse, profileResponse, answersResponse);
                 })
                 .toList();
@@ -220,12 +212,6 @@ public class TaskService {
 
         // add the offer to the task
         task.getOffers().add(offer);
-
-        Task savedTask = taskRepository.save(task);
-
-        // Find the newly added offer from the saved task entity to ensure we return the persisted state.
-        Offer savedOffer = savedTask.getOffers().stream()
-                .filter(o -> o.getId().equals(offer.getId())).findFirst().orElse(offer);
 
         Tasker tasker = taskerRepository.findById(taskerId)
                 .orElseThrow(() -> new TaskNotFoundException("TaskerService. Tasker not found"));
@@ -368,10 +354,6 @@ public class TaskService {
      */
     public void listByStatus(TaskStatus status) {
         // TODO implement here
-    }
-
-    public TaskMapper getTaskMapper() {
-        return taskMapper;
     }
 
     // private methods (HELPERS)
