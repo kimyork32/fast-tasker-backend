@@ -3,6 +3,7 @@ package com.fasttasker.fast_tasker.web.controller;
 import com.fasttasker.fast_tasker.application.AccountService;
 import com.fasttasker.fast_tasker.application.dto.account.*;
 import com.fasttasker.fast_tasker.config.JwtService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +17,13 @@ import java.util.UUID;
 /**
  * 
  */
+@Slf4j
 @RestController
 @RequestMapping("api/v1/auth")
 public class AccountController {
 
     private final AccountService accountService;
     private final JwtService jwtService;
-    private final String AUTH_COOKIE_NAME = "jwtToken"; // this should be same as proxy.ts token
 
     /**
      * constructor for dependencies injection
@@ -44,7 +45,7 @@ public class AccountController {
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterAccountRequest request) {
         AccountResponse accountResponse = accountService.registerAccount(request);
 
-        System.out.println("AccountController. register. accountId: " + accountResponse.id());
+        log.info("accountId: {}", accountResponse.id());
         String newToken = jwtService.generateToken(UUID.fromString(accountResponse.id()), false); // profileCompleted = false
 
         var registerResponse = new RegisterResponse(

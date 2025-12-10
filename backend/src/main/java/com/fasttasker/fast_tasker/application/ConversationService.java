@@ -5,7 +5,7 @@ import com.fasttasker.fast_tasker.application.dto.conversation.ConversationSumma
 import com.fasttasker.fast_tasker.application.dto.conversation.MessageRequest;
 import com.fasttasker.fast_tasker.application.dto.conversation.MessageResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.ChatProfileResponse;
-import com.fasttasker.fast_tasker.application.exception.ConversationNotFountException;
+import com.fasttasker.fast_tasker.application.exception.ConversationNotFoundException;
 import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
 import com.fasttasker.fast_tasker.application.mapper.ConversationMapper;
 import com.fasttasker.fast_tasker.application.mapper.TaskerMapper;
@@ -85,7 +85,7 @@ public class ConversationService {
                             .profile(profile)
                             .build();
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -96,19 +96,19 @@ public class ConversationService {
     @Transactional(readOnly = true)
     public List<MessageResponse> getHistory(UUID conversationId, UUID requesterId) {
         Conversation c = conversationRepository.findById(conversationId)
-                .orElseThrow(() -> new ConversationNotFountException("Conversation Not Found"));
+                .orElseThrow(() -> new ConversationNotFoundException("Conversation Not Found"));
 
         // verify that the user requesting the history is a participant in the conversation
         boolean isParticipant = c.getParticipantA().equals(requesterId) || c.getParticipantB().equals(requesterId);
         if (!isParticipant) {
             // throw an exception that will be handled to return a 403 Forbidden or 404 Not Found
             // using ConversationNotFoundException prevents leaking information that the conversation exists
-            throw new ConversationNotFountException("Conversation not found or access denied");
+            throw new ConversationNotFoundException("Conversation not found or access denied");
         }
 
         return c.getMessages().stream()
                 .map(conversationMapper::toMessageResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -119,7 +119,7 @@ public class ConversationService {
     @Transactional
     public void processAndSendMessage(MessageRequest messageRequest, UUID senderIdFromToken) {
         Conversation conversation = conversationRepository.findById(messageRequest.conversationId())
-                .orElseThrow(() -> new ConversationNotFountException("Conversation Not Found"));
+                .orElseThrow(() -> new ConversationNotFoundException("Conversation Not Found"));
 
         MessageContent messageContent = conversationMapper.toMessageContentEntity(messageRequest.content());
 
