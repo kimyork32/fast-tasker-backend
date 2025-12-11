@@ -67,7 +67,7 @@ class AccountServiceTest {
         ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
         ArgumentCaptor<Tasker> taskerCaptor = ArgumentCaptor.forClass(Tasker.class);
 
-        when(accountRepository.findByEmailValue(request.email())).thenReturn(Optional.empty());
+        when(accountRepository.getByEmailValue(request.email())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(request.rawPassword())).thenReturn(hashedPassword);
         when(accountMapper.toResponse(any(Account.class))).thenReturn(responseDto);
 

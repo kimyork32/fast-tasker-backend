@@ -1,6 +1,5 @@
 package com.fasttasker.fast_tasker.domain.account;
 
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -11,7 +10,10 @@ public interface IAccountRepository {
 
     Account save(Account account);
 
-    Optional<Account> findById(UUID id);
+    Account findById(UUID id);
 
-    Optional<Account> findByEmailValue(String emailValue);
+    boolean existsByEmailValue(String emailValue);
+
+    Account getByEmailValue(String emailValue);
+
 }

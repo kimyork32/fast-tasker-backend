@@ -1,34 +1,38 @@
 package com.fasttasker.fast_tasker.persistence.repository;
 
+import com.fasttasker.fast_tasker.application.exception.DomainException;
 import com.fasttasker.fast_tasker.domain.account.Account;
 import com.fasttasker.fast_tasker.domain.account.IAccountRepository;
 import com.fasttasker.fast_tasker.persistence.jpa.JpaAccountRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@RequiredArgsConstructor
 public class AccountRepositoryImpl implements IAccountRepository {
 
-    private final JpaAccountRepository jpa;
-
-    public AccountRepositoryImpl(JpaAccountRepository jpa) {
-        this.jpa = jpa;
-    }
+    private final JpaAccountRepository jpaAccountRepository;
 
     @Override
     public Account save(Account account) {
-        return jpa.save(account);
+        return jpaAccountRepository.save(account);
     }
 
     @Override
-    public Optional<Account> findById(UUID id) {
-        return jpa.findById(id);
+    public Account findById(UUID id) {
+        return jpaAccountRepository.findById(id).orElse(null);
     }
 
     @Override
-    public Optional<Account> findByEmailValue(String emailValue) {
-        return jpa.findByEmailValue(emailValue);
+    public boolean existsByEmailValue(String emailValue) {
+        return jpaAccountRepository.existsByEmailValue(emailValue);
+    }
+
+    @Override
+    public Account getByEmailValue(String emailValue) {
+        return jpaAccountRepository.findByEmailValue(emailValue)
+                .orElseThrow(() -> new DomainException("Account not found with email: " + emailValue));
     }
 }

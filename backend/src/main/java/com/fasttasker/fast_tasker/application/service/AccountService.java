@@ -3,10 +3,7 @@ package com.fasttasker.fast_tasker.application.service;
 import com.fasttasker.fast_tasker.application.dto.account.AccountResponse;
 import com.fasttasker.fast_tasker.application.dto.account.LoginResponse;
 import com.fasttasker.fast_tasker.application.dto.account.RegisterAccountRequest;
-import com.fasttasker.fast_tasker.application.exception.AccountNotFoundException;
-import com.fasttasker.fast_tasker.application.exception.EmailAlreadyExistsException;
-import com.fasttasker.fast_tasker.application.exception.PasswordIncorrectException;
-import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
+import com.fasttasker.fast_tasker.application.exception.*;
 import com.fasttasker.fast_tasker.application.mapper.AccountMapper;
 import com.fasttasker.fast_tasker.config.JwtService;
 import com.fasttasker.fast_tasker.domain.account.*;
@@ -24,9 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.UUID;
 
-/**
- *
- */
 @Slf4j
 @Service
 public class AccountService {
@@ -58,10 +52,9 @@ public class AccountService {
 
     @Transactional
     public AccountResponse registerAccount(RegisterAccountRequest request) {
-        accountRepository.findByEmailValue(request.email()).ifPresent(acc -> {
-            throw new EmailAlreadyExistsException(
-                    "the email address" + request.email() + " is already in use");
-        });
+        if (accountRepository.existsByEmailValue(request.email())) {
+            throw new EmailAlreadyExistsException(request.email());
+        }
 
         // the password is receiver of the client in plain text. The client will send
         // it using a secure channel such as HTTPS.
@@ -88,15 +81,14 @@ public class AccountService {
 
     @Transactional(readOnly = true)
     public LoginResponse login(String email, String rawPassword) {
-        Account account = accountRepository.findByEmailValue(email)
-                .orElseThrow(() -> new AccountNotFoundException("login exception: invalid email"));
+        Account account = accountRepository.getByEmailValue(email);
 
         if (!passwordEncoder.matches(rawPassword, account.getPassword().getValue())) {
-            throw new AccountNotFoundException("login exception: invalid password");
+            throw new InvalidPasswordException();
         }
 
         if (account.getStatus() == AccountStatus.BANNED) {
-            throw new AccountNotFoundException("your account has been banned");
+            throw new BannedAccountException();
         }
 
         // NOTE: This is inefficient
@@ -119,7 +111,7 @@ public class AccountService {
         Account account = findAccountById(accountId);
 
         if (!passwordEncoder.matches(oldPass, account.getPassword().getValue())) {
-            throw new PasswordIncorrectException("the password has been incorrect");
+            throw new PasswordIncorrectException();
         }
 
         String newHashedPassword = passwordEncoder.encode(newPass);
@@ -154,7 +146,6 @@ public class AccountService {
     }
 
     private Account findAccountById(UUID accountId) {
-        return accountRepository.findById(accountId)
-                .orElseThrow(() -> new AccountNotFoundException("not found account with id: " + accountId));
+        return accountRepository.findById(accountId);
     }
 }
