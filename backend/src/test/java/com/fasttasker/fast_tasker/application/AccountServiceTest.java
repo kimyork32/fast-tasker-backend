@@ -81,13 +81,13 @@ class AccountServiceTest {
         verify(accountRepository).save(accountCaptor.capture());
         Account savedAccount = accountCaptor.getValue();
         assertThat(savedAccount.getEmail().getValue()).isEqualTo(request.email());
-        assertThat(savedAccount.getPasswordHash().getValue()).isEqualTo(hashedPassword);
+        assertThat(savedAccount.getPassword().getValue()).isEqualTo(hashedPassword);
         assertThat(savedAccount.getStatus()).isEqualTo(AccountStatus.PENDING_VERIFICATION);
-        assertThat(savedAccount.getTaskerId()).isNotNull();
+        assertThat(savedAccount.getId()).isNotNull();
 
         verify(taskerRepository).save(taskerCaptor.capture());
         Tasker savedTasker = taskerCaptor.getValue();
-        assertThat(savedTasker.getAccountId()).isEqualTo(savedAccount.getTaskerId());
+        assertThat(savedTasker.getAccountId()).isEqualTo(savedAccount.getId());
         assertThat(savedTasker.getProfile()).isNull();
 
         verify(notificationService).sendNotification(eq(savedTasker.getId()), isNull(), eq(NotificationType.SYSTEM));

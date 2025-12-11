@@ -18,7 +18,8 @@ import java.util.regex.Pattern;
 @ToString
 public class Email {
 
-    public static final String REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+    // Stricter regex that enforces a TLD and disallows leading dots in the domain
+    public static final String REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)+$";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     @Column(name = "email", unique = true, nullable = false)
