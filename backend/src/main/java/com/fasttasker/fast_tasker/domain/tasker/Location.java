@@ -31,18 +31,18 @@ public class Location {
     /**
      * zip code of peru (FOR THE MOMENT)
      */
-    private int zip;
+    private String zip;
 
     @Builder(toBuilder = true)
-    public Location(double latitude, double longitude, String address, int zip) {
+    public Location(double latitude, double longitude, String address, String zip) {
         if (latitude < -90 || latitude > 90) {
             throw new IllegalArgumentException("latitude must be between -90 and 90");
         }
         if (longitude < -180 || longitude > 180) {
             throw new IllegalArgumentException("longitude must be between -180 and 180");
         }
-        if (zip < 0) {
-            throw new IllegalArgumentException("zip cannot be negative");
+        if (zip.isEmpty()) {
+            throw new IllegalArgumentException("zip cannot be empty");
         }
 
         // validate address with zip here

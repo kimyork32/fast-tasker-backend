@@ -7,6 +7,5 @@ public record LocationRequest(
         double latitude,
         double longitude,
         String address,
-        int zip
-) {
-}
+        String zip
+) {}

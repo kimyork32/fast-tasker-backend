@@ -30,9 +30,6 @@ public class TaskerMapper {
                         .zip(loc.zip())
                         .build())
                 .about(request.about())
-                .reputation(request.reputation())
-                .clientReviews(request.clientReviews())
-                .completedTasks(request.completedTasks())
                 .build();
     }
 

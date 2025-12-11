@@ -121,7 +121,7 @@ class AccountServiceTest {
                 -15.542353,
                 -12.252514,
                 "address fake",
-                4141414
+                "4141414"
         );
 
         var fakeProfile = new Profile(
@@ -129,10 +129,7 @@ class AccountServiceTest {
                 "gonzales",
                 "photo.com",
                 fakeLocation,
-                "about me",
-                3,
-                5,
-                12
+                "about me"
         );
 
         var taskerSaved = new Tasker(

@@ -65,7 +65,7 @@ class TaskerServiceTest {
                 0,
                 0,
                 "",
-                0
+                "0"
         );
 
         var defaultProfile = new Profile(
@@ -73,10 +73,7 @@ class TaskerServiceTest {
                 "User",
                 "",
                 defaultLocation,
-                "",
-                0,
-                0,
-                0
+                ""
         );
 
         tasker = new Tasker(
@@ -95,7 +92,7 @@ class TaskerServiceTest {
                 -13.412453,
                 -12.158023,
                 "address street",
-                4141414
+                "4141414"
         );
 
         var profileRequest = new ProfileRequest(
@@ -103,9 +100,6 @@ class TaskerServiceTest {
                 "simpson",
                 "https://aws-service-s3.com/photo/141454",
                 "about me",
-                4,
-                14,
-                12,
                 locationRequest
         );
 
@@ -120,7 +114,7 @@ class TaskerServiceTest {
         // Mocking Mapper behavior
         // 1. toProfileEntity
         var newLocation = new Location(locationRequest.latitude(), locationRequest.longitude(), locationRequest.address(), locationRequest.zip());
-        var newProfile = new Profile(profileRequest.firstName(), profileRequest.lastName(), profileRequest.photo(), newLocation, profileRequest.about(), profileRequest.reputation(), profileRequest.clientReviews(), profileRequest.completedTasks());
+        var newProfile = new Profile(profileRequest.firstName(), profileRequest.lastName(), profileRequest.photo(), newLocation, profileRequest.about());
         when(taskerMapper.toProfileEntity(any())).thenReturn(newProfile);
 
         // 2. toResponse

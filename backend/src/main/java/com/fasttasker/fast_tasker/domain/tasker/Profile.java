@@ -50,8 +50,7 @@ public class Profile {
 
 
     @Builder(toBuilder = true)
-    public Profile(String firstName, String lastName, String photo, Location location, String about, float reputation,
-                   int clientReviews, int completedTasks) {
+    public Profile(String firstName, String lastName, String photo, Location location, String about) {
         if (firstName == null || lastName == null) {
             throw new IllegalArgumentException("firstName and lastName cannot be null");
         }
@@ -64,23 +63,13 @@ public class Profile {
         if (about.length() > 200) {
             throw new IllegalArgumentException("about cannot be longer than 200 characters");
         }
-        if (reputation < 0 || reputation > 5) {
-            throw new IllegalArgumentException("reputation must be between 0 and 5");
-
-        }
-        if (clientReviews < 0) {
-            throw new IllegalArgumentException("clientReviews cannot be negative");
-        }
-        if (completedTasks < 0) {
-            throw new IllegalArgumentException("completedTasks cannot be negative");
-        }
         this.firstName = firstName;
         this.lastName = lastName;
         this.photo = photo;
         this.location = location;
         this.about = about;
-        this.reputation = reputation;
-        this.clientReviews = clientReviews;
-        this.completedTasks = completedTasks;
+        this.reputation = 0.f;
+        this.clientReviews = 0;
+        this.completedTasks = 0;
     }
 }

@@ -31,7 +31,7 @@ class JpaTaskRepositoryTest {
     void shouldSaveAndFindYouTaskById() {
         // 1. ARRANGE
         UUID id = UUID.randomUUID();
-        Location location = new Location(12.1212, 42.4242, "address location", 4141414);
+        Location location = new Location(12.1212, 42.4242, "address location", "4141414");
         LocalDate date = LocalDate.parse("2020-04-20");
         UUID posterId = UUID.randomUUID();
 
@@ -98,7 +98,7 @@ class JpaTaskRepositoryTest {
 
         // created task
         UUID taskId = UUID.randomUUID();
-        Location location = new Location(12.1212, 42.4242, "address location", 414141);
+        Location location = new Location(12.1212, 42.4242, "address location", "414141");
         LocalDate taskDate = LocalDate.parse("2020-04-20");
         UUID posterId = UUID.randomUUID();
 

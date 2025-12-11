@@ -31,7 +31,7 @@ class JpaTaskerRepositoryTest {
                 -16.409047,
                 -71.537731,
                 "location random",
-                4141414
+                "4141414"
         );
 
         Profile profile = new Profile(
@@ -39,10 +39,7 @@ class JpaTaskerRepositoryTest {
                 "simpson",
                 "https://example.com/photo.png",
                 location,
-                "im tasker expert in plumbing",
-                4,
-                3,
-                10
+                "im tasker expert in plumbing"
         );
 
         Tasker newTasker =  new Tasker(
@@ -79,7 +76,7 @@ class JpaTaskerRepositoryTest {
                 -16.409047,
                 -71.537731,
                 "location random",
-                41414141
+                "41414141"
         );
 
         var profile = new Profile(
@@ -87,10 +84,7 @@ class JpaTaskerRepositoryTest {
                 "simpson",
                 "https://example.com/photo.png",
                 location,
-                "im tasker expert in plumbing",
-                4,
-                3,
-                10
+                "im tasker expert in plumbing"
         );
 
         var newTasker =  new Tasker(

@@ -41,7 +41,7 @@ public class TaskerController {
 
     @PutMapping("/register")
     public ResponseEntity<TaskerRegistrationResponse> initialRegister(
-            @RequestBody TaskerRequest request,
+            @Valid @RequestBody TaskerRequest request,
             Authentication authentication
     ) {
 
