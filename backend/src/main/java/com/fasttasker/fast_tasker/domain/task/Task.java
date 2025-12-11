@@ -56,12 +56,6 @@ public class Task {
      * mapped to specific columns in the 'task' table.
      */
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "latitude", column = @Column(name = "latitude", nullable = false)),
-            @AttributeOverride(name = "longitude", column = @Column(name = "longitude", nullable = false)),
-            @AttributeOverride(name = "address", column = @Column(name = "address", length = 255, nullable = false)),
-            @AttributeOverride(name = "zip", column = @Column(name = "location_zip")) // SUGGESTION: Add zip for consistency
-    })
     private Location location;
 
     /**

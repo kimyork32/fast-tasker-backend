@@ -50,7 +50,7 @@ public class Question {
     /**
      * date and time the question was created
      */
-    @Column(name = "create", nullable = false)
+    @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
 
