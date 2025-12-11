@@ -21,7 +21,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,7 +66,7 @@ class AccountServiceTest {
         ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
         ArgumentCaptor<Tasker> taskerCaptor = ArgumentCaptor.forClass(Tasker.class);
 
-        when(accountRepository.getByEmailValue(request.email())).thenReturn(Optional.empty());
+        when(accountRepository.getByEmailValue(request.email())).thenReturn(null);
         when(passwordEncoder.encode(request.rawPassword())).thenReturn(hashedPassword);
         when(accountMapper.toResponse(any(Account.class))).thenReturn(responseDto);
 
@@ -75,7 +74,7 @@ class AccountServiceTest {
         AccountResponse response = accountService.registerAccount(request);
 
         // 3. THEN
-        verify(accountRepository).findByEmailValue("newUser@domain.com");
+        verify(accountRepository).getByEmailValue("newUser@domain.com");
         verify(passwordEncoder).encode(request.rawPassword());
 
         verify(accountRepository).save(accountCaptor.capture());
@@ -141,8 +140,8 @@ class AccountServiceTest {
                 .thenReturn(taskerSaved);
 
         // simulating that the email EXISTS
-        when(accountRepository.findByEmailValue(email))
-                .thenReturn(Optional.of(accountToFind));
+        when(accountRepository.getByEmailValue(email))
+                .thenReturn(accountToFind);
 
         // simulating the hashing of the password
         when(passwordEncoder.matches(rawPassword, hashedPassword))
@@ -155,7 +154,7 @@ class AccountServiceTest {
 
         // 3. THEN
         // verify that the email was found
-        verify(accountRepository).findByEmailValue(email);
+        verify(accountRepository).getByEmailValue(email);
 
         // verify that the password was hashed
         verify(passwordEncoder).matches(rawPassword, hashedPassword);

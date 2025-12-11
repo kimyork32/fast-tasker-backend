@@ -3,7 +3,6 @@ package com.fasttasker.fast_tasker.persistence.repository;
 import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
 import com.fasttasker.fast_tasker.persistence.jpa.JpaTaskerRepository;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

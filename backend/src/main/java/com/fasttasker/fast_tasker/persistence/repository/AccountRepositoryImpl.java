@@ -1,6 +1,6 @@
 package com.fasttasker.fast_tasker.persistence.repository;
 
-import com.fasttasker.fast_tasker.application.exception.DomainException;
+import com.fasttasker.fast_tasker.application.exception.AccountNotFoundException;
 import com.fasttasker.fast_tasker.domain.account.Account;
 import com.fasttasker.fast_tasker.domain.account.IAccountRepository;
 import com.fasttasker.fast_tasker.persistence.jpa.JpaAccountRepository;
@@ -22,7 +22,8 @@ public class AccountRepositoryImpl implements IAccountRepository {
 
     @Override
     public Account findById(UUID id) {
-        return jpaAccountRepository.findById(id).orElse(null);
+        return jpaAccountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException(id));
     }
 
     @Override
@@ -33,6 +34,6 @@ public class AccountRepositoryImpl implements IAccountRepository {
     @Override
     public Account getByEmailValue(String emailValue) {
         return jpaAccountRepository.findByEmailValue(emailValue)
-                .orElseThrow(() -> new DomainException("Account not found with email: " + emailValue));
+                .orElseThrow(() -> new AccountNotFoundException(emailValue));
     }
 }

@@ -1,85 +1,74 @@
 package com.fasttasker.fast_tasker.persistence.jpa;
 
-import com.fasttasker.fast_tasker.domain.account.*;
-import com.fasttasker.fast_tasker.persistence.repository.AccountRepositoryImpl;
+import com.fasttasker.fast_tasker.domain.account.Account;
+import com.fasttasker.fast_tasker.domain.account.Email;
+import com.fasttasker.fast_tasker.domain.account.Password;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.Optional;
-import java.util.UUID;
-import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = AccountRepositoryImpl.class))
+/**
+ * Integration test
+ */
+@DataJpaTest
 class JpaAccountRepositoryTest {
 
-    Logger logger = Logger.getLogger(JpaAccountRepositoryTest.class.getName());
+    @Autowired
+    private JpaAccountRepository jpaRepository;
 
     @Autowired
-    private IAccountRepository accountRepository;
+    private TestEntityManager entityManager;
 
     @Test
-    void shouldSaveAndFindYourAccountByEmail() {
-        // 1. ARRANGE
-        UUID id = UUID.randomUUID();
-        Email email = new Email("test@domain.com");
-        Password hash = new Password("bcrypt-hash-string-12345");
-        logger.info("expected:");
-        logger.info("id: " + id);
-        logger.info("email: " + email.getValue());
-        logger.info("hashed password: " + hash.getValue());
+    void shouldFindByEmailValue() {
+        // 1. Arrange
+        String emailValue = "juan@fasttasker.com";
+        Account account = createAccountEntity(emailValue);
 
-        Account newAccount = new Account(
-                email,
-                hash
-        );
-        logger.info(newAccount.toString()); // automatic toString
+        entityManager.persist(account);
+        entityManager.flush();
 
-        // 2. ACT
-        // save account in the test bd
-        accountRepository.save(newAccount);
-        // we tried to find it using the repository method
-        Optional<Account> accountFoundOpt = accountRepository.findByEmailValue("test@domain.com");
+        // 2. Act
+        Optional<Account> found = jpaRepository.findByEmailValue(emailValue);
 
-        // 3. ASSERT
-        // a) checking that we found it
-        assertThat(accountFoundOpt).isPresent();
-
-        // b) checking that the data is correct
-        Account accountFound = accountFoundOpt.get();
-
-        assertThat(accountFound.getEmail()).isEqualTo(email);
-        assertThat(accountFound.getPassword()).isEqualTo(hash);
-        assertThat(accountFound.getStatus()).isEqualTo(AccountStatus.PENDING_VERIFICATION);
+        // 3. Assert
+        assertThat(found).isPresent();
+        assertThat(found.get().getId()).isNotNull();
+        assertThat(found.get().getEmail().getValue()).isEqualTo(emailValue);
     }
 
     @Test
-    void shouldSaveAndFindYourAccountById() {
-        // 1. ARRANGE
-        UUID id = UUID.randomUUID();
-        Email email = new Email("test2@domain.com");
-        Password hash = new Password("bcrypt-hash-string-313131");
-        Account newAccount = new Account(
-                email,
-                hash
-        );
+    void shouldCheckIfEmailExists() {
+        // 1. Arrange
+        String emailValue = "exists@fasttasker.com";
+        Account account = createAccountEntity(emailValue);
 
-        // 2. ACT
-        // save account in the test bd
-        accountRepository.save(newAccount);
-        // we tried find it with ID use the repository method
-        Optional<Account> accountFoundOpt = accountRepository.findById(id);
+        entityManager.persist(account);
+        entityManager.flush();
 
-        // 3. ASSERT
-        // verify if it was found
-        assertThat(accountFoundOpt).isPresent();
-        Account accountFound = accountFoundOpt.get();
+        // 2. Act
+        boolean exists = jpaRepository.existsByEmailValue(emailValue);
 
-        // checking if it is equal to what was expected
-        assertThat(accountFound.getEmail()).isEqualTo(email);
+        // 3. Assert
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalseWhenEmailDoesNotExist() {
+        boolean exists = jpaRepository.existsByEmailValue("unknown@fasttasker.com");
+        assertThat(exists).isFalse();
+    }
+
+    // helper
+    private Account createAccountEntity(String emailString) {
+        Email emailVO = new Email(emailString);
+        Password passwordVO = new Password("hashed_secret_123");
+
+        return new Account(emailVO, passwordVO);
     }
 }

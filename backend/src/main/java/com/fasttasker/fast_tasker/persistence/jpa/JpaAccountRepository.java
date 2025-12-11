@@ -15,6 +15,7 @@ public interface JpaAccountRepository extends JpaRepository<Account, UUID> {
 
     Optional<Account> findByEmailValue(String emailValue);
 
+    boolean existsByEmailValue(String emailValue);
     // NOTE: Spring implemented the other methods (query methods conversions)
 
 }
