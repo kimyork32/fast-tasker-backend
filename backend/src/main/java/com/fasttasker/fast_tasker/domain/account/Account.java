@@ -30,11 +30,9 @@ public class Account {
      * The column email in the BD must be unique.
      */
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "email", unique = true, nullable = false))
     private Email email;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "password_hash", nullable = false))
     private Password passwordHash;
 
     /**

@@ -1,10 +1,8 @@
 package com.fasttasker.fast_tasker.domain.account;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * represent a VO for a password.
@@ -16,25 +14,21 @@ import lombok.NoArgsConstructor;
  */
 @Embeddable
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @EqualsAndHashCode
+@ToString(exclude = "value") //exclude "value" in logs
 public class Password {
 
     /**
      * never stored the password in plain text.
      */
+    @Column(name = "password_hash", nullable = false)
     private String value;
 
-    /**
-     *
-     * @param rawPassword password in plain text.
-     * @return true if the password matches. False otherwise.
-     */
-    public boolean verify(String rawPassword) {
-        // TODO implement the hash verification logic
-        // Use BCryptPasswordEncoder
-        return false;
+    public Password(String hash) {
+        if (hash == null || hash.isBlank()) {
+            throw new IllegalArgumentException("Password hash cannot be empty");
+        }
+        this.value = hash;
     }
-
 }
