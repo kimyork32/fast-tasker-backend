@@ -84,8 +84,8 @@ public class TaskerService {
      */
     @Transactional(readOnly = true)
     public TaskerResponse getByAccountId(UUID taskerId) {
-        Tasker tasker = taskerRepository.findById(taskerId)
-                .orElseThrow(() -> new TaskerNotFoundException("TaskerService. getByAccountId. tasker not fount"));
+        Tasker tasker = taskerRepository.findByAccountId(taskerId)
+                .orElseThrow(() -> new TaskerNotFoundException("TaskerService. getByAccountId. tasker not found"));
         return taskerMapper.toResponse(tasker);
     }
 

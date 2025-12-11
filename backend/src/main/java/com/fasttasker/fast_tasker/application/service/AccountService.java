@@ -116,8 +116,8 @@ public class AccountService {
         }
 
         // NOTE: This is inefficient
-        Tasker tasker = taskerRepository.findById(account.getTaskerId())
-                .orElseThrow(() -> new TaskerNotFoundException("Tasker not found"));
+        Tasker tasker = taskerRepository.findByAccountId(account.getTaskerId())
+                .orElseThrow(() -> new TaskerNotFoundException("Tasker not found with account id: " + account.getTaskerId()));
 
         // calculate if the profile is complete.
         // NOTE: This should be factored out

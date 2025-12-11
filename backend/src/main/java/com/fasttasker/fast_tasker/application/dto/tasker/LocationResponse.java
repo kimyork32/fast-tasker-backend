@@ -7,6 +7,6 @@ public record LocationResponse(
         double latitude,
         double longitude,
         String address,
-        int zip
+        String zip
 ) {
 }

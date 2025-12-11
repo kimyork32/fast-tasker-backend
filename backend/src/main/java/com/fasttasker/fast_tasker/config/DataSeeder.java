@@ -11,6 +11,7 @@ import com.fasttasker.fast_tasker.application.dto.task.TaskResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.LocationRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.ProfileRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
+import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -47,14 +48,11 @@ public class DataSeeder implements CommandLineRunner {
                         .lastName("fronton")
                         .photo("")
                         .about("sobre mi")
-                        .reputation(3)
-                        .clientReviews(0)
-                        .completedTasks(0)
                         .location(LocationRequest.builder()
                                 .latitude(23.33)
                                 .longitude(55.23)
                                 .address("address 1")
-                                .zip(4402)
+                                .zip("4402")
                                 .build()
                                 )
                         .build())
@@ -68,7 +66,7 @@ public class DataSeeder implements CommandLineRunner {
                 .build();
 
         taskerService.registerTasker(taskerRequest1);
-        taskerService.registerTasker(taskerRequest2);
+        TaskerResponse taskerResponse2 = taskerService.registerTasker(taskerRequest2);
 
 
         // simulating that the tasker creating a task
@@ -92,6 +90,6 @@ public class DataSeeder implements CommandLineRunner {
                 44,
                 "quiero hacer esto"
         );
-        taskService.createOffer(offerRequest, UUID.fromString(taskResponse.id()), UUID.fromString(accountResponse2.id()));
+        taskService.createOffer(offerRequest, UUID.fromString(taskResponse.id()), taskerResponse2.id());
     }
 }
