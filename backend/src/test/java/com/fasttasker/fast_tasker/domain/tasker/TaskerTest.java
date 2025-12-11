@@ -19,7 +19,6 @@ class TaskerTest {
             .build();
 
     @Test
-    @DisplayName("Should create Tasker with valid data and generate ID")
     void shouldCreateTasker() {
         Tasker tasker = new Tasker(validAccountId, validProfile);
 
@@ -30,7 +29,6 @@ class TaskerTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when accountId is null")
     void shouldThrowWhenAccountIdNull() {
         assertThatThrownBy(() -> new Tasker(null, validProfile))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -38,7 +36,6 @@ class TaskerTest {
     }
 
     @Test
-    @DisplayName("Should create Tasker without profile using factory method")
     void shouldCreateWithoutProfile() {
         Tasker tasker = Tasker.createWithoutProfile(validAccountId);
 
@@ -49,7 +46,6 @@ class TaskerTest {
     }
 
     @Test
-    @DisplayName("Should update profile correctly")
     void shouldUpdateProfile() {
         Tasker tasker = Tasker.createWithoutProfile(validAccountId);
 

@@ -16,7 +16,6 @@ class ProfileTest {
             .build();
 
     @Test
-    @DisplayName("Should create profile and initialize stats to zero")
     void shouldCreateProfileAndInitStats() {
         Profile profile = Profile.builder()
                 .firstName("Juan")
@@ -32,7 +31,6 @@ class ProfileTest {
     }
 
     @Test
-    @DisplayName("Should throw when firstName is null")
     void shouldThrowWhenFirstNameNull() {
         assertThatThrownBy(() -> Profile.builder()
                 .firstName(null)
@@ -44,7 +42,6 @@ class ProfileTest {
     }
 
     @Test
-    @DisplayName("Should throw when firstName is empty")
     void shouldThrowWhenFirstNameEmpty() {
         assertThatThrownBy(() -> Profile.builder()
                 .firstName("")
@@ -56,7 +53,6 @@ class ProfileTest {
     }
 
     @Test
-    @DisplayName("Should throw when location is null")
     void shouldThrowWhenLocationNull() {
         assertThatThrownBy(() -> Profile.builder()
                 .firstName("Juan")
@@ -68,7 +64,6 @@ class ProfileTest {
     }
 
     @Test
-    @DisplayName("Should throw when about is too long")
     void shouldThrowWhenAboutTooLong() {
         String longAbout = "a".repeat(201); // string with 201 characters
 

@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class LocationTest {
     @Test
-    @DisplayName("Should create valid location")
     void shouldCreateValidLocation() {
         Location location = Location.builder()
                 .latitude(-16.409)
@@ -26,7 +25,6 @@ class LocationTest {
 
     @ParameterizedTest
     @ValueSource(doubles = {-90.1, 90.1, -100.0, 100.0})
-    @DisplayName("Should throw exception when latitude is invalid")
     void shouldThrowWhenLatitudeInvalid(double invalidLat) {
         assertThatThrownBy(() -> Location.builder()
                 .latitude(invalidLat)
@@ -40,7 +38,6 @@ class LocationTest {
 
     @ParameterizedTest
     @ValueSource(doubles = {-180.1, 180.1, -200.0})
-    @DisplayName("Should throw exception when longitude is invalid")
     void shouldThrowWhenLongitudeInvalid(double invalidLon) {
         assertThatThrownBy(() -> Location.builder()
                 .latitude(0)
@@ -53,7 +50,6 @@ class LocationTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when zip is empty")
     void shouldThrowWhenZipIsEmpty() {
         assertThatThrownBy(() -> Location.builder()
                 .latitude(0)
