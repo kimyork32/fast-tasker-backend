@@ -34,10 +34,8 @@ class JpaAccountRepositoryTest {
         logger.info("hashed password: " + hash.getValue());
 
         Account newAccount = new Account(
-                id,
                 email,
-                hash,
-                AccountStatus.PENDING_VERIFICATION
+                hash
         );
         logger.info(newAccount.toString()); // automatic toString
 
@@ -55,7 +53,7 @@ class JpaAccountRepositoryTest {
         Account accountFound = accountFoundOpt.get();
 
         assertThat(accountFound.getEmail()).isEqualTo(email);
-        assertThat(accountFound.getPasswordHash()).isEqualTo(hash);
+        assertThat(accountFound.getPassword()).isEqualTo(hash);
         assertThat(accountFound.getStatus()).isEqualTo(AccountStatus.PENDING_VERIFICATION);
     }
 
@@ -66,10 +64,8 @@ class JpaAccountRepositoryTest {
         Email email = new Email("test2@domain.com");
         Password hash = new Password("bcrypt-hash-string-313131");
         Account newAccount = new Account(
-                id,
                 email,
-                hash,
-                AccountStatus.PENDING_VERIFICATION
+                hash
         );
 
         // 2. ACT

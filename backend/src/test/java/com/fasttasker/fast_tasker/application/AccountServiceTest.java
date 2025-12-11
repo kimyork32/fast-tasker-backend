@@ -109,10 +109,8 @@ class AccountServiceTest {
         UUID accountId = UUID.randomUUID();
 
         var accountToFind = new Account(
-                accountId,
                 new Email(email),
-                new Password(hashedPassword),
-                AccountStatus.ACTIVE
+                new Password(hashedPassword)
         );
 
         String fakeToken= "fake-token.eyJzdWIiOiJ";
@@ -139,7 +137,7 @@ class AccountServiceTest {
         );
 
         // simulating that the tasker EXISTS
-        when(taskerRepository.findById(accountToFind.getTaskerId()))
+        when(taskerRepository.findById(accountToFind.getId()))
                 .thenReturn(taskerSaved);
 
         // simulating that the email EXISTS

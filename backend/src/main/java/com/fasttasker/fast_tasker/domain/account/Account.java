@@ -1,5 +1,6 @@
 package com.fasttasker.fast_tasker.domain.account;
 
+import com.fasttasker.fast_tasker.application.exception.DomainException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,19 +12,16 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "account")
-@AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor (access = AccessLevel.PROTECTED)
 @Getter
-@Setter
 @ToString
-@Builder(toBuilder = true)
 public class Account {
 
     /**
      * unique ID generates for the application. Primary Key (PK)
      */
     @Id
-    private UUID taskerId;
+    private UUID id;
 
     /**
      * Email for account, mapped as an  immutable VO.
@@ -33,7 +31,7 @@ public class Account {
     private Email email;
 
     @Embedded
-    private Password passwordHash;
+    private Password password;
 
     /**
      * The account state of the account.
@@ -43,6 +41,30 @@ public class Account {
     @Column(name ="status", nullable = false)
     private AccountStatus status;
 
-    // Note: the taskerId UUID is assumed to be generated in the application layer (services) before saved.
-    // if a generated here, so we used @GeneratedValue.
+    public Account(Email email, Password password) {
+        if (email == null) {
+            throw new IllegalArgumentException("Email cannot be null");
+        }
+        if (password == null) {
+            throw new IllegalArgumentException("Password cannot be null");
+        }
+        this.id = UUID.randomUUID();
+        this.email = email;
+        this.password = password;
+        this.status = AccountStatus.PENDING_VERIFICATION;
+    }
+
+    public void changePassword(Password newPassword) {
+        if (newPassword == null) {
+            throw new DomainException("Password cannot be null");
+        }
+        this.password = newPassword;
+    }
+
+    public void changeStatus(AccountStatus newStatus) {
+        if (newStatus == null) {
+            throw new DomainException("Status cannot be null");
+        }
+        this.status = newStatus;
+    }
 }
