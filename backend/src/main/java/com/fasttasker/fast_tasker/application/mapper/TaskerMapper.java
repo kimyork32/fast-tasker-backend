@@ -70,8 +70,8 @@ public class TaskerMapper {
                 .build();
 
         return TaskerResponse.builder()
-                .id(tasker.getId())
-                .accountId(tasker.getAccountId())
+                .id(tasker.getId().toString())
+                .accountId(tasker.getAccountId().toString())
                 .profile(profileResponse)
                 .build();
     }

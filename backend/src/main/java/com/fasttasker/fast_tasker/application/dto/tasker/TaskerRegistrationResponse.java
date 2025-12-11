@@ -1,10 +1,8 @@
 package com.fasttasker.fast_tasker.application.dto.tasker;
 
-import java.util.UUID;
-
 public record TaskerRegistrationResponse(
-        UUID id,
-        UUID accountId,
+        String id,
+        String accountId,
         ProfileResponse profile,
         String token
 ) {}

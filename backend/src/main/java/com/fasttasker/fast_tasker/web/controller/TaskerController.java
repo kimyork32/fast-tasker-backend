@@ -51,8 +51,8 @@ public class TaskerController {
         String newToken = jwtService.generateToken(accountId, true); // profileCompleted = true
         // creating DTO with the token
         var response = new TaskerRegistrationResponse(
-                taskerResponse.id(),
-                taskerResponse.accountId(),
+                taskerResponse.id().toString(),
+                taskerResponse.accountId().toString(),
                 taskerResponse.profile(),
                 newToken
         );

@@ -56,7 +56,7 @@ class TaskerControllerTest {
                 -13.412453,
                 -12.158023,
                 "address street",
-                414141
+                "414141"
         );
 
         var mockProfile = new ProfileResponse(
@@ -72,8 +72,8 @@ class TaskerControllerTest {
         );
 
         var mockResponse = new TaskerResponse(
-                UUID.randomUUID(),
-                testAccountId,
+                UUID.randomUUID().toString(),
+                testAccountId.toString(),
                 mockProfile
         );
 
