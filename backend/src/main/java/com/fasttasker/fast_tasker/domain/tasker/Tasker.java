@@ -41,10 +41,10 @@ public class Tasker {
             @AttributeOverride(name = "clientReviews", column = @Column(name = "profile_client_reviews")),
             @AttributeOverride(name = "completedTasks", column = @Column(name = "profile_completed_tasks")),
 
-            @AttributeOverride(name = "location.zip", column = @Column(name = "location_zip", nullable = false)),
-            @AttributeOverride(name = "location.latitude", column = @Column(name = "location_latitude", nullable = false)),
-            @AttributeOverride(name = "location.longitude", column = @Column(name = "location_longitude", nullable = false)),
-            @AttributeOverride(name = "location.address", column = @Column(name = "location_address", length = 255, nullable = false))
+            @AttributeOverride(name = "location.zip", column = @Column(name = "location_zip")),
+            @AttributeOverride(name = "location.latitude", column = @Column(name = "location_latitude")),
+            @AttributeOverride(name = "location.longitude", column = @Column(name = "location_longitude")),
+            @AttributeOverride(name = "location.address", column = @Column(name = "location_address", length = 255))
     })
     private Profile profile;
 
