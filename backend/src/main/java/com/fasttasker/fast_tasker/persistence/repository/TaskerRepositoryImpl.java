@@ -1,12 +1,12 @@
 package com.fasttasker.fast_tasker.persistence.repository;
 
+import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
 import com.fasttasker.fast_tasker.persistence.jpa.JpaTaskerRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -24,8 +24,9 @@ public class TaskerRepositoryImpl implements ITaskerRepository {
     }
 
     @Override
-    public Optional<Tasker> findById(UUID id) {
-        return jpa.findById(id);
+    public Tasker findById(UUID id) {
+        return jpa.findById(id)
+                .orElseThrow(() -> new TaskerNotFoundException(id));
     }
 
     @Override
@@ -39,8 +40,9 @@ public class TaskerRepositoryImpl implements ITaskerRepository {
     }
 
     @Override
-    public Optional<Tasker> findByAccountId(UUID accountId) {
-        return jpa.findByAccountId(accountId);
+    public Tasker findByAccountId(UUID accountId) {
+        return jpa.findByAccountId(accountId)
+                .orElseThrow(() -> TaskerNotFoundException.fromAccountId(accountId));
     }
 
     @Override

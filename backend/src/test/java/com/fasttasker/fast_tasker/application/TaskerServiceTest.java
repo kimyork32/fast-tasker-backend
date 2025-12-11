@@ -109,7 +109,7 @@ class TaskerServiceTest {
         );
 
         // Mocking Repository behavior
-        when(taskerRepository.findByAccountId(testAccountId)).thenReturn(Optional.of(tasker));
+        when(taskerRepository.findByAccountId(testAccountId)).thenReturn(tasker);
 
         // Mocking Mapper behavior
         // 1. toProfileEntity

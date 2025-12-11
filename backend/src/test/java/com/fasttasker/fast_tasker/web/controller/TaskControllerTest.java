@@ -55,7 +55,7 @@ class TaskControllerTest {
                 -13.412453,
                 -12.158023,
                 "address request",
-                414144
+                "414144"
         );
 
         var taskRequest = new TaskRequest(

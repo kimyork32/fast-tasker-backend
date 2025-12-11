@@ -46,9 +46,7 @@ public class TaskerService {
     @Transactional
     public TaskerResponse registerTasker(TaskerRequest request) {
         UUID accountId = UUID.fromString(request.accountId());
-        Tasker tasker = taskerRepository.findByAccountId(accountId)
-                .orElseThrow(() -> new TaskerNotFoundException(
-                        "the tasker not found with account id: " + accountId));
+        Tasker tasker = taskerRepository.findByAccountId(accountId);
 
         Profile profile = taskerMapper.toProfileEntity(request.profile());
 
@@ -64,14 +62,7 @@ public class TaskerService {
      */
     @Transactional(readOnly = true)
     public TaskerResponse getById(UUID taskerId) {
-        Optional<Tasker> taskerOpt = taskerRepository.findById(taskerId);
-
-        if (taskerOpt.isEmpty()) {
-            throw new TaskerNotFoundException(
-                    "the tasker not found with id: " + taskerId);
-        }
-
-        Tasker tasker = taskerOpt.get();
+        Tasker tasker = taskerRepository.findById(taskerId);
 
         return taskerMapper.toResponse(tasker);
     }
@@ -84,8 +75,7 @@ public class TaskerService {
      */
     @Transactional(readOnly = true)
     public TaskerResponse getByAccountId(UUID taskerId) {
-        Tasker tasker = taskerRepository.findByAccountId(taskerId)
-                .orElseThrow(() -> new TaskerNotFoundException("TaskerService. getByAccountId. tasker not found"));
+        Tasker tasker = taskerRepository.findByAccountId(taskerId);
         return taskerMapper.toResponse(tasker);
     }
 

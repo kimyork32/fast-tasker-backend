@@ -140,7 +140,7 @@ class AccountServiceTest {
 
         // simulating that the tasker EXISTS
         when(taskerRepository.findById(accountToFind.getTaskerId()))
-                .thenReturn(Optional.of(taskerSaved));
+                .thenReturn(taskerSaved);
 
         // simulating that the email EXISTS
         when(accountRepository.findByEmailValue(email))

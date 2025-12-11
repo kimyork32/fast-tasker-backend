@@ -11,7 +11,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,16 +51,9 @@ class JpaTaskerRepositoryTest {
         // save
         taskerRepository.save(newTasker);
         // find
-        Optional<Tasker> foundTaskerOpt = taskerRepository.findById(taskerId);
+        Tasker tasker = taskerRepository.findById(taskerId);
 
-        // 3. ASSERT
-        assertThat(foundTaskerOpt)
-                .withFailMessage("Tasker with id " + taskerId + " not found")
-                .isPresent();
-
-        Tasker  foundTasker = foundTaskerOpt.get();
-
-        assertThat(foundTasker)
+        assertThat(tasker)
                 .withFailMessage("the Tasker found IS NOT as the expected one")
                 .isEqualTo(newTasker);
     }
@@ -97,16 +89,9 @@ class JpaTaskerRepositoryTest {
         // save
         taskerRepository.save(newTasker);
         // find
-        Optional<Tasker> foundTaskerOpt = taskerRepository.findByAccountId(accountId);
+        Tasker tasker = taskerRepository.findByAccountId(accountId);
 
-        // 3. ASSERT
-        assertThat(foundTaskerOpt)
-                .withFailMessage("Tasker with id " + taskerId + " not found")
-                .isPresent();
-
-        Tasker  foundTasker = foundTaskerOpt.get();
-
-        assertThat(foundTasker)
+        assertThat(tasker)
                 .withFailMessage("the Tasker found IS NOT as the expected one")
                 .isEqualTo(newTasker);
     }

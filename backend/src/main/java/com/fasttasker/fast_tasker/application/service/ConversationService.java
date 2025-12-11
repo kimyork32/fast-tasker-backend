@@ -72,8 +72,8 @@ public class ConversationService {
                     MessageContent lastMessageContent = c.getMessages().getLast().getContent();
 
                     // build profile of the tasker for chat
-                    Tasker tasker = taskerRepository.findById(otherId)
-                            .orElseThrow(() -> new TaskerNotFoundException("Tasker not found"));
+                    Tasker tasker = taskerRepository.findById(otherId);
+
                     ChatProfileResponse profile = taskerMapper.toChatProfileResponse(tasker);
 
                     return ConversationSummary.builder()

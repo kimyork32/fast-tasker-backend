@@ -44,7 +44,7 @@ class TaskServiceTest {
                 -13.412453,
                 -12.158023,
                 "address street",
-                4141414
+                "4141414"
         );
 
         var taskRequest = new TaskRequest(

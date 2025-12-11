@@ -90,6 +90,9 @@ public class DataSeeder implements CommandLineRunner {
                 44,
                 "quiero hacer esto"
         );
-        taskService.createOffer(offerRequest, UUID.fromString(taskResponse.id()), taskerResponse2.id());
+        taskService.createOffer(
+                offerRequest,
+                UUID.fromString(taskResponse.id()),
+                UUID.fromString(taskerResponse2.id()));
     }
 }

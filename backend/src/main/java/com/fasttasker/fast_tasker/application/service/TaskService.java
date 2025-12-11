@@ -91,8 +91,7 @@ public class TaskService {
     @Transactional(readOnly = true)
     public TaskCompleteResponse getTaskCompleteById(UUID taskId) {
         Task task = findTask(taskId);
-        Tasker tasker = taskerRepository.findById(task.getPosterId())
-                .orElseThrow(() -> new TaskerNotFoundException("tasker not found with ID: " + task.getPosterId()));
+        Tasker tasker = taskerRepository.findById(task.getPosterId());
 
         MinimalProfileResponse profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
 
@@ -122,8 +121,7 @@ public class TaskService {
                 .filter(q -> q.getId().equals(question.getId())).findFirst().orElse(question);
 
         // create minimalProfile
-        Tasker tasker = taskerRepository.findById(question.getAskedById())
-                .orElseThrow(() -> new TaskerNotFoundException("TaskService. createQuestion. task not found"));
+        Tasker tasker = taskerRepository.findById(question.getAskedById());
 
         MinimalProfileResponse profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
         // create profileResponse
@@ -213,8 +211,7 @@ public class TaskService {
         // add the offer to the task
         task.getOffers().add(offer);
 
-        Tasker tasker = taskerRepository.findById(taskerId)
-                .orElseThrow(() -> new TaskNotFoundException("TaskerService. Tasker not found"));
+        Tasker tasker = taskerRepository.findById(taskerId);
 
         MinimalProfileResponse  profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
         OfferResponse offerResponse = taskMapper.toOfferResponse(offer);
@@ -302,8 +299,7 @@ public class TaskService {
                 .orElseThrow(() -> new AnswerNotFoundException("TaskerService. Answer not found"));
 
         // find tasker
-        Tasker tasker = taskerRepository.findById(taskerId)
-                .orElseThrow(() -> new TaskNotFoundException("TaskerService. Tasker not found"));
+        Tasker tasker = taskerRepository.findById(taskerId);
 
         MinimalProfileResponse  profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
         AnswerResponse answerResponse = taskMapper.toAnswerResponse(answerSaved);
