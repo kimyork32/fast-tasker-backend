@@ -43,7 +43,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/register").permitAll()
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/ws/**").permitAll() // allow handshake for websocket
-                        .requestMatchers("/h2-console/**").permitAll() // WARNING in production. changes to postgresql
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers
