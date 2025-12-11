@@ -1,5 +1,6 @@
 package com.fasttasker.fast_tasker.domain.task;
 
+import com.fasttasker.fast_tasker.application.exception.DomainException;
 import com.fasttasker.fast_tasker.domain.tasker.Location;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,13 +16,10 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "task")
-@AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access =  AccessLevel.PROTECTED)
 @Getter
-@Setter
 @ToString
 @EqualsAndHashCode(exclude = {"questions", "offers"})
-@Builder(toBuilder = true)
 public class Task {
 
     @Id
@@ -43,8 +41,8 @@ public class Task {
 
     /**
      * The offered budget or amount for the task.
-     * Note: Currently non-null, although future versions
      * might allow tasks without an initial budget.
+     * budget must be a positive integer a maximum 999
      */
     @Column(name = "budget", nullable = false) // IMPROVEMENT: nullable may be nullable
     private int budget;
@@ -52,8 +50,6 @@ public class Task {
     /**
      * Physical location where the task must be performed.
      * Mapped as an Embedded Value Object.
-     * The field names (latitude, longitude, address) are
-     * mapped to specific columns in the 'task' table.
      */
     @Embedded
     private Location location;
@@ -108,4 +104,95 @@ public class Task {
     @ToString.Exclude
     private List<Offer> offers = new ArrayList<>();
 
+    @Builder(toBuilder = true)
+    public Task(String title, String description, int budget, Location location, LocalDate taskDate) {
+        if (title == null || title.isEmpty()) {
+            throw new DomainException("Title cannot be null or empty");
+        }
+        if (description == null || description.isEmpty()) {
+            throw new DomainException("Description cannot be null or empty");
+        }
+        if (budget < 0 || budget > 999) {
+            throw new DomainException("Budget must be between 0 and 999");
+        }
+        if (location == null) {
+            throw new DomainException("Location cannot be null");
+        }
+        if (taskDate == null) {
+            throw new DomainException("Task date cannot be null");
+        }
+        this.id = UUID.randomUUID();
+        this.title = title;
+        this.description = description;
+        this.budget = budget;
+        this.location = location;
+        this.taskDate = taskDate;
+        this.status = TaskStatus.ACTIVE;
+    }
+
+    public void updateDetails(String newTitle, String newDescription) {
+        if (newTitle == null || newTitle.isEmpty()) {
+            throw new DomainException("Title cannot be null or empty");
+        }
+        if (newDescription == null || newDescription.isEmpty()) {
+            throw new DomainException("Description cannot be null or empty");
+        }
+        if (this.status == TaskStatus.COMPLETED) {
+            throw new DomainException("Cannot update details of a completed task");
+        }
+
+        this.title = newTitle;
+        this.description = newDescription;
+    }
+
+    public void adjustBudget(int newBudget) {
+        if (budget < 0 || budget > 999) {
+            throw new DomainException("Budget must be between 0 and 999");
+        }
+        if (!this.offers.isEmpty() && newBudget < this.budget) {
+            throw new DomainException("Cannot decrease budget when offers exist");
+        }
+
+        this.budget = newBudget;
+    }
+
+    public void assignTasker(UUID taskerId, int agreedPrice) {
+        if (taskerId == null) {
+            throw new DomainException("Tasker ID cannot be null");
+        }
+        if (this.status != TaskStatus.ACTIVE) {
+            throw new DomainException("Only active tasks can be assigned");
+        }
+
+        this.budget = agreedPrice;
+        this.assignedTaskerId = taskerId;
+        this.status = TaskStatus.ASSIGNED;
+    }
+
+    // ASSIGNED to IN_PROGRESS
+    public void startWork() {
+        if (this.status != TaskStatus.ASSIGNED) {
+            throw new DomainException("The task must be assigned in order to begin");
+        }
+        this.status = TaskStatus.IN_PROGRESS;
+    }
+
+    /**
+     * ASSIGNED/IN_PROGRESS to COMPLETED
+     */
+    public void completeTask() {
+        if (this.status != TaskStatus.ASSIGNED && this.status != TaskStatus.IN_PROGRESS) {
+            throw new DomainException("You cannot complete a task that is not in progress or assigned");
+        }
+        this.status = TaskStatus.COMPLETED;
+    }
+
+    // cancel. This is complex
+    public void cancel() {
+        if (this.status == TaskStatus.COMPLETED) {
+            throw new DomainException("You cannot cancel a task that has already been completed");
+        }
+        // if it's ASSIGNED, there would be a refund logic here
+        this.status = TaskStatus.CANCELLED;
+    }
 }
