@@ -1,5 +1,6 @@
 package com.fasttasker.fast_tasker.domain.task;
 
+import com.fasttasker.fast_tasker.application.exception.DomainException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,12 +16,9 @@ import java.util.UUID;
 @Entity
 @Table(name = "question")
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 @EqualsAndHashCode
-@Builder(toBuilder = true)
 public class Question {
 
     @Id
@@ -53,10 +51,6 @@ public class Question {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-
-    /**
-     *
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_id", nullable = false)
     @ToString.Exclude
@@ -64,6 +58,56 @@ public class Question {
 
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
-    @Builder.Default
     private List<Answer> answers = new ArrayList<>();
+
+    @Builder(toBuilder = true)
+    public Question(String description, UUID askedById, Task task) {
+        validateDescription(description);
+        if (askedById == null) {
+            throw new IllegalArgumentException("AskedById cannot be null");
+        }
+        if (task == null) {
+            throw new IllegalArgumentException("Task cannot be null");
+        }
+        this.id = UUID.randomUUID();
+        this.description = description;
+        this.askedById = askedById;
+        this.task = task;
+        this.status = QuestionStatus.PENDING;
+        this.createdAt = Instant.now();
+    }
+
+    public void editDescription(String newDescription) {
+        validateDescription(newDescription);
+
+        if (this.status == QuestionStatus.ANSWERED) {
+            throw new DomainException("Cannot edit a question that has already been answered");
+        }
+
+        this.description = newDescription;
+    }
+
+    public void postAnswer(String answerContent, UUID responderId) {
+        var newAnswer = Answer.builder()
+                .description(answerContent)
+                .responderId(responderId)
+                .question(this)
+                .build();
+
+        this.answers.add(newAnswer);
+        this.status = QuestionStatus.ANSWERED;
+    }
+
+    public void markAsDeleted() {
+        this.status = QuestionStatus.DELETED;
+    }
+
+    private void validateDescription(String description) {
+        if (description == null || description.trim().isEmpty()) {
+            throw new DomainException("Question description cannot be empty");
+        }
+        if (description.length() > 500) {
+            throw new DomainException("Question description exceeds 500 characters");
+        }
+    }
 }
