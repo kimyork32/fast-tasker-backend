@@ -16,6 +16,7 @@ public class AccountMapper {
         if (account == null) return null;
 
         return AccountResponse.builder()
+                .id(account.getId().toString())
                 .email(account.getEmail().getValue())
                 .status(account.getStatus())
                 .build();

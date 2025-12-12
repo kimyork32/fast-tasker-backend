@@ -106,22 +106,19 @@ public class Task {
     private final List<Offer> offers = new ArrayList<>();
 
     @Builder(toBuilder = true)
-    public Task(String title, String description, int budget, Location location, LocalDate taskDate) {
+    public Task(String title, String description, int budget, Location location, LocalDate taskDate, UUID posterId) {
         if (title == null || title.isEmpty()) {
             throw new DomainException("Title cannot be null or empty");
         }
         if (description == null || description.isEmpty()) {
             throw new DomainException("Description cannot be null or empty");
         }
-        if (budget < 5 || budget > 999) {
-            throw new DomainException("Budget must be between 0 and 999");
-        }
         if (location == null) {
             throw new DomainException("Location cannot be null");
         }
-        if (taskDate == null) {
-            throw new DomainException("Task date cannot be null");
-        }
+        validateBudget(budget);
+        validateTaskDate(taskDate);
+
         this.id = UUID.randomUUID();
         this.title = title;
         this.description = description;
@@ -129,6 +126,8 @@ public class Task {
         this.location = location;
         this.taskDate = taskDate;
         this.status = TaskStatus.ACTIVE;
+        this.posterId = posterId;
+        this.assignedTaskerId = null;
     }
 
     public void updateDetails(String newTitle, String newDescription) {
@@ -157,7 +156,7 @@ public class Task {
         this.budget = newBudget;
     }
 
-    public void assignTasker(UUID taskerId, int agreedPrice) {
+    public void assignTasker(UUID taskerId) {
         if (taskerId == null) {
             throw new DomainException("Tasker ID cannot be null");
         }
@@ -165,7 +164,7 @@ public class Task {
             throw new DomainException("Only active tasks can be assigned");
         }
 
-        this.budget = agreedPrice;
+        // assign the offered price to the budget
         this.assignedTaskerId = taskerId;
         this.status = TaskStatus.ASSIGNED;
     }
@@ -195,5 +194,24 @@ public class Task {
         }
         // if it's ASSIGNED, there would be a refund logic here
         this.status = TaskStatus.CANCELLED;
+    }
+
+    private void validateBudget(int budget) {
+        if (budget < 5 || budget > 999) {
+            throw new DomainException("Budget must be between 5 and 999");
+        }
+    }
+
+    /**
+     * ake sure the date is not invalid and is not in the past
+     * @param date date
+     */
+    private void validateTaskDate(LocalDate date) {
+        if (date == null) {
+            throw new DomainException("Task date cannot be null");
+        }
+        if (date.isBefore(LocalDate.now())) {
+            throw new DomainException("Task date cannot be in the past");
+        }
     }
 }

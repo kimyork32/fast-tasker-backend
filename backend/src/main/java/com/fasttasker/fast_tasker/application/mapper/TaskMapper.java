@@ -8,18 +8,16 @@ import com.fasttasker.fast_tasker.domain.tasker.Location;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Component
 public class TaskMapper {
     // toEntity //////////////////////////////////////
-    public Task toTaskEntity(TaskRequest request) {
+    public Task toTaskEntity(TaskRequest request, UUID posterId) {
         if (request == null) return null;
 
         return Task.builder()
-                .id(UUID.randomUUID())
                 .title(request.title())
                 .description(request.description())
                 .budget(request.budget())
@@ -30,7 +28,7 @@ public class TaskMapper {
                         request.location().zip()
                 ))
                 .taskDate(LocalDate.parse(request.taskDate()))
-                .status(TaskStatus.IN_PROGRESS)
+                .posterId(posterId)
                 .build();
         // insert in this instance: posterId, assignedTaskerId, questions, offers
     }

@@ -1,5 +1,6 @@
 package com.fasttasker.fast_tasker.persistence.repository;
 
+import com.fasttasker.fast_tasker.application.exception.TaskNotFoundException;
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
 import com.fasttasker.fast_tasker.domain.task.Task;
 import com.fasttasker.fast_tasker.domain.task.TaskStatus;
@@ -35,8 +36,9 @@ public class TaskRepositoryImpl implements ITaskRepository {
     }
 
     @Override
-    public Optional<Task> findById(UUID id) {
-        return jpa.findById(id);
+    public Task findById(UUID id) {
+        return jpa.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(id));
     }
 
     @Override

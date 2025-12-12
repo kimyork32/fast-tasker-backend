@@ -44,11 +44,7 @@ public class TaskService {
      */
     @Transactional
     public TaskResponse createTask(TaskRequest taskRequest, UUID posterId) {
-        Task newTask = taskMapper.toTaskEntity(taskRequest);
-
-        // assign the values here, ignoring what comes from the client
-        newTask.setPosterId(posterId);
-        newTask.setStatus(TaskStatus.ACTIVE); // assign the default initial state
+        Task newTask = taskMapper.toTaskEntity(taskRequest, posterId);
 
         taskRepository.save(newTask);
 
@@ -354,8 +350,7 @@ public class TaskService {
 
     // private methods (HELPERS)
     private Task findTask(UUID taskId) {
-        return taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("TaskService. Task not found"));
+        return taskRepository.findById(taskId);
     }
 
     private Map<UUID, Tasker> loadTaskersMap(List<UUID> ids) {

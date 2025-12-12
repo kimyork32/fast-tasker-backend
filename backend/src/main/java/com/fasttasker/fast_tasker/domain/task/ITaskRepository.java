@@ -17,7 +17,7 @@ public interface ITaskRepository {
 
     List<Task> findAll();
 
-    Optional<Task> findById(UUID id);
+    Task findById(UUID id);
 
     List<Task> findByStatus(TaskStatus status);
 
