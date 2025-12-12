@@ -12,7 +12,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "answer")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 @EqualsAndHashCode
 public class Answer {

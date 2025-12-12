@@ -21,16 +21,16 @@ public class TaskMapper {
                 .title(request.title())
                 .description(request.description())
                 .budget(request.budget())
-                .location(new Location(
-                        request.location().latitude(),
-                        request.location().longitude(),
-                        request.location().address(),
-                        request.location().zip()
-                ))
+                .location(Location.builder()
+                        .latitude(request.location().latitude())
+                        .longitude(request.location().longitude())
+                        .address(request.location().address())
+                        .zip(request.location().zip())
+                        .build())
                 .taskDate(LocalDate.parse(request.taskDate()))
                 .posterId(posterId)
                 .build();
-        // insert in this instance: posterId, assignedTaskerId, questions, offers
+        // insert in this instance: assignedTaskerId, questions, offers
     }
 
     public Offer toOfferEntity(OfferRequest request) {
@@ -44,28 +44,25 @@ public class TaskMapper {
         // insert in this instance: status, offertedById, createAt, task
     }
 
-    public Question toQuestionEntity(QuestionRequest request) {
+    public Question toQuestionEntity(QuestionRequest request, UUID askedById, Task task) {
         if (request == null) return null;
 
         return Question.builder()
-                .id(UUID.randomUUID())
                 .description(request.description())
-                .status(QuestionStatus.PENDING)
+                .askedById(askedById)
+                .task(task)
                 .build();
-        // insert in this instance: status, askedById, createAt, task, answers
+        // insert in this instance: answers
     }
 
-    public Answer toAnswerEntity(AnswerRequest request) {
+    public Answer toAnswerEntity(AnswerRequest request, UUID responderId, Question question) {
         if (request == null) return null;
 
-        return new Answer(
-                UUID.randomUUID(),
-                request.description(),
-                UUID.fromString(request.questionId()),
-                null, // insert answered id
-                null, // insert create at
-                null // insert question
-        );
+        return Answer.builder()
+                .description(request.description())
+                .responderId(responderId)
+                .question(question)
+                .build();
     }
 
     // toEntity //////////////////////////////////////
@@ -152,7 +149,7 @@ public class TaskMapper {
         return AnswerResponse.builder()
                 .id(answer.getId().toString())
                 .description(answer.getDescription())
-                .answeredId(answer.getAnsweredId().toString())
+                .answeredId(answer.getResponderId().toString())
                 .createdAt(answer.getCreatedAt().toString())
                 .build();
     }

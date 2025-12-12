@@ -95,15 +95,10 @@ public class TaskService {
     }
 
     @Transactional
-    public QuestionProfileResponse createQuestion(QuestionRequest questionRequest, UUID taskId, UUID taskerId) {
+    public QuestionProfileResponse createQuestion(QuestionRequest questionRequest, UUID askedById, UUID taskerId) {
         // find task for the insert question
-        Task task = findTask(taskId);
-        Question question = taskMapper.toQuestionEntity(questionRequest);
-        // insert values
-        question.setStatus(QuestionStatus.PENDING);
-        question.setAskedById(taskerId);
-        question.setCreatedAt(Instant.now());
-        question.setTask(task);
+        Task task = findTask(askedById);
+        Question question = taskMapper.toQuestionEntity(questionRequest, askedById, task);
 
         // insert question in the task
         task.getQuestions().add(question);
@@ -141,7 +136,7 @@ public class TaskService {
                 .flatMap(question ->
                         Stream.concat(
                                 Stream.of(question.getAskedById()),
-                                question.getAnswers().stream().map(Answer::getAnsweredId)
+                                question.getAnswers().stream().map(Answer::getResponderId)
                         )
                 )
                 .distinct()
@@ -159,7 +154,7 @@ public class TaskService {
                     QuestionResponse questionResponse = taskMapper.toQuestionResponse(question);
                     List<AnswerProfileResponse> answersResponse = question.getAnswers().stream()
                             .map(answer -> {
-                                Tasker answerer = taskersById.get(answer.getAnsweredId());
+                                Tasker answerer = taskersById.get(answer.getResponderId());
                                 // answererProfileResponse
                                 MinimalProfileResponse apr = taskerMapper.toMinimalProfileResponse(answerer);
                                 // answeredResponse
@@ -255,7 +250,7 @@ public class TaskService {
     public AnswerProfileResponse answerQuestion(
             AnswerRequest answerRequest,
             UUID taskId,
-            UUID taskerId
+            UUID responderId
     ) {
         UUID questionId = UUID.fromString(answerRequest.questionId());
 
@@ -268,15 +263,7 @@ public class TaskService {
                 .findFirst()
                 .orElseThrow(() -> new QuestionNotFoundException("TaskerService. Question not found"));
 
-        Answer answer = taskMapper.toAnswerEntity(answerRequest);
-
-        // insert values of the answer
-        answer.setQuestionId(questionId);
-        answer.setAnsweredId(taskerId);
-        answer.setCreatedAt(Instant.now());
-        answer.setQuestion(question);
-
-
+        Answer answer = taskMapper.toAnswerEntity(answerRequest, responderId, question);
 
         // add the answer to the question
         question.getAnswers().add(answer);
@@ -295,7 +282,7 @@ public class TaskService {
                 .orElseThrow(() -> new AnswerNotFoundException("TaskerService. Answer not found"));
 
         // find tasker
-        Tasker tasker = taskerRepository.findById(taskerId);
+        Tasker tasker = taskerRepository.findById(responderId);
 
         MinimalProfileResponse  profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
         AnswerResponse answerResponse = taskMapper.toAnswerResponse(answerSaved);

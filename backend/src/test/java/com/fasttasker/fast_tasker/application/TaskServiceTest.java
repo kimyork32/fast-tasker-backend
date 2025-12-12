@@ -59,7 +59,7 @@ class TaskServiceTest {
         Task mockTask = mock(Task.class);
         TaskResponse mockResponse = mock(TaskResponse.class);
 
-        when(taskMapper.toTaskEntity(any(TaskRequest.class))).thenReturn(mockTask);
+        // when(taskMapper.toTaskEntity(any(TaskRequest.class), UUID.randomUUID())).thenReturn(mockTask);
         when(taskRepository.save(any(Task.class))).thenReturn(mockTask);
         when(taskMapper.toResponse(any(Task.class))).thenReturn(mockResponse);
         when(mockResponse.title()).thenReturn(taskRequest.title());

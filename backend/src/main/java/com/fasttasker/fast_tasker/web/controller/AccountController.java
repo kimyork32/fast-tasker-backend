@@ -67,7 +67,7 @@ public class AccountController {
     public ResponseEntity<LoginResponse> login(
             @RequestBody LoginRequest request
     ) {
-        LoginResponse loginResponse = accountService.login(request.email(), request.rawPassword());
+        LoginResponse loginResponse = accountService.login(request);
 
         return ResponseEntity.ok(loginResponse);
     }
