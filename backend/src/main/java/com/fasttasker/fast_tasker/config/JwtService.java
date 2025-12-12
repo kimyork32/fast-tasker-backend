@@ -25,9 +25,10 @@ public class JwtService {
     /**
      * Genera un nuevo token JWT para un ID de cuenta.
      */
-    public String generateToken(UUID accountId, boolean completedProfile) {
+    public String generateToken(UUID accountId, UUID taskerId, boolean completedProfile) {
         return Jwts.builder()
                 .subject(accountId.toString()) // ¡Aquí guardamos el ID!
+                .claim("taskerId", taskerId)
                 .claim("profileCompleted", completedProfile) // claim = extra information
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expirationTime))
