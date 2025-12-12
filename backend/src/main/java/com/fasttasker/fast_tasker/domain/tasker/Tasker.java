@@ -53,4 +53,16 @@ public class Tasker {
     public void updateProfile(Profile newProfile) {
         this.profile = newProfile;
     }
+
+    public boolean isProfileComplete() {
+        if (this.profile == null) {
+            return false;
+        }
+        return hasText(this.profile.getFirstName()) &&
+                hasText(this.profile.getLastName());
+    }
+
+    private boolean hasText(String str) {
+        return str != null && !str.isBlank();
+    }
 }

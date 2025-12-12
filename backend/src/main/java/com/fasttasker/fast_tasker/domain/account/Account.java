@@ -41,6 +41,7 @@ public class Account {
     @Column(name ="status", nullable = false)
     private AccountStatus status;
 
+    @Builder(toBuilder = true)
     public Account(Email email, Password password) {
         if (email == null) {
             throw new IllegalArgumentException("Email cannot be null");
@@ -61,10 +62,19 @@ public class Account {
         this.password = newPassword;
     }
 
-    public void changeStatus(AccountStatus newStatus) {
-        if (newStatus == null) {
-            throw new DomainException("Status cannot be null");
-        }
-        this.status = newStatus;
+    public void banned() {
+        this.status = AccountStatus.BANNED;
+    }
+
+    public void activate() {
+        this.status = AccountStatus.ACTIVE;
+    }
+
+    public void deactivate() {
+        this.status = AccountStatus.INACTIVE;
+    }
+
+    public void pendingVerification() {
+        this.status = AccountStatus.PENDING_VERIFICATION;
     }
 }

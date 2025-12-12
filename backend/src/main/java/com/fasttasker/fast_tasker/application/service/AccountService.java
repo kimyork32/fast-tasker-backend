@@ -1,6 +1,7 @@
 package com.fasttasker.fast_tasker.application.service;
 
 import com.fasttasker.fast_tasker.application.dto.account.AccountResponse;
+import com.fasttasker.fast_tasker.application.dto.account.LoginRequest;
 import com.fasttasker.fast_tasker.application.dto.account.LoginResponse;
 import com.fasttasker.fast_tasker.application.dto.account.RegisterAccountRequest;
 import com.fasttasker.fast_tasker.application.exception.*;
@@ -60,10 +61,10 @@ public class AccountService {
         // it using a secure channel such as HTTPS.
         String hashedPassword = passwordEncoder.encode(request.rawPassword());
 
-        var account = new Account(
-                new Email(request.email()),
-                new Password(hashedPassword)
-        );
+        var account = Account.builder()
+                .email(new Email(request.email()))
+                .password(new Password(hashedPassword))
+                .build();
 
         // save account, if any error occurs then rollback
         accountRepository.save(account);
@@ -80,10 +81,10 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    public LoginResponse login(String email, String rawPassword) {
-        Account account = accountRepository.getByEmailValue(email);
+    public LoginResponse login(LoginRequest request) {
+        Account account = accountRepository.getByEmailValue(request.email());
 
-        if (!passwordEncoder.matches(rawPassword, account.getPassword().getValue())) {
+        if (!passwordEncoder.matches(request.rawPassword(), account.getPassword().getValue())) {
             throw new InvalidPasswordException();
         }
 
@@ -91,15 +92,12 @@ public class AccountService {
             throw new BannedAccountException();
         }
 
-        // NOTE: This is inefficient
+        // FIXME: currently, this throws an exception if the Tasker does not exist, breaking
+        //  the login. Use `Optional` in the future to handle this smoothly
         Tasker tasker = taskerRepository.findByAccountId(account.getId());
 
-        // calculate if the profile is complete.
-        // NOTE: This should be factored out
-        boolean profileCompleted = tasker.getProfile().getFirstName() != null && !tasker.getProfile().getFirstName().isBlank()
-                && tasker.getProfile().getLastName() != null && !tasker.getProfile().getLastName().isBlank();
-
-        log.info("profileCompleted: {}", profileCompleted);
+        // calculate if the profile is complete
+        boolean profileCompleted = tasker.isProfileComplete();
 
         // return a JWT token
         String token = jwtService.generateToken(account.getId(), profileCompleted);
@@ -122,19 +120,19 @@ public class AccountService {
     @Transactional
     public void activate(UUID accountId) {
         Account account = findAccountById(accountId);
-        account.changeStatus(AccountStatus.ACTIVE);
+        account.activate();
         accountRepository.save(account);
     }
 
     @Transactional
     public void ban(UUID accountId) {
         Account account = findAccountById(accountId);
-        account.changeStatus(AccountStatus.BANNED);
+        account.banned();
         accountRepository.save(account);
 
         List<Task> userTasks = taskRepository.findByPosterIdAndStatus(accountId, TaskStatus.ACTIVE);
         for (Task task : userTasks) {
-            task.setStatus(TaskStatus.CANCELLED);
+            task.cancel();
         }
         taskRepository.saveAll(userTasks);
     }
