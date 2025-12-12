@@ -27,7 +27,8 @@ public class Offer {
     private UUID id;
 
     /**
-     *
+     * budget must be a positive integer
+     * greater than 5 and less than 999
      */
     @Column(name = "price")
     private int price;

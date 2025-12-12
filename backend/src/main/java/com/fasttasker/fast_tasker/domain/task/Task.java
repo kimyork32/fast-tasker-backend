@@ -42,7 +42,8 @@ public class Task {
     /**
      * The offered budget or amount for the task.
      * might allow tasks without an initial budget.
-     * budget must be a positive integer a maximum 999
+     * budget must be a positive integer
+     * greater than 5 and less than 999
      */
     @Column(name = "budget", nullable = false) // IMPROVEMENT: nullable may be nullable
     private int budget;
@@ -92,7 +93,7 @@ public class Task {
      */
     @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
-    private List<Question> questions = new ArrayList<>();
+    private final List<Question> questions = new ArrayList<>();
 
     /**
      * List of offers made by Taskers for this task.
@@ -102,7 +103,7 @@ public class Task {
      */
     @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
-    private List<Offer> offers = new ArrayList<>();
+    private final List<Offer> offers = new ArrayList<>();
 
     @Builder(toBuilder = true)
     public Task(String title, String description, int budget, Location location, LocalDate taskDate) {
@@ -112,7 +113,7 @@ public class Task {
         if (description == null || description.isEmpty()) {
             throw new DomainException("Description cannot be null or empty");
         }
-        if (budget < 0 || budget > 999) {
+        if (budget < 5 || budget > 999) {
             throw new DomainException("Budget must be between 0 and 999");
         }
         if (location == null) {
@@ -146,7 +147,7 @@ public class Task {
     }
 
     public void adjustBudget(int newBudget) {
-        if (budget < 0 || budget > 999) {
+        if (budget < 5 || budget > 999) {
             throw new DomainException("Budget must be between 0 and 999");
         }
         if (!this.offers.isEmpty() && newBudget < this.budget) {
