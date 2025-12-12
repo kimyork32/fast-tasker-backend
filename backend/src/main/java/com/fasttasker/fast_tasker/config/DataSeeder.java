@@ -78,6 +78,7 @@ public class DataSeeder implements CommandLineRunner {
                         .latitude(14.234)
                         .longitude(35.42)
                         .address("miraflores porvenir N21")
+                        .zip("314141")
                         .build())
                 .taskDate("2025-12-10")
                 .build();

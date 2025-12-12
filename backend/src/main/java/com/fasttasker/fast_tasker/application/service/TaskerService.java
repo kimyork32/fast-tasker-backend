@@ -8,7 +8,6 @@ import com.fasttasker.fast_tasker.application.dto.task.AssignTaskerResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
 import com.fasttasker.fast_tasker.application.exception.TaskAccessDeniedException;
-import com.fasttasker.fast_tasker.application.exception.TaskerNotFoundException;
 import com.fasttasker.fast_tasker.application.mapper.TaskerMapper;
 import com.fasttasker.fast_tasker.domain.notification.NotificationType;
 import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
@@ -19,7 +18,6 @@ import com.fasttasker.fast_tasker.domain.tasker.Tasker;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -85,15 +83,14 @@ public class TaskerService {
         UUID taskerId = UUID.fromString(request.taskerId());
         UUID offerId = UUID.fromString(request.offerId());
 
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskerNotFoundException("Task not found with id: " + taskId));
+        Task task = taskRepository.findById(taskId);
 
         if (!posterId.equals(task.getPosterId())) {
             throw new TaskAccessDeniedException("User does not have permission to assign this task.");
         }
 
         // save tasker how assignTasker in the task
-        task.setAssignedTaskerId(taskerId);
+        task.assignTasker(taskerId);
         taskRepository.save(task);
 
         // notifying of the tasker that the task has been assigned
