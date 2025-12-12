@@ -1,5 +1,6 @@
 package com.fasttasker.fast_tasker.domain.tasker;
 
+import com.fasttasker.fast_tasker.application.exception.DomainException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,7 +8,7 @@ import lombok.*;
  * 
  */
 @Embeddable
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @EqualsAndHashCode
 @ToString
@@ -15,23 +16,28 @@ public class Profile {
     /**
      * minimum one name required and maximum three (words)
      */
+    @Column(name = "first_name", length = 60, nullable = false)
     private String firstName;
 
     /**
      * minimum one name required and maximum three (words)
      */
+    @Column(name = "last_name", length = 60, nullable = false)
     private String lastName;
 
     /**
      * url of the photo
      */
+    @Column(name = "photo_url", length = 256)
     private String photo;
 
+    @Embedded
     private Location location;
 
     /**
      * max 200 characters
      */
+    @Column(name = "about", length = 200)
     private String about;
 
     /**
@@ -39,29 +45,32 @@ public class Profile {
      * each star is a value between 0 and 5.
      * one decimal place precision
      */
+    @Column(name = "reputation", nullable = false)
     private float reputation;
 
     /**
      * number of the comments given by the clients
      */
+    @Column(name = "client_reviews", nullable = false)
     private int clientReviews;
 
+    @Column(name = "completed_tasks", nullable = false)
     private int completedTasks;
 
 
     @Builder(toBuilder = true)
     public Profile(String firstName, String lastName, String photo, Location location, String about) {
         if (firstName == null || lastName == null) {
-            throw new IllegalArgumentException("firstName and lastName cannot be null");
+            throw new DomainException("firstName and lastName cannot be null");
         }
         if (firstName.isEmpty() || lastName.isEmpty()) {
-            throw new IllegalArgumentException("firstName and lastName cannot be empty");
+            throw new DomainException("firstName and lastName cannot be empty");
         }
         if (location == null) {
-            throw new IllegalArgumentException("location cannot be null");
+            throw new DomainException("location cannot be null");
         }
         if (about.length() > 200) {
-            throw new IllegalArgumentException("about cannot be longer than 200 characters");
+            throw new DomainException("about cannot be longer than 200 characters");
         }
         this.firstName = firstName;
         this.lastName = lastName;

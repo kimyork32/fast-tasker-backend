@@ -108,13 +108,13 @@ public class Task {
     @Builder(toBuilder = true)
     public Task(String title, String description, int budget, Location location, LocalDate taskDate, UUID posterId) {
         if (title == null || title.isEmpty()) {
-            throw new DomainException("Title cannot be null or empty");
+            throw new IllegalArgumentException("Title cannot be null or empty");
         }
         if (description == null || description.isEmpty()) {
-            throw new DomainException("Description cannot be null or empty");
+            throw new IllegalArgumentException("Description cannot be null or empty");
         }
         if (location == null) {
-            throw new DomainException("Location cannot be null");
+            throw new IllegalArgumentException("Location cannot be null");
         }
         validateBudget(budget);
         validateTaskDate(taskDate);

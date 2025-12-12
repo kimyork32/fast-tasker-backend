@@ -1,6 +1,7 @@
 package com.fasttasker.fast_tasker.domain.tasker;
 
 
+import com.fasttasker.fast_tasker.application.exception.DomainException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,26 +33,12 @@ public class Tasker {
      * profile data
      */
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "firstName", column = @Column(name = "first_name", length = 60)),
-            @AttributeOverride(name = "lastName", column = @Column(name = "last_name", length = 60)),
-            @AttributeOverride(name = "photo", column = @Column(name = "profile_photo_url", length = 255)),
-            @AttributeOverride(name = "about", column = @Column(name = "profile_about", length = 200)),
-            @AttributeOverride(name = "reputation", column = @Column(name = "profile_reputation")),
-            @AttributeOverride(name = "clientReviews", column = @Column(name = "profile_client_reviews")),
-            @AttributeOverride(name = "completedTasks", column = @Column(name = "profile_completed_tasks")),
-
-            @AttributeOverride(name = "location.zip", column = @Column(name = "location_zip")),
-            @AttributeOverride(name = "location.latitude", column = @Column(name = "location_latitude")),
-            @AttributeOverride(name = "location.longitude", column = @Column(name = "location_longitude")),
-            @AttributeOverride(name = "location.address", column = @Column(name = "location_address", length = 255))
-    })
     private Profile profile;
 
     @Builder(toBuilder = true)
     public Tasker(UUID accountId, Profile profile) {
         if (accountId == null) {
-            throw new IllegalArgumentException("accountId cannot be null");
+            throw new DomainException("accountId cannot be null");
         }
         this.id = UUID.randomUUID();
         this.accountId = accountId;
