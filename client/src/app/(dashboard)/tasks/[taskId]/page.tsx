@@ -44,6 +44,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
   
   // Estado para almacenar el ID del usuario actual
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [currentTaskerId, setCurrentTaskerId] = useState<string | null>(null);
 
   // Nuevo Estado para el Modal de Oferta
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
@@ -68,10 +69,12 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
       try {
         // Decodifica el token para obtener el payload.
         // 'sub' (subject) usualmente contiene el ID del usuario.
-        const decodedToken: { sub: string } = jwtDecode(token);
+        // Agregamos 'taskerId' a la definición del tipo para poder leerlo
+        const decodedToken: { sub: string; taskerId?: string } = jwtDecode(token);
         const userIdFromToken = decodedToken.sub;
         setCurrentUserId(userIdFromToken);
-        console.log(`ID de usuario obtenido del token: ${userIdFromToken}`); // Logueamos el valor adirecto
+        if (decodedToken.taskerId) setCurrentTaskerId(decodedToken.taskerId);
+        console.log(`ID de usuario: ${userIdFromToken}, TaskerID: ${decodedToken.taskerId}`);
       } catch (error) {
         console.error("Error al decodificar el token JWT:", error);
       }
@@ -204,8 +207,10 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
   if (!taskComplete) return <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-500">No se encontró la tarea.</div>;
 
   // Determinar si el usuario actual es el creador de la tarea
-  const isCreator = !!(currentUserId && taskComplete.task?.posterId === currentUserId);
+  const isCreator = !!(currentTaskerId && taskComplete.task?.posterId === currentTaskerId);
 
+  console.log(`currentId: ${currentUserId}`);
+  console.log(`taskComplete: ${JSON.stringify(taskComplete)}`);
   return (
     <>
     <div className="min-h-screen bg-gray-100 p-4 md:p-8 font-sans">
