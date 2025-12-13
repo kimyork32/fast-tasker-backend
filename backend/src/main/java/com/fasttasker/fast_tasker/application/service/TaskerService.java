@@ -68,17 +68,18 @@ public class TaskerService {
     /**
      * get TaskerResponse by account id
      * 
-     * @param taskerId tasker id
+     * @param accountId account id
      * @return taskerResponse
      */
     @Transactional(readOnly = true)
-    public TaskerResponse getByAccountId(UUID taskerId) {
-        Tasker tasker = taskerRepository.findByAccountId(taskerId);
+    public TaskerResponse getByAccountId(UUID accountId) {
+        Tasker tasker = taskerRepository.findByAccountId(accountId);
         return taskerMapper.toResponse(tasker);
     }
 
     @Transactional
-    public AssignTaskerResponse assignTaskToTasker(AssignTaskerRequest request, UUID posterId) {
+    public AssignTaskerResponse assignTaskToTasker(AssignTaskerRequest request, UUID accountId) {
+        UUID posterId = taskerRepository.findByAccountId(accountId).getId();
         UUID taskId = UUID.fromString(request.taskId());
         UUID taskerId = UUID.fromString(request.taskerId());
         UUID offerId = UUID.fromString(request.offerId());

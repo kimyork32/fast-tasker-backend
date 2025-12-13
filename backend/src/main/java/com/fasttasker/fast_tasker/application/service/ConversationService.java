@@ -15,6 +15,7 @@ import com.fasttasker.fast_tasker.domain.conversation.Message;
 import com.fasttasker.fast_tasker.domain.conversation.MessageContent;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class ConversationService {
     private final IConversationRepository conversationRepository;
@@ -62,7 +64,10 @@ public class ConversationService {
      * @return list of conversations
      */
     @Transactional(readOnly = true)
-    public List<ConversationSummary> getUserInbox(UUID taskerId) {
+    public List<ConversationSummary> getUserInbox(UUID accountId) {
+        UUID taskerId = taskerRepository.findByAccountId(accountId).getId();
+
+        log.info("taskerId: {}", taskerId);
         return conversationRepository.findByParticipantId(taskerId).stream()
                 .map(c -> {
                     // calculate other id
@@ -96,7 +101,7 @@ public class ConversationService {
     public List<MessageResponse> getHistory(UUID conversationId, UUID requesterId) {
         Conversation c = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new ConversationNotFoundException("Conversation Not Found"));
-
+        log.info("conversation: {}", c.toString());
         // verify that the user requesting the history is a participant in the conversation
         boolean isParticipant = c.getParticipantA().equals(requesterId) || c.getParticipantB().equals(requesterId);
         if (!isParticipant) {

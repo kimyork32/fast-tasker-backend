@@ -34,9 +34,9 @@ public class TaskController {
             Authentication authentication
     ) {
         // extract posterId from the token
-        UUID posterId = (UUID) authentication.getPrincipal();
+        UUID accountId = (UUID) authentication.getPrincipal();
 
-        TaskResponse response = taskService.createTask(request, posterId);
+        TaskResponse response = taskService.createTask(request, accountId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
@@ -48,8 +48,8 @@ public class TaskController {
 
     @GetMapping("/my-tasks")
     public ResponseEntity<List<TaskResponse>> getAllMyTasks(Authentication authentication) {
-        UUID posterId = (UUID) authentication.getPrincipal();
-        List<TaskResponse> posterTasks = taskService.listTasksByPoster(posterId);
+        UUID accountId = (UUID) authentication.getPrincipal();
+        List<TaskResponse> posterTasks = taskService.listTasksByPoster(accountId);
         return ResponseEntity.ok(posterTasks);
     }
 
@@ -65,8 +65,8 @@ public class TaskController {
             @RequestBody OfferRequest offerRequest,
             Authentication authentication
     ) {
-        UUID posterId = (UUID) authentication.getPrincipal();
-        OfferProfileResponse offerProfileResponse = taskService.createOffer(offerRequest, taskId, posterId);
+        UUID accountId = (UUID) authentication.getPrincipal();
+        OfferProfileResponse offerProfileResponse = taskService.createOffer(offerRequest, taskId, accountId);
         return ResponseEntity.status(HttpStatus.CREATED).body(offerProfileResponse);
     }
 
@@ -82,8 +82,8 @@ public class TaskController {
             @RequestBody QuestionRequest questionRequest,
             Authentication authentication
     ) {
-        UUID taskerId = (UUID) authentication.getPrincipal();
-        QuestionProfileResponse response = taskService.createQuestion(questionRequest, taskId, taskerId);
+        UUID accountId = (UUID) authentication.getPrincipal();
+        QuestionProfileResponse response = taskService.createQuestion(questionRequest, taskId, accountId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -99,8 +99,8 @@ public class TaskController {
             @RequestBody AnswerRequest answerRequest,
             Authentication authentication
     ) {
-        UUID taskerId = (UUID) authentication.getPrincipal();
-        AnswerProfileResponse response = taskService.answerQuestion(answerRequest, taskId, taskerId);
+        UUID accountId = (UUID) authentication.getPrincipal();
+        AnswerProfileResponse response = taskService.answerQuestion(answerRequest, taskId, accountId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

@@ -2,6 +2,7 @@ package com.fasttasker.fast_tasker.config;
 // creado con Gemini
 // arreglado por chatgpt
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -60,6 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 4. Validar token JWT
         if (jwtService.isTokenValid(token)) {
             UUID accountId = jwtService.extractAccountId(token);
+            Claims claims = jwtService.extractAllClaims(token);
 
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
 
@@ -69,9 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         Collections.emptyList()
                 );
 
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                authToken.setDetails(claims);
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }

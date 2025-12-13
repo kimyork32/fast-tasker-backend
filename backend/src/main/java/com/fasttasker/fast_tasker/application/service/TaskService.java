@@ -8,6 +8,7 @@ import com.fasttasker.fast_tasker.application.mapper.TaskerMapper;
 import com.fasttasker.fast_tasker.domain.task.*;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.util.stream.Stream;
 /**
  *
  */
+@Slf4j
 @Service
 public class TaskService {
 
@@ -43,7 +45,9 @@ public class TaskService {
      *
      */
     @Transactional
-    public TaskResponse createTask(TaskRequest taskRequest, UUID posterId) {
+    public TaskResponse createTask(TaskRequest taskRequest, UUID accountId) {
+        UUID posterId = taskerRepository.findByAccountId(accountId).getId();
+
         Task newTask = taskMapper.toTaskEntity(taskRequest, posterId);
 
         taskRepository.save(newTask);
@@ -68,7 +72,9 @@ public class TaskService {
      * return all tasks created by a specific user (Tasker)
      */
     @Transactional(readOnly = true)
-    public List<TaskResponse> listTasksByPoster(UUID posterId) {
+    public List<TaskResponse> listTasksByPoster(UUID accountId) {
+        UUID posterId = taskerRepository.findByAccountId(accountId).getId();
+
         return taskRepository.findByPosterId(posterId)
                 .stream()
                 .map(taskMapper::toResponse)
@@ -87,17 +93,22 @@ public class TaskService {
     @Transactional(readOnly = true)
     public TaskCompleteResponse getTaskCompleteById(UUID taskId) {
         Task task = findTask(taskId);
+        log.info("task: {}", task.toString());
         Tasker tasker = taskerRepository.findById(task.getPosterId());
+        log.info("tasker: {}", tasker.toString());
 
         MinimalProfileResponse profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
+        log.info("profileResponse: {}", profileResponse.toString());
 
         return taskMapper.toTaskCompleteResponse(task, profileResponse);
     }
 
     @Transactional
-    public QuestionProfileResponse createQuestion(QuestionRequest questionRequest, UUID askedById, UUID taskerId) {
+    public QuestionProfileResponse createQuestion(QuestionRequest questionRequest, UUID taskId, UUID accountId) {
+        UUID askedById = taskerRepository.findByAccountId(accountId).getId();
+
         // find task for the insert question
-        Task task = findTask(askedById);
+        Task task = findTask(taskId);
         Question question = taskMapper.toQuestionEntity(questionRequest, askedById, task);
 
         // insert question in the task
@@ -187,7 +198,9 @@ public class TaskService {
      * @param taskId id of the task
      */
     @Transactional
-    public OfferProfileResponse createOffer(OfferRequest offerRequest, UUID taskId, UUID taskerId) {
+    public OfferProfileResponse createOffer(OfferRequest offerRequest, UUID taskId, UUID accountId) {
+
+        UUID taskerId = taskerRepository.findByAccountId(accountId).getId();
 
         // find task
         Task task = findTask(taskId);
@@ -250,8 +263,10 @@ public class TaskService {
     public AnswerProfileResponse answerQuestion(
             AnswerRequest answerRequest,
             UUID taskId,
-            UUID responderId
+            UUID accountId
     ) {
+        UUID responderId = taskerRepository.findByAccountId(accountId).getId();
+
         UUID questionId = UUID.fromString(answerRequest.questionId());
 
         // find task

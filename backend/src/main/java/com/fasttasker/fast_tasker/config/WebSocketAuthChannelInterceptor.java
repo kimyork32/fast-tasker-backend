@@ -7,6 +7,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -19,9 +20,11 @@ import java.util.List;
 public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 
     private final UserAuthenticationProvider userAuthenticationProvider;
+    private final JwtService jwtService;
 
-    public WebSocketAuthChannelInterceptor(UserAuthenticationProvider userAuthenticationProvider) {
+    public WebSocketAuthChannelInterceptor(UserAuthenticationProvider userAuthenticationProvider, JwtService jwtService) {
         this.userAuthenticationProvider = userAuthenticationProvider;
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -52,6 +55,13 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
         try {
             String token = bearerToken.substring(7);
             Authentication auth = userAuthenticationProvider.validateToken(token);
+            
+            // FIX: Inyectamos los Claims en los detalles para que JwtService.extractTaskerId funcione
+            if (auth instanceof UsernamePasswordAuthenticationToken) {
+                var claims = jwtService.extractAllClaims(token);
+                ((UsernamePasswordAuthenticationToken) auth).setDetails(claims);
+            }
+
             accessor.setUser(auth);
             log.info("WebSocket user authenticated successfully: {}", auth.getPrincipal());
         } catch (Exception e) {

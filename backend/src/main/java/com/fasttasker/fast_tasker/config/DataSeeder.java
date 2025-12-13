@@ -80,7 +80,7 @@ public class DataSeeder implements CommandLineRunner {
                         .address("miraflores porvenir N21")
                         .zip("314141")
                         .build())
-                .taskDate("2025-12-10")
+                .taskDate("2026-12-31")
                 .build();
 
         TaskResponse taskResponse = taskService.createTask(taskRequest, UUID.fromString(accountResponse1.id()));
@@ -94,6 +94,6 @@ public class DataSeeder implements CommandLineRunner {
         taskService.createOffer(
                 offerRequest,
                 UUID.fromString(taskResponse.id()),
-                UUID.fromString(taskerResponse2.id()));
+                UUID.fromString(accountResponse2.id()));
     }
 }

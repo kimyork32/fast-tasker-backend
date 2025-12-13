@@ -35,6 +35,7 @@ export const getMyTasks = (): Promise<TaskResponse[]> => {
  * Obtiene una tarea por su ID.
  */
 export const getTaskById = (id: string): Promise<TaskCompleteResponse> => {
+  console.log("getTaskById called");
   return apiClient<TaskCompleteResponse>(`${TASK_PREFIX}/${id}`, {
     method: 'GET',
   }, true); // withCredentials = true

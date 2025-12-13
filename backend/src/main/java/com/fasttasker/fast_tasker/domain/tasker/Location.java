@@ -18,13 +18,13 @@ public class Location {
     /**
      * value between -90 and 90
      */
-    @Column(name = "latitude", nullable = false)
+    @Column(name = "latitude")
     private double latitude;
 
     /**
      * value between -180 and 180
      */
-    @Column(name = "longitude", nullable = false)
+    @Column(name = "longitude")
     private double longitude;
 
     /**
@@ -36,7 +36,7 @@ public class Location {
     /**
      * zip code of peru (FOR THE MOMENT)
      */
-    @Column(name = "zip", nullable = false)
+    @Column(name = "zip")
     private String zip;
 
     @Builder(toBuilder = true)

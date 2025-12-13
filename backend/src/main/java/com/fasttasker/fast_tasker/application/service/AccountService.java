@@ -100,7 +100,7 @@ public class AccountService {
         boolean profileCompleted = tasker.isProfileComplete();
 
         // return a JWT token
-        String token = jwtService.generateToken(account.getId(), profileCompleted);
+        String token = jwtService.generateToken(account.getId(), tasker.getId(), profileCompleted);
         return new LoginResponse(token);
     }
 

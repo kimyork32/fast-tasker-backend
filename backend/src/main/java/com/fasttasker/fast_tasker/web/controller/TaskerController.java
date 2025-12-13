@@ -10,6 +10,7 @@ import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
 import com.fasttasker.fast_tasker.config.JwtService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,7 @@ import java.util.UUID;
 /**
  *
  */
+@Slf4j
 @RestController
 @RequestMapping("api/v1/tasker")
 public class TaskerController {
@@ -48,11 +50,13 @@ public class TaskerController {
         UUID accountId = (UUID) authentication.getPrincipal();
         var serviceRequest = new TaskerRequest(accountId.toString(), request.profile());
         TaskerResponse taskerResponse = taskerService.registerTasker(serviceRequest);
-        String newToken = jwtService.generateToken(accountId, true); // profileCompleted = true
+        log.info("taskerId: {}", accountId);
+        log.info("accountId: {}", UUID.fromString(taskerResponse.id()));
+        String newToken = jwtService.generateToken(accountId, UUID.fromString(taskerResponse.id()), true); // profileCompleted = true
         // creating DTO with the token
         var response = new TaskerRegistrationResponse(
-                taskerResponse.id().toString(),
-                taskerResponse.accountId().toString(),
+                taskerResponse.id(),
+                taskerResponse.accountId(),
                 taskerResponse.profile(),
                 newToken
         );
@@ -70,9 +74,9 @@ public class TaskerController {
     @GetMapping("/user/me")
     public ResponseEntity<TaskerResponse> getTaskerMe(Authentication authentication) {
         // first extract the Principal, before casting the object to UUID
-        UUID taskerId = (UUID) authentication.getPrincipal();
+        UUID accountId = (UUID) authentication.getPrincipal();
         // { @see JwtAuthenticationFilter } for explanation
-        TaskerResponse response = taskerService.getByAccountId(taskerId);
+        TaskerResponse response = taskerService.getByAccountId(accountId);
         return ResponseEntity.ok(response);
     }
 
@@ -81,15 +85,15 @@ public class TaskerController {
             Authentication authentication,
             @Valid @RequestBody AssignTaskerRequest request
     ) {
-        UUID posterId = (UUID) authentication.getPrincipal();
-        AssignTaskerResponse response = taskerService.assignTaskToTasker(request, posterId);
+        UUID accountId = (UUID) authentication.getPrincipal();
+        AssignTaskerResponse response = taskerService.assignTaskToTasker(request, accountId);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/notifications")
     public ResponseEntity<List<NotificationResponse>> getNotificationsByTasker(Authentication authentication) {
-        UUID taskerId = (UUID) authentication.getPrincipal();
-        List<NotificationResponse> notifications = notificationService.getAll(taskerId);
+        UUID accountId = (UUID) authentication.getPrincipal();
+        List<NotificationResponse> notifications = notificationService.getAll(accountId);
         return ResponseEntity.ok(notifications);
     }
 }

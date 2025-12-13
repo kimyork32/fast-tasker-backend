@@ -5,7 +5,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -13,6 +15,7 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.function.Function;
 
+@Slf4j
 @Service
 public class JwtService {
 
@@ -56,6 +59,22 @@ public class JwtService {
         return UUID.fromString(id);
     }
 
+    public UUID extractTaskerId(Authentication authentication) {
+        log.info("call extractTaskerId");
+        log.info("authentication: {}", authentication);
+        if (authentication == null) {
+            log.info("authentication is null");
+            return null;
+        }
+
+        // NOTE: refactor
+        Object details = authentication.getDetails();
+        var claims = (Claims) details;
+        String taskerIdStr = claims.get("taskerId", String.class);
+        log.info("taskerId: {}", taskerIdStr);
+        return UUID.fromString(taskerIdStr);
+    }
+
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
@@ -69,7 +88,7 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()

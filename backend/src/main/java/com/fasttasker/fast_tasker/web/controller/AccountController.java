@@ -46,7 +46,7 @@ public class AccountController {
         AccountResponse accountResponse = accountService.registerAccount(request);
 
         log.info("accountId: {}", accountResponse.id());
-        String newToken = jwtService.generateToken(UUID.fromString(accountResponse.id()), false); // profileCompleted = false
+        String newToken = jwtService.generateToken(UUID.fromString(accountResponse.id()), null,false); // profileCompleted = false
 
         var registerResponse = new RegisterResponse(
                 accountResponse.id(),
