@@ -1,34 +1,13 @@
-package com.fasttasker.fast_tasker.domain.conversation;
-
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-/**
- * one-to-one conversation (poster to tasker)
- */
 @Entity
 @Table(name = "conversation")
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
-@Setter // this no shouldn't be here before it breaks DDD
-@ToString(exclude = "messages") // avoid infinite loop
-@Builder(toBuilder = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString(exclude = "messages")
 public class Conversation {
-
-    // NOTE: add semantic constructor (DDD) for validate attributes, and add ID generation (annotation with
-    // strategy = GenerationType.UUID)
 
     @Id
     private UUID id;
 
-    /**
-     * task is the context for the conversation
-     */
     @Column(name = "task_id", nullable = false)
     private UUID taskId;
 
@@ -38,35 +17,63 @@ public class Conversation {
     @Column(name = "participant_b_id", nullable = false)
     private UUID participantB;
 
-    @OneToMany(mappedBy = "conversation", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default // if the messages field is not explicitly set when using the builder, then
-                    // you must use the default value
-    private List<Message> messages = new ArrayList<>();
+    @OneToMany(
+            mappedBy = "conversation",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private final List<Message> messages = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private ConversationStatus status;
 
-    public void sendMessage(UUID senderId, MessageContent content) {
-
-        // validations
-        if (this.status == ConversationStatus.CLOSED) {
-            throw new IllegalStateException("cannot send messages in a closed chat");
+    public static Conversation open(UUID taskId, UUID participantA, UUID participantB) {
+        if (taskId == null) {
+            throw new IllegalArgumentException("TaskId cannot be null");
+        }
+        if (participantA == null || participantB == null) {
+            throw new IllegalArgumentException("Participants cannot be null");
+        }
+        if (participantA.equals(participantB)) {
+            throw new IllegalArgumentException("Participants must be different");
         }
 
-        // verify if the participant is the sender
-        if (!senderId.equals(participantA) && !senderId.equals(participantB)) {
-            throw new IllegalArgumentException("the user " + senderId + " is not a participant of this conversation");
-        }
+        Conversation conversation = new Conversation();
+        conversation.id = UUID.randomUUID();
+        conversation.taskId = taskId;
+        conversation.participantA = participantA;
+        conversation.participantB = participantB;
+        conversation.status = ConversationStatus.OPEN;
 
-        // create and save message
-        Message newMessage = new Message(this, senderId, content);
-        this.messages.add(newMessage);
+        return conversation;
     }
 
-    public UUID otherParticipantId(UUID taskerId) {
-        if (participantA.equals(taskerId)) {
-            return  participantB;
+    public void sendMessage(UUID senderId, MessageContent content) {
+        if (status == ConversationStatus.CLOSED) {
+            throw new IllegalStateException("Cannot send messages in a closed conversation");
         }
-        return participantA;
+        if (!isParticipant(senderId)) {
+            throw new IllegalArgumentException("Sender is not a participant");
+        }
+        if (content == null) {
+            throw new IllegalArgumentException("Message content cannot be null");
+        }
+
+        messages.add(Message.of(this, senderId, content));
+    }
+
+    public UUID otherParticipantId(UUID participantId) {
+        if (participantA.equals(participantId)) return participantB;
+        if (participantB.equals(participantId)) return participantA;
+        throw new IllegalArgumentException("User is not a participant");
+    }
+
+    public List<Message> getMessages() {
+        return List.copyOf(messages);
+    }
+
+    private boolean isParticipant(UUID userId) {
+        return participantA.equals(userId) || participantB.equals(userId);
     }
 }
