@@ -16,13 +16,13 @@ public class Profile {
     /**
      * minimum one name required and maximum three (words)
      */
-    @Column(name = "first_name", length = 60, nullable = false)
+    @Column(name = "first_name", length = 60)
     private String firstName;
 
     /**
      * minimum one name required and maximum three (words)
      */
-    @Column(name = "last_name", length = 60, nullable = false)
+    @Column(name = "last_name", length = 60)
     private String lastName;
 
     /**
@@ -45,16 +45,16 @@ public class Profile {
      * each star is a value between 0 and 5.
      * one decimal place precision
      */
-    @Column(name = "reputation", nullable = false)
+    @Column(name = "reputation")
     private float reputation;
 
     /**
      * number of the comments given by the clients
      */
-    @Column(name = "client_reviews", nullable = false)
+    @Column(name = "client_reviews")
     private int clientReviews;
 
-    @Column(name = "completed_tasks", nullable = false)
+    @Column(name = "completed_tasks")
     private int completedTasks;
 
 
