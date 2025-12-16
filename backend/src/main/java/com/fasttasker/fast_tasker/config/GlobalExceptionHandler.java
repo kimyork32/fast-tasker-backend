@@ -3,6 +3,8 @@ package com.fasttasker.fast_tasker.config;
 import com.fasttasker.fast_tasker.application.exception.AccountNotFoundException;
 import com.fasttasker.fast_tasker.application.exception.DomainException;
 import com.fasttasker.fast_tasker.application.exception.EmailAlreadyExistsException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +17,22 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    private static final String TITLE_CONFLICT = "Conflict";
+    private static final String TITLE_BAD_REQUEST = "Bad Request";
+    private static final String TITLE_NOT_FOUND = "Not Found";
+    private static final String TITLE_INTERNAL_ERROR = "Internal Server Error";
+    private static final String TYPE_EMAIL_EXISTS = "https://fasttasker.com/errors/email-exists";
+    private static final String TYPE_INVALID_DATA = "https://fasttasker.com/errors/invalid-data";
+    private static final String MSG_UNEXPECTED_ERROR = "An unexpected error occurred";
+
     // Conflict Handling -> 409 conflict
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ProblemDetail> handleEmailExists(EmailAlreadyExistsException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
-        problem.setTitle("Conflict");
-        problem.setType(URI.create("https://fasttasker.com/errors/email-exists"));
+        problem.setTitle(TITLE_CONFLICT);
+        problem.setType(URI.create(TYPE_EMAIL_EXISTS));
         problem.setProperty("timestamp", LocalDateTime.now());
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
@@ -30,8 +42,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({IllegalArgumentException.class, DomainException.class})
     public ResponseEntity<ProblemDetail> handleDomainValidation(RuntimeException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
-        problem.setTitle("Bad Request");
-        problem.setType(URI.create("https://fasttasker.com/errors/invalid-data"));
+        problem.setTitle(TITLE_BAD_REQUEST);
+        problem.setType(URI.create(TYPE_INVALID_DATA));
         problem.setProperty("timestamp", LocalDateTime.now());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
@@ -41,7 +53,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<ProblemDetail> handleNotFound(AccountNotFoundException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
-        problem.setTitle("Not Found");
+        problem.setTitle(TITLE_NOT_FOUND);
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problem);
     }
@@ -49,8 +61,11 @@ public class GlobalExceptionHandler {
     // Fallback for any other unhandled error -> 400 internal server error
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleGeneric(Exception ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
-        problem.setTitle("Internal Server Error");
+        // log the critical error
+        log.error("Unexpected error occurred in the application", ex);
+
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, MSG_UNEXPECTED_ERROR);
+        problem.setTitle(TITLE_INTERNAL_ERROR);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
     }
