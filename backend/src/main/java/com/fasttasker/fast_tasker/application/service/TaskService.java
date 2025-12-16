@@ -18,6 +18,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasttasker.fast_tasker.application.exception.DomainException;
+
 /**
  *
  */
@@ -107,29 +109,29 @@ public class TaskService {
     public QuestionProfileResponse createQuestion(QuestionRequest questionRequest, UUID taskId, UUID accountId) {
         UUID askedById = taskerRepository.findByAccountId(accountId).getId();
 
-        // find task for the insert question
+        // Find task for the question
         Task task = findTask(taskId);
         Question question = taskMapper.toQuestionEntity(questionRequest, askedById, task);
 
-        // insert question in the task
-        task.getQuestions().add(question);
+        // Use business method instead of direct list manipulation
+        task.addQuestion(question);
 
-        // and save
+        // Save the task
         Task taskSaved = taskRepository.save(task);
 
-        // check if the questions saved is equal to the questions will be saved
-        // Find the newly added offer from the saved task entity to ensure we return the persisted state.
-        Question savedQuestions = taskSaved.getQuestions().stream()
-                .filter(q -> q.getId().equals(question.getId())).findFirst().orElse(question);
+        // Find the newly added question from the saved task entity
+        Question savedQuestion = taskSaved.getQuestions().stream()
+                .filter(q -> q.getId().equals(question.getId()))
+                .findFirst()
+                .orElseThrow(() -> new QuestionNotFoundException("Question was not saved correctly"));
 
-        // create minimalProfile
+        // Create minimalProfile
         Tasker tasker = taskerRepository.findById(question.getAskedById());
 
         MinimalProfileResponse profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
-        // create profileResponse
-        QuestionResponse questionResponse = taskMapper.toQuestionResponse(savedQuestions);
+        QuestionResponse questionResponse = taskMapper.toQuestionResponse(savedQuestion);
 
-        return taskMapper.toQuestionProfileResponse(questionResponse, profileResponse, null); // answers are null
+        return taskMapper.toQuestionProfileResponse(questionResponse, profileResponse, null);
     }
 
     @Transactional(readOnly = true)
@@ -202,23 +204,31 @@ public class TaskService {
 
         UUID taskerId = taskerRepository.findByAccountId(accountId).getId();
 
-        // find task
+        // Find task
         Task task = findTask(taskId);
 
-        Offer offer = taskMapper.toOfferEntity(offerRequest);
-        // insert values of the offer
-        offer.setStatus(OfferStatus.PENDING);
-        offer.setOffertedById(taskerId); // Corrected: Should be the ID of the user making the offer
-        offer.setCreatedAt(Instant.now());
-        offer.setTask(task);
+        // Create offer with all required fields using the mapper
+        // The mapper now accepts taskerId and task parameters
+        Offer offer = taskMapper.toOfferEntity(offerRequest, taskerId, task);
 
-        // add the offer to the task
-        task.getOffers().add(offer);
+        // Use the business method to add the offer to the task
+        // This maintains encapsulation and applies domain validations
+        task.addOffer(offer);
 
+        // Save the task (cascade will save the offer)
+        Task savedTask = taskRepository.save(task);
+
+        // Find the saved offer from the task
+        Offer savedOffer = savedTask.getOffers().stream()
+                .filter(o -> o.getId().equals(offer.getId()))
+                .findFirst()
+                .orElseThrow(() -> new DomainException("Offer was not saved correctly"));
+
+        // Get tasker profile
         Tasker tasker = taskerRepository.findById(taskerId);
 
-        MinimalProfileResponse  profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
-        OfferResponse offerResponse = taskMapper.toOfferResponse(offer);
+        MinimalProfileResponse profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
+        OfferResponse offerResponse = taskMapper.toOfferResponse(savedOffer);
 
         return taskMapper.toOfferProfileResponse(offerResponse, profileResponse);
     }
@@ -260,51 +270,50 @@ public class TaskService {
                 .toList();
     }
 
+    @Transactional
     public AnswerProfileResponse answerQuestion(
             AnswerRequest answerRequest,
             UUID taskId,
             UUID accountId
     ) {
         UUID responderId = taskerRepository.findByAccountId(accountId).getId();
-
         UUID questionId = UUID.fromString(answerRequest.questionId());
 
-        // find task
+        // Find task
         Task task = findTask(taskId);
 
-        // find question
+        // Find question
         Question question = task.getQuestions().stream()
                 .filter(q -> q.getId().equals(questionId))
                 .findFirst()
-                .orElseThrow(() -> new QuestionNotFoundException("TaskerService. Question not found"));
+                .orElseThrow(() -> new QuestionNotFoundException("TaskService. Question not found"));
 
         Answer answer = taskMapper.toAnswerEntity(answerRequest, responderId, question);
 
-        // add the answer to the question
-        question.getAnswers().add(answer);
+        // Use business method instead of direct list manipulation
+        question.addAnswer(answer);
 
-        // save updated task
+        // Save updated task
         Task taskSaved = taskRepository.save(task);
 
         Question questionSaved = taskSaved.getQuestions().stream()
                 .filter(q -> q.getId().equals(questionId))
                 .findFirst()
-                .orElseThrow(() -> new QuestionNotFoundException("TaskerService. Question not found"));
+                .orElseThrow(() -> new QuestionNotFoundException("TaskService. Question not found"));
 
         Answer answerSaved = questionSaved.getAnswers().stream()
                 .filter(a -> a.getId().equals(answer.getId()))
                 .findFirst()
-                .orElseThrow(() -> new AnswerNotFoundException("TaskerService. Answer not found"));
+                .orElseThrow(() -> new AnswerNotFoundException("TaskService. Answer not found"));
 
-        // find tasker
+        // Find tasker
         Tasker tasker = taskerRepository.findById(responderId);
 
-        MinimalProfileResponse  profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
+        MinimalProfileResponse profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
         AnswerResponse answerResponse = taskMapper.toAnswerResponse(answerSaved);
 
         return taskMapper.toAnswerProfileResponse(answerResponse, profileResponse);
     }
-
     /**
      * @param taskId
      * @param offerId

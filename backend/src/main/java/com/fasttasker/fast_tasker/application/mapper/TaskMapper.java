@@ -30,18 +30,27 @@ public class TaskMapper {
                 .taskDate(LocalDate.parse(request.taskDate()))
                 .posterId(posterId)
                 .build();
-        // insert in this instance: assignedTaskerId, questions, offers
+        // Note: assignedTaskerId, questions, offers are managed internally by the entity
     }
 
-    public Offer toOfferEntity(OfferRequest request) {
+    /**
+     * Creates an Offer entity from a request.
+     * IMPORTANT: This creates a partial Offer. You must call task.addOffer(offer)
+     * to properly associate it with a task and set remaining fields.
+     *
+     * Alternative: Use the full constructor with all required fields.
+     */
+    public Offer toOfferEntity(OfferRequest request, UUID offertedById, Task task) {
         if (request == null) return null;
 
+        // Use the full constructor that validates and sets all fields including ID
         return Offer.builder()
-                .id(UUID.randomUUID())
                 .price(request.price())
                 .description(request.description())
+                .offertedById(offertedById)
+                .task(task)
                 .build();
-        // insert in this instance: status, offertedById, createAt, task
+        // The constructor now handles: id generation, status (PENDING), createdAt (now)
     }
 
     public Question toQuestionEntity(QuestionRequest request, UUID askedById, Task task) {
@@ -52,7 +61,7 @@ public class TaskMapper {
                 .askedById(askedById)
                 .task(task)
                 .build();
-        // insert in this instance: answers
+        // The constructor handles: id generation, status (PENDING), createdAt (now)
     }
 
     public Answer toAnswerEntity(AnswerRequest request, UUID responderId, Question question) {
@@ -65,7 +74,7 @@ public class TaskMapper {
                 .build();
     }
 
-    // toEntity //////////////////////////////////////
+    // toResponse //////////////////////////////////////
     public TaskResponse toResponse(Task task) {
         if (task == null) return null;
 

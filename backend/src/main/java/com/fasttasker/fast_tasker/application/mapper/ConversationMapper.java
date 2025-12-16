@@ -15,15 +15,15 @@ public class ConversationMapper {
     public Conversation toConversationEntity(ConversationRequest request) {
         if (request == null) return null;
 
+        // El constructor ahora genera el ID automáticamente y establece el status a ACTIVE
         return Conversation.builder()
-                .id(UUID.randomUUID())
                 .taskId(request.taskId())
                 .participantA(request.participantA())
                 .participantB(request.participantB())
-                .status(ConversationStatus.OPEN)
                 .build();
-        // add attribute: messages (List>
+        // Ya no necesitas pasar .id() ni .status() porque el constructor los maneja
     }
+
     public MessageContent toMessageContentEntity(MessageContentRequest request) {
         if (request == null) return null;
 
