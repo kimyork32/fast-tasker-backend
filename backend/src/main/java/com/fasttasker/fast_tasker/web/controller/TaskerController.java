@@ -46,8 +46,7 @@ public class TaskerController {
             @Valid @RequestBody TaskerRequest request,
             Authentication authentication
     ) {
-
-        UUID accountId = (UUID) authentication.getPrincipal();
+        UUID accountId = jwtService.extractAccountId(authentication);
         var serviceRequest = new TaskerRequest(accountId.toString(), request.profile());
         TaskerResponse taskerResponse = taskerService.registerTasker(serviceRequest);
         log.info("taskerId: {}", accountId);
@@ -73,9 +72,7 @@ public class TaskerController {
 
     @GetMapping("/user/me")
     public ResponseEntity<TaskerResponse> getTaskerMe(Authentication authentication) {
-        // first extract the Principal, before casting the object to UUID
-        UUID accountId = (UUID) authentication.getPrincipal();
-        // { @see JwtAuthenticationFilter } for explanation
+        UUID accountId = jwtService.extractAccountId(authentication);
         TaskerResponse response = taskerService.getByAccountId(accountId);
         return ResponseEntity.ok(response);
     }
@@ -85,14 +82,14 @@ public class TaskerController {
             Authentication authentication,
             @Valid @RequestBody AssignTaskerRequest request
     ) {
-        UUID accountId = (UUID) authentication.getPrincipal();
+        UUID accountId = jwtService.extractAccountId(authentication);
         AssignTaskerResponse response = taskerService.assignTaskToTasker(request, accountId);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/notifications")
     public ResponseEntity<List<NotificationResponse>> getNotificationsByTasker(Authentication authentication) {
-        UUID accountId = (UUID) authentication.getPrincipal();
+        UUID accountId = jwtService.extractAccountId(authentication);
         List<NotificationResponse> notifications = notificationService.getAll(accountId);
         return ResponseEntity.ok(notifications);
     }

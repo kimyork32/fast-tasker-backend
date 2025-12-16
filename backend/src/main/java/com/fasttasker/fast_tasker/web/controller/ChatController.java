@@ -48,7 +48,7 @@ public class ChatController {
     @GetMapping("/api/v1/conversations/inbox")
     public ResponseEntity<List<ConversationSummary>> getInbox(Authentication authentication) {
         // extract ID of the token
-        UUID accountId = (UUID) authentication.getPrincipal();
+        UUID accountId = jwtService.extractAccountId(authentication);
         log.info("Account Id: {}", accountId);
         return ResponseEntity.ok(conversationService.getUserInbox(accountId));
     }

@@ -2,6 +2,7 @@ package com.fasttasker.fast_tasker.web.controller;
 
 import com.fasttasker.fast_tasker.application.service.TaskService;
 import com.fasttasker.fast_tasker.application.dto.task.*;
+import com.fasttasker.fast_tasker.config.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +21,14 @@ import java.util.UUID;
 public class TaskController {
 
     private final TaskService taskService;
+    private final JwtService jwtService;
     /**
      * constructor for dependencies injection
      */
     @Autowired
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, JwtService jwtService) {
         this.taskService = taskService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping
@@ -33,8 +36,7 @@ public class TaskController {
             @RequestBody TaskRequest request,
             Authentication authentication
     ) {
-        // extract posterId from the token
-        UUID accountId = (UUID) authentication.getPrincipal();
+        UUID accountId = jwtService.extractAccountId(authentication);
 
         TaskResponse response = taskService.createTask(request, accountId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -48,7 +50,7 @@ public class TaskController {
 
     @GetMapping("/my-tasks")
     public ResponseEntity<List<TaskResponse>> getAllMyTasks(Authentication authentication) {
-        UUID accountId = (UUID) authentication.getPrincipal();
+        UUID accountId = jwtService.extractAccountId(authentication);
         List<TaskResponse> posterTasks = taskService.listTasksByPoster(accountId);
         return ResponseEntity.ok(posterTasks);
     }
@@ -65,7 +67,7 @@ public class TaskController {
             @RequestBody OfferRequest offerRequest,
             Authentication authentication
     ) {
-        UUID accountId = (UUID) authentication.getPrincipal();
+        UUID accountId = jwtService.extractAccountId(authentication);
         OfferProfileResponse offerProfileResponse = taskService.createOffer(offerRequest, taskId, accountId);
         return ResponseEntity.status(HttpStatus.CREATED).body(offerProfileResponse);
     }
@@ -82,7 +84,7 @@ public class TaskController {
             @RequestBody QuestionRequest questionRequest,
             Authentication authentication
     ) {
-        UUID accountId = (UUID) authentication.getPrincipal();
+        UUID accountId = jwtService.extractAccountId(authentication);
         QuestionProfileResponse response = taskService.createQuestion(questionRequest, taskId, accountId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -99,7 +101,7 @@ public class TaskController {
             @RequestBody AnswerRequest answerRequest,
             Authentication authentication
     ) {
-        UUID accountId = (UUID) authentication.getPrincipal();
+        UUID accountId = jwtService.extractAccountId(authentication);
         AnswerProfileResponse response = taskService.answerQuestion(answerRequest, taskId, accountId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
