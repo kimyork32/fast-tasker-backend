@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.net.URI;
 import java.time.LocalDateTime;
 
+// learning about HTTP Status Codes: https://datatracker.ietf.org/doc/html/rfc2616
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -23,8 +24,8 @@ public class GlobalExceptionHandler {
     private static final String TITLE_BAD_REQUEST = "Bad Request";
     private static final String TITLE_NOT_FOUND = "Not Found";
     private static final String TITLE_INTERNAL_ERROR = "Internal Server Error";
-    private static final String TYPE_EMAIL_EXISTS = "https://fasttasker.com/errors/email-exists";
-    private static final String TYPE_INVALID_DATA = "https://fasttasker.com/errors/invalid-data";
+    private static final String TYPE_EMAIL_EXISTS = "urn:problem:email-exists";
+    private static final String TYPE_INVALID_DATA = "urn:problem:invalid-data";
     private static final String MSG_UNEXPECTED_ERROR = "An unexpected error occurred";
 
     // Conflict Handling -> 409 conflict
