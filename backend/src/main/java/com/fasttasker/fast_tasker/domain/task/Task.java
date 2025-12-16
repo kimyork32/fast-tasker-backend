@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,7 +46,7 @@ public class Task {
      * budget must be a positive integer
      * greater than 5 and less than 999
      */
-    @Column(name = "budget", nullable = false) // IMPROVEMENT: nullable may be nullable
+    @Column(name = "budget", nullable = false)
     private int budget;
 
     /**
@@ -71,7 +72,7 @@ public class Task {
 
     /**
      * the ID of the account that posted this task.
-     * ForeignKey that links it to the Account .
+     * ForeignKey that links it to the Account.
      */
     @Column(name = "poster_id", nullable = false)
     private UUID posterId;
@@ -130,6 +131,128 @@ public class Task {
         this.assignedTaskerId = null;
     }
 
+    // ============================================================================
+    // ENCAPSULATION: Getters that return unmodifiable collections
+    // ============================================================================
+
+    /**
+     * Returns an unmodifiable view of the questions list.
+     * External code cannot modify the internal state through this getter.
+     *
+     * @return unmodifiable list of questions
+     */
+    public List<Question> getQuestions() {
+        return Collections.unmodifiableList(questions);
+    }
+
+    /**
+     * Returns an unmodifiable view of the offers list.
+     * External code cannot modify the internal state through this getter.
+     *
+     * @return unmodifiable list of offers
+     */
+    public List<Offer> getOffers() {
+        return Collections.unmodifiableList(offers);
+    }
+
+    // ============================================================================
+    // BUSINESS METHODS: Controlled manipulation of internal state
+    // ============================================================================
+
+    /**
+     * Business method to add a question to this task.
+     * Encapsulates the logic and validations for adding questions.
+     *
+     * @param question the question to add
+     * @throws DomainException if the task is not in a valid state to receive questions
+     */
+    public void addQuestion(Question question) {
+        if (question == null) {
+            throw new DomainException("Question cannot be null");
+        }
+        if (this.status == TaskStatus.COMPLETED || this.status == TaskStatus.CANCELLED) {
+            throw new DomainException("Cannot add questions to a completed or cancelled task");
+        }
+        this.questions.add(question);
+    }
+
+    /**
+     * Business method to add an offer to this task.
+     * Encapsulates the logic and validations for adding offers.
+     *
+     * @param offer the offer to add
+     * @throws DomainException if the task is not in a valid state to receive offers
+     */
+    public void addOffer(Offer offer) {
+        if (offer == null) {
+            throw new DomainException("Offer cannot be null");
+        }
+        if (this.status != TaskStatus.ACTIVE) {
+            throw new DomainException("Can only add offers to active tasks");
+        }
+        if (this.assignedTaskerId != null) {
+            throw new DomainException("Cannot add offers to an already assigned task");
+        }
+        this.offers.add(offer);
+    }
+
+    /**
+     * Business method to answer a question.
+     * This ensures the question belongs to this task and the task state allows it.
+     *
+     * @param questionId the ID of the question to answer
+     * @param answer the answer text
+     * @throws DomainException if the question doesn't exist or task state is invalid
+     */
+    public void answerQuestion(UUID questionId, Answer answer) {
+        if (answer == null) {
+            throw new DomainException("Answer cannot be null");
+        }
+
+        Question question = this.questions.stream()
+                .filter(q -> q.getId().equals(questionId))
+                .findFirst()
+                .orElseThrow(() -> new DomainException("Question not found in this task"));
+
+        if (this.status == TaskStatus.COMPLETED || this.status == TaskStatus.CANCELLED) {
+            throw new DomainException("Cannot answer questions on a completed or cancelled task");
+        }
+
+        question.addAnswer(answer);
+    }
+
+    /**
+     * Business method to accept an offer and assign the task.
+     *
+     * @param offerId the ID of the offer to accept
+     * @throws DomainException if the offer doesn't exist or task state is invalid
+     */
+    public void acceptOffer(UUID offerId) {
+        Offer offer = this.offers.stream()
+                .filter(o -> o.getId().equals(offerId))
+                .findFirst()
+                .orElseThrow(() -> new DomainException("Offer not found in this task"));
+
+        if (this.status != TaskStatus.ACTIVE) {
+            throw new DomainException("Only active tasks can have offers accepted");
+        }
+
+        // Mark the offer as accepted
+        offer.accept();
+
+        // Assign the tasker
+        this.assignTasker(offer.getTaskerId());
+
+        // Reject all other offers
+        this.offers.stream()
+                .filter(o -> !o.getId().equals(offerId))
+                .forEach(Offer::reject);
+    }
+
+    // ============================================================================
+    // EXISTING BUSINESS METHODS
+    // ============================================================================
+
     public void updateDetails(String newTitle, String newDescription) {
         if (newTitle == null || newTitle.isEmpty()) {
             throw new DomainException("Title cannot be null or empty");
@@ -146,8 +269,8 @@ public class Task {
     }
 
     public void adjustBudget(int newBudget) {
-        if (budget < 5 || budget > 999) {
-            throw new DomainException("Budget must be between 0 and 999");
+        if (newBudget < 5 || newBudget > 999) {
+            throw new DomainException("Budget must be between 5 and 999");
         }
         if (!this.offers.isEmpty() && newBudget < this.budget) {
             throw new DomainException("Cannot decrease budget when offers exist");
@@ -164,12 +287,10 @@ public class Task {
             throw new DomainException("Only active tasks can be assigned");
         }
 
-        // assign the offered price to the budget
         this.assignedTaskerId = taskerId;
         this.status = TaskStatus.ASSIGNED;
     }
 
-    // ASSIGNED to IN_PROGRESS
     public void startWork() {
         if (this.status != TaskStatus.ASSIGNED) {
             throw new DomainException("The task must be assigned in order to begin");
@@ -177,9 +298,6 @@ public class Task {
         this.status = TaskStatus.IN_PROGRESS;
     }
 
-    /**
-     * ASSIGNED/IN_PROGRESS to COMPLETED
-     */
     public void completeTask() {
         if (this.status != TaskStatus.ASSIGNED && this.status != TaskStatus.IN_PROGRESS) {
             throw new DomainException("You cannot complete a task that is not in progress or assigned");
@@ -187,14 +305,16 @@ public class Task {
         this.status = TaskStatus.COMPLETED;
     }
 
-    // cancel. This is complex
     public void cancel() {
         if (this.status == TaskStatus.COMPLETED) {
             throw new DomainException("You cannot cancel a task that has already been completed");
         }
-        // if it's ASSIGNED, there would be a refund logic here
         this.status = TaskStatus.CANCELLED;
     }
+
+    // ============================================================================
+    // PRIVATE VALIDATION METHODS
+    // ============================================================================
 
     private void validateBudget(int budget) {
         if (budget < 5 || budget > 999) {
@@ -202,10 +322,6 @@ public class Task {
         }
     }
 
-    /**
-     * ake sure the date is not invalid and is not in the past
-     * @param date date
-     */
     private void validateTaskDate(LocalDate date) {
         if (date == null) {
             throw new DomainException("Task date cannot be null");

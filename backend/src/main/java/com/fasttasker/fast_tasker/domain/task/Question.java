@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,7 +19,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "answers")
 public class Question {
 
     @Id
@@ -58,7 +59,7 @@ public class Question {
 
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
-    private List<Answer> answers = new ArrayList<>();
+    private final List<Answer> answers = new ArrayList<>();
 
     @Builder(toBuilder = true)
     public Question(String description, UUID askedById, Task task) {
@@ -77,6 +78,46 @@ public class Question {
         this.createdAt = Instant.now();
     }
 
+    // ============================================================================
+    // ENCAPSULATION: Getter that returns unmodifiable collection
+    // ============================================================================
+
+    /**
+     * Returns an unmodifiable view of the answers list.
+     * External code cannot modify the internal state through this getter.
+     *
+     * @return unmodifiable list of answers
+     */
+    public List<Answer> getAnswers() {
+        return Collections.unmodifiableList(answers);
+    }
+
+    // ============================================================================
+    // BUSINESS METHODS
+    // ============================================================================
+
+    /**
+     * Business method to add an answer to this question.
+     * This is the method that Task.answerQuestion() calls.
+     *
+     * @param answer the answer to add
+     * @throws DomainException if the answer is null or question is already answered
+     */
+    public void addAnswer(Answer answer) {
+        if (answer == null) {
+            throw new DomainException("Answer cannot be null");
+        }
+        if (this.status == QuestionStatus.ANSWERED) {
+            throw new DomainException("Question has already been answered");
+        }
+        if (this.status == QuestionStatus.DELETED) {
+            throw new DomainException("Cannot answer a deleted question");
+        }
+
+        this.answers.add(answer);
+        this.status = QuestionStatus.ANSWERED;
+    }
+
     public void editDescription(String newDescription) {
         validateDescription(newDescription);
 
@@ -87,6 +128,10 @@ public class Question {
         this.description = newDescription;
     }
 
+    /**
+     * Legacy method - kept for backward compatibility.
+     * Consider using addAnswer() instead for better encapsulation.
+     */
     public void postAnswer(String answerContent, UUID responderId) {
         var newAnswer = Answer.builder()
                 .description(answerContent)
@@ -94,8 +139,7 @@ public class Question {
                 .question(this)
                 .build();
 
-        this.answers.add(newAnswer);
-        this.status = QuestionStatus.ANSWERED;
+        this.addAnswer(newAnswer);
     }
 
     public void markAsDeleted() {
