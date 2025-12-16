@@ -2,6 +2,6 @@ package com.fasttasker.fast_tasker.application.exception;
 
 public class EmailAlreadyExistsException extends RuntimeException {
     public EmailAlreadyExistsException(String email) {
-        super("the email address" + email + " is already in use");
+        super("the email address '" + email + "' is already in use");
     }
 }

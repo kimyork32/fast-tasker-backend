@@ -59,6 +59,16 @@ public class JwtService {
         return UUID.fromString(id);
     }
 
+    /**
+     * extract the accountID from the security context
+     */
+    public UUID extractAccountId(Authentication authentication) {
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new IllegalStateException("cannot extract Account ID: Authentication is missing");
+        }
+        return (UUID) authentication.getPrincipal();
+    }
+
     public UUID extractTaskerId(Authentication authentication) {
         log.info("call extractTaskerId");
         log.info("authentication: {}", authentication);
