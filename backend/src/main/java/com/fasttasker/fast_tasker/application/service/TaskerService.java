@@ -29,12 +29,17 @@ public class TaskerService {
     private final NotificationService notificationService;
     private final ConversationService conversationService;
 
-    public TaskerService(ITaskerRepository taskerRepository, ITaskRepository taskRepository, TaskerMapper taskerMapper,
-                         NotificationService notificationService, ConversationService conversationService) {
+    public TaskerService(
+            ITaskerRepository taskerRepository,
+            ITaskRepository taskRepository,
+            TaskerMapper taskerMapper,
+            NotificationService notificationService,
+            ConversationService conversationService
+    ) {
         this.taskerRepository = taskerRepository;
-        this.notificationService = notificationService;
         this.taskRepository = taskRepository;
         this.taskerMapper = taskerMapper;
+        this.notificationService = notificationService;
         this.conversationService = conversationService;
     }
 
@@ -67,7 +72,7 @@ public class TaskerService {
 
     /**
      * get TaskerResponse by account id
-     * 
+     *
      * @param accountId account id
      * @return taskerResponse
      */
@@ -79,40 +84,65 @@ public class TaskerService {
 
     @Transactional
     public AssignTaskerResponse assignTaskToTasker(AssignTaskerRequest request, UUID accountId) {
-        UUID posterId = taskerRepository.findByAccountId(accountId).getId();
-        UUID taskId = UUID.fromString(request.taskId());
-        UUID taskerId = UUID.fromString(request.taskerId());
-        UUID offerId = UUID.fromString(request.offerId());
+        UUID posterId = getPosterIdFromAccount(accountId);
+
+        UUID taskId = parseUuid(request.taskId(), "taskId");
+        UUID taskerId = parseUuid(request.taskerId(), "taskerId");
+        UUID offerId = parseUuid(request.offerId(), "offerId");
 
         Task task = taskRepository.findById(taskId);
 
+        validatePosterOwnsTask(posterId, task);
+
+        assignTaskerAndSave(task, taskerId);
+
+        notifyOfferAccepted(taskerId, offerId);
+
+        UUID conversationId = startPosterTaskerConversation(taskId, posterId, taskerId);
+
+        sendGreetingMessage(conversationId, posterId);
+
+        return taskerMapper.toAssignTaskerResponse(request);
+    }
+
+    private UUID getPosterIdFromAccount(UUID accountId) {
+        return taskerRepository.findByAccountId(accountId).getId();
+    }
+
+    private UUID parseUuid(String raw, String fieldName) {
+        try {
+            return UUID.fromString(raw);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Invalid UUID for " + fieldName + ": " + raw, ex);
+        }
+    }
+
+    private void validatePosterOwnsTask(UUID posterId, Task task) {
         if (!posterId.equals(task.getPosterId())) {
             throw new TaskAccessDeniedException("User does not have permission to assign this task.");
         }
+    }
 
-        // save tasker how assignTasker in the task
+    private void assignTaskerAndSave(Task task, UUID taskerId) {
         task.assignTasker(taskerId);
         taskRepository.save(task);
+    }
 
-        // notifying of the tasker that the task has been assigned
+    private void notifyOfferAccepted(UUID taskerId, UUID offerId) {
         notificationService.sendNotification(taskerId, offerId, NotificationType.OFFER_ACCEPTED);
-        var conversationRequest = new ConversationRequest(
-                taskId,
-                posterId,
-                taskerId
-        );
+    }
 
-        // create a new conversation between the poster and the tasker
-        UUID conversationId = conversationService.startConversation(conversationRequest);
+    private UUID startPosterTaskerConversation(UUID taskId, UUID posterId, UUID taskerId) {
+        var conversationRequest = new ConversationRequest(taskId, posterId, taskerId);
+        return conversationService.startConversation(conversationRequest);
+    }
 
-        // poster sends a message to the tasker
+    private void sendGreetingMessage(UUID conversationId, UUID posterId) {
         var messageRequest = new MessageRequest(
                 conversationId,
                 new MessageContentRequest("Hola, te he asignado una tarea :)", null)
         );
         conversationService.processAndSendMessage(messageRequest, posterId);
-
-        return taskerMapper.toAssignTaskerResponse(request);
     }
 
     /**
@@ -128,5 +158,4 @@ public class TaskerService {
     public void getActiveTasks(UUID taskerId) {
         // TODO implement here
     }
-
 }
