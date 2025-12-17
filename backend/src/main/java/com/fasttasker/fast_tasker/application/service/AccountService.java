@@ -77,7 +77,7 @@ public class AccountService {
         // notifying of the tasker that your account has been created
         notificationService.sendNotification(savedTasker.getId(), null, NotificationType.SYSTEM);
 
-        return accountMapper.toResponse(account);
+        return accountMapper.toResponse(savedAccount);
     }
 
     @Transactional(readOnly = true)
