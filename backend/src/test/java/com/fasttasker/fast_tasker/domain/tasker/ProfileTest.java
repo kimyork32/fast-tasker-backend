@@ -1,6 +1,6 @@
 package com.fasttasker.fast_tasker.domain.tasker;
 
-import org.junit.jupiter.api.DisplayName;
+import com.fasttasker.fast_tasker.application.exception.DomainException;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,7 +37,7 @@ class ProfileTest {
                 .lastName("Perez")
                 .location(validLocation)
                 .build()
-        ).isInstanceOf(IllegalArgumentException.class)
+        ).isInstanceOf(DomainException.class)
                 .hasMessage("firstName and lastName cannot be null");
     }
 
@@ -48,7 +48,7 @@ class ProfileTest {
                 .lastName("Perez")
                 .location(validLocation)
                 .build()
-        ).isInstanceOf(IllegalArgumentException.class)
+        ).isInstanceOf(DomainException.class)
                 .hasMessage("firstName and lastName cannot be empty");
     }
 
@@ -59,7 +59,7 @@ class ProfileTest {
                 .lastName("Perez")
                 .location(null)
                 .build()
-        ).isInstanceOf(IllegalArgumentException.class)
+        ).isInstanceOf(DomainException.class)
                 .hasMessage("location cannot be null");
     }
 
@@ -73,7 +73,7 @@ class ProfileTest {
                 .location(validLocation)
                 .about(longAbout)
                 .build()
-        ).isInstanceOf(IllegalArgumentException.class)
+        ).isInstanceOf(DomainException.class)
                 .hasMessage("about cannot be longer than 200 characters");
     }
 }

@@ -1,6 +1,6 @@
 package com.fasttasker.fast_tasker.domain.tasker;
 
-import org.junit.jupiter.api.DisplayName;
+import com.fasttasker.fast_tasker.application.exception.DomainException;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -31,7 +31,7 @@ class TaskerTest {
     @Test
     void shouldThrowWhenAccountIdNull() {
         assertThatThrownBy(() -> new Tasker(null, validProfile))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(DomainException.class)
                 .hasMessage("accountId cannot be null");
     }
 

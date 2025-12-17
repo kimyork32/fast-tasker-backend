@@ -1,6 +1,6 @@
 package com.fasttasker.fast_tasker.domain.tasker;
 
-import org.junit.jupiter.api.DisplayName;
+import com.fasttasker.fast_tasker.application.exception.DomainException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -29,10 +29,11 @@ class LocationTest {
         assertThatThrownBy(() -> Location.builder()
                 .latitude(invalidLat)
                 .longitude(0)
+                .address("direction")
                 .zip("04001")
                 .build()
         )
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(DomainException.class)
                 .hasMessageContaining("latitude must be between -90 and 90");
     }
 
@@ -45,7 +46,7 @@ class LocationTest {
                 .zip("04001")
                 .build()
         )
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(DomainException.class)
                 .hasMessageContaining("longitude must be between -180 and 180");
     }
 
@@ -57,7 +58,7 @@ class LocationTest {
                 .zip("") // Empty
                 .build()
         )
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(DomainException.class)
                 .hasMessage("zip cannot be empty");
     }
 }
