@@ -51,7 +51,6 @@ class AccountServiceTest {
 
     @Test
     void shouldRegisterAccountSuccess() {
-        /*
         // 1. GIVEN
         var request = new RegisterAccountRequest(
                 "newUser@domain.com",
@@ -67,7 +66,7 @@ class AccountServiceTest {
         ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
         ArgumentCaptor<Tasker> taskerCaptor = ArgumentCaptor.forClass(Tasker.class);
 
-        when(accountRepository.getByEmailValue(request.email())).thenReturn(null);
+        when(accountRepository.existsByEmailValue(request.email())).thenReturn(Boolean.valueOf(false));
         when(passwordEncoder.encode(request.rawPassword())).thenReturn(hashedPassword);
         when(accountMapper.toResponse(any(Account.class))).thenReturn(responseDto);
 
@@ -75,7 +74,7 @@ class AccountServiceTest {
         AccountResponse response = accountService.registerAccount(request);
 
         // 3. THEN
-        verify(accountRepository).getByEmailValue("newUser@domain.com");
+        verify(accountRepository).existsByEmailValue("newUser@domain.com");
         verify(passwordEncoder).encode(request.rawPassword());
 
         verify(accountRepository).save(accountCaptor.capture());
@@ -96,8 +95,6 @@ class AccountServiceTest {
         assertThat(response.id()).isNotNull();
         assertThat(response.email()).isEqualTo("newUser@domain.com");
         assertThat(response.status()).isEqualTo(AccountStatus.PENDING_VERIFICATION);
-
-         */
     }
 
     @Test
