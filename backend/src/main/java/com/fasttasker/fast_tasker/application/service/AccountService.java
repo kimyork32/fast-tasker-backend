@@ -67,15 +67,15 @@ public class AccountService {
                 .build();
 
         // save account, if any error occurs then rollback
-        accountRepository.save(account);
+        Account savedAccount = accountRepository.save(account);
 
-        var defaultTasker = Tasker.createWithoutProfile(account.getId());
+        var defaultTasker = Tasker.createWithoutProfile(savedAccount.getId());
 
         // save tasker, if any error occurs then rollback
-        taskerRepository.save(defaultTasker);
+        Tasker savedTasker = taskerRepository.save(defaultTasker);
 
         // notifying of the tasker that your account has been created
-        notificationService.sendNotification(defaultTasker.getId(), null, NotificationType.SYSTEM);
+        notificationService.sendNotification(savedTasker.getId(), null, NotificationType.SYSTEM);
 
         return accountMapper.toResponse(account);
     }
