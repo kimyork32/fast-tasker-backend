@@ -1,6 +1,7 @@
 package com.fasttasker.fast_tasker.application;
 
 import com.fasttasker.fast_tasker.application.dto.account.AccountResponse;
+import com.fasttasker.fast_tasker.application.dto.account.LoginRequest;
 import com.fasttasker.fast_tasker.application.dto.account.LoginResponse;
 import com.fasttasker.fast_tasker.application.dto.account.RegisterAccountRequest;
 import com.fasttasker.fast_tasker.application.mapper.AccountMapper;
@@ -51,7 +52,6 @@ class AccountServiceTest {
 
     @Test
     void shouldRegisterAccountSuccess() {
-        /*
         // 1. GIVEN
         var request = new RegisterAccountRequest(
                 "newUser@domain.com",
@@ -67,19 +67,21 @@ class AccountServiceTest {
         ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
         ArgumentCaptor<Tasker> taskerCaptor = ArgumentCaptor.forClass(Tasker.class);
 
-        when(accountRepository.getByEmailValue(request.email())).thenReturn(null);
+        when(accountRepository.existsByEmailValue(request.email())).thenReturn(Boolean.valueOf(false));
         when(passwordEncoder.encode(request.rawPassword())).thenReturn(hashedPassword);
         when(accountMapper.toResponse(any(Account.class))).thenReturn(responseDto);
+        when(accountRepository.save(any(Account.class))).thenAnswer(i -> i.getArguments()[0]);
+        when(taskerRepository.save(any(Tasker.class))).thenAnswer(i -> i.getArguments()[0]);
 
         // 2. WHEN
         AccountResponse response = accountService.registerAccount(request);
 
         // 3. THEN
-        verify(accountRepository).getByEmailValue("newUser@domain.com");
+        verify(accountRepository).existsByEmailValue("newUser@domain.com");
         verify(passwordEncoder).encode(request.rawPassword());
-
         verify(accountRepository).save(accountCaptor.capture());
         Account savedAccount = accountCaptor.getValue();
+
         assertThat(savedAccount.getEmail().getValue()).isEqualTo(request.email());
         assertThat(savedAccount.getPassword().getValue()).isEqualTo(hashedPassword);
         assertThat(savedAccount.getStatus()).isEqualTo(AccountStatus.PENDING_VERIFICATION);
@@ -96,79 +98,82 @@ class AccountServiceTest {
         assertThat(response.id()).isNotNull();
         assertThat(response.email()).isEqualTo("newUser@domain.com");
         assertThat(response.status()).isEqualTo(AccountStatus.PENDING_VERIFICATION);
-
-         */
     }
 
     @Test
     void shouldLoginSuccess() {
-        /*
         // 1. GIVE
 
         // simulating an existing account
         String email = "old-user@domain.com";
         String rawPassword = "password123456";
-        String hashedPassword = "hashedPassword-xyz";
-        UUID accountId = UUID.randomUUID();
-
-        var accountToFind = new Account(
-                new Email(email),
-                new Password(hashedPassword)
-        );
 
         String fakeToken= "fake-token.eyJzdWIiOiJ";
 
-        var  fakeLocation = new Location(
-                -15.542353,
-                -12.252514,
-                "address fake",
-                "4141414"
-        );
+        double latitude = -85.542353;
+        double longitude = -172.252514;
+        String address = "fake address";
+        String zip = "04144";
 
-        var fakeProfile = new Profile(
-                "fakundo",
-                "gonzales",
-                "photo.com",
-                fakeLocation,
-                "about me"
-        );
+        String firstName = "fakundo";
+        String lastName = "Gonzales";
+        String about = "fake about";
 
-        var taskerSaved = new Tasker(
-                UUID.randomUUID(),
-                accountId,
-                fakeProfile
-        );
+        var loginRequest = new LoginRequest(email, rawPassword);
 
-        // simulating that the tasker EXISTS
-        when(taskerRepository.findById(accountToFind.getId()))
-                .thenReturn(taskerSaved);
+        var accountToFind = Account.builder()
+                .email(new Email(email))
+                .password(new Password(rawPassword))
+                .build();
+
+        var  fakeLocation = Location.builder()
+                .latitude(latitude)
+                .longitude(longitude)
+                .address(address)
+                .zip(zip)
+                .build();
+
+        var fakeProfile = Profile.builder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .photo("")
+                .location(fakeLocation)
+                .about(about)
+                .build();
+
+        var savedTasker = Tasker.builder()
+                .accountId(accountToFind.getId())
+                .profile(fakeProfile)
+                .build();
 
         // simulating that the email EXISTS
-        when(accountRepository.getByEmailValue(email))
+        when(accountRepository.getByEmailValue(loginRequest.email()))
                 .thenReturn(accountToFind);
 
         // simulating the hashing of the password
-        when(passwordEncoder.matches(rawPassword, hashedPassword))
-                .thenReturn(true);
+        when(passwordEncoder.matches(loginRequest.rawPassword(), accountToFind.getPassword().getValue()))
+                .thenReturn(Boolean.valueOf(true));
+
+        // simulating the tasker to find
+        when(taskerRepository.findByAccountId(accountToFind.getId())).thenReturn(savedTasker);
 
         // simulating the token generation to return the fake
-        when(jwtService.generateToken(accountId, true)).thenReturn(fakeToken);
+        when(jwtService.generateToken(accountToFind.getId(), savedTasker.getId(), true)).thenReturn(fakeToken);
+
         // 2. WHEN
-        LoginResponse response = accountService.login(email, rawPassword);
+        LoginResponse response = accountService.login(loginRequest);
 
         // 3. THEN
         // verify that the email was found
         verify(accountRepository).getByEmailValue(email);
 
         // verify that the password was hashed
-        verify(passwordEncoder).matches(rawPassword, hashedPassword);
+        verify(passwordEncoder).matches(rawPassword, accountToFind.getPassword().getValue());
 
-        // verifiy that generate token was called with correct ID
-        verify(jwtService).generateToken(accountId, true);
+        // verifying that generate token was called with correct ID
+        verify(jwtService).generateToken(accountToFind.getId(), savedTasker.getId(), true);
 
         assertThat(response).isNotNull();
         assertThat(response.token()).isEqualTo(fakeToken);
-
-         */
     }
 }
