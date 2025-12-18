@@ -52,9 +52,9 @@ public class TaskService {
 
         Task newTask = taskMapper.toTaskEntity(taskRequest, posterId);
 
-        taskRepository.save(newTask);
+        Task savedTask = taskRepository.save(newTask);
 
-        return taskMapper.toResponse(newTask);
+        return taskMapper.toResponse(savedTask);
     }
 
     /**
