@@ -65,9 +65,9 @@ public class TaskService {
         return taskRepository.findByStatus(TaskStatus.ACTIVE)
                 .stream() // convert to stream
                 .map(taskMapper::toResponse) // It applies a function (toResponse) to each element of
-                                             // the stream and returns a new stream with the results (TaskResponse)
+                // the stream and returns a new stream with the results (TaskResponse)
                 .toList();  // after processing the stream elements, it reconstructs
-                                                // the result into a concrete collection (List)
+        // the result into a concrete collection (List)
     }
 
     /**
@@ -270,6 +270,10 @@ public class TaskService {
                 .toList();
     }
 
+    /**
+     * Answers a question on a task.
+     * Now uses task.getQuestionById() for better encapsulation.
+     */
     @Transactional
     public AnswerProfileResponse answerQuestion(
             AnswerRequest answerRequest,
@@ -282,24 +286,19 @@ public class TaskService {
         // Find task
         Task task = findTask(taskId);
 
-        // Find question
-        Question question = task.getQuestions().stream()
-                .filter(q -> q.getId().equals(questionId))
-                .findFirst()
-                .orElseThrow(() -> new QuestionNotFoundException("TaskService. Question not found"));
+        // Use the new query method instead of stream
+        Question question = task.getQuestionById(questionId);
 
         Answer answer = taskMapper.toAnswerEntity(answerRequest, responderId, question);
 
-        // Use business method instead of direct list manipulation
+        // Use business method to add answer
         question.addAnswer(answer);
 
         // Save updated task
         Task taskSaved = taskRepository.save(task);
 
-        Question questionSaved = taskSaved.getQuestions().stream()
-                .filter(q -> q.getId().equals(questionId))
-                .findFirst()
-                .orElseThrow(() -> new QuestionNotFoundException("TaskService. Question not found"));
+        // Use the new query method to get the saved question
+        Question questionSaved = taskSaved.getQuestionById(questionId);
 
         Answer answerSaved = questionSaved.getAnswers().stream()
                 .filter(a -> a.getId().equals(answer.getId()))

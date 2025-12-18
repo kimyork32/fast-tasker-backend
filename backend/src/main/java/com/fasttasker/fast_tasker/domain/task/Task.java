@@ -330,4 +330,74 @@ public class Task {
             throw new DomainException("Task date cannot be in the past");
         }
     }
+    /**
+     * Retrieves a question by its ID from this task.
+     *
+     * @param questionId the ID of the question to find
+     * @return the Question if found
+     * @throws DomainException if the question is not found in this task
+     */
+    public Question getQuestionById(UUID questionId) {
+        if (questionId == null) {
+            throw new DomainException("Question ID cannot be null");
+        }
+
+        return this.questions.stream()
+                .filter(q -> q.getId().equals(questionId))
+                .findFirst()
+                .orElseThrow(() -> new DomainException(
+                        "Question with ID " + questionId + " not found in this task"
+                ));
+    }
+
+    /**
+     * Retrieves an offer by its ID from this task.
+     *
+     * @param offerId the ID of the offer to find
+     * @return the Offer if found
+     * @throws DomainException if the offer is not found in this task
+     */
+    public Offer getOfferById(UUID offerId) {
+        if (offerId == null) {
+            throw new DomainException("Offer ID cannot be null");
+        }
+
+        return this.offers.stream()
+                .filter(o -> o.getId().equals(offerId))
+                .findFirst()
+                .orElseThrow(() -> new DomainException(
+                        "Offer with ID " + offerId + " not found in this task"
+                ));
+    }
+
+    /**
+     * Checks if a question with the given ID exists in this task.
+     *
+     * @param questionId the ID of the question to check
+     * @return true if the question exists, false otherwise
+     */
+    public boolean hasQuestion(UUID questionId) {
+        if (questionId == null) {
+            return false;
+        }
+        return this.questions.stream()
+                .anyMatch(q -> q.getId().equals(questionId));
+    }
+
+    /**
+     * Checks if an offer with the given ID exists in this task.
+     *
+     * @param offerId the ID of the offer to check
+     * @return true if the offer exists, false otherwise
+     */
+    public boolean hasOffer(UUID offerId) {
+        if (offerId == null) {
+            return false;
+        }
+        return this.offers.stream()
+                .anyMatch(o -> o.getId().equals(offerId));
+    }
+
+
+
 }
