@@ -88,7 +88,7 @@ public class DataSeeder implements CommandLineRunner {
         // simulating that the tasker 2 creates an offer
         var offerRequest = new OfferRequest(
                 44,
-                "quiero hacer esto"
+                "me gustaría hacer esta tarea"
         );
         taskService.createOffer(
                 offerRequest,
