@@ -33,7 +33,7 @@ pipeline {
                         sh """
                             mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                             -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                            -Dsonar.token=${SONAR_TOKEN} \ 
+                            -Dsonar.token=${SONAR_TOKEN} \
                             -Dsonar.host.url=${SONAR_HOST_URL}
                         """
                     }
