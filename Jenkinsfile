@@ -30,10 +30,12 @@ pipeline {
                 dir('backend') {
                     script {
                         // Ejecutamos el comando de Maven con los mismos parámetros
-                        sh "mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                        sh """
+                            mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                             -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
                             -Dsonar.token=${SONAR_TOKEN} \ 
-                            -Dsonar.host.url=${SONAR_HOST_URL}"
+                            -Dsonar.host.url=${SONAR_HOST_URL}
+                        """
                     }
                 }
             }
