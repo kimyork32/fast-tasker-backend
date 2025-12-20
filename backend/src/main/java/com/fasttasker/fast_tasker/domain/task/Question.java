@@ -57,6 +57,9 @@ public class Question {
     @ToString.Exclude
     private Task task;
 
+    /**
+     * accepts multiple answers
+     */
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
     private final List<Answer> answers = new ArrayList<>();
@@ -106,9 +109,6 @@ public class Question {
     public void addAnswer(Answer answer) {
         if (answer == null) {
             throw new DomainException("Answer cannot be null");
-        }
-        if (this.status == QuestionStatus.ANSWERED) {
-            throw new DomainException("Question has already been answered");
         }
         if (this.status == QuestionStatus.DELETED) {
             throw new DomainException("Cannot answer a deleted question");
