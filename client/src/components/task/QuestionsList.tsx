@@ -14,6 +14,7 @@ interface QuestionsListProps {
   onQuestionSubmit: () => void;
   // Props para la caja de "responder una pregunta"
   onAnswerSubmit: (questionId: string, answerDescription: string) => void;
+  isCreator: boolean;
 }
 
 export function QuestionsList({ 
@@ -21,7 +22,8 @@ export function QuestionsList({
   questionDescription,
   setQuestionDescription,
   onQuestionSubmit,
-  onAnswerSubmit
+  onAnswerSubmit,
+  isCreator
 }: QuestionsListProps) {
   const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
   const [replyDescription, setReplyDescription] = useState('');
@@ -80,8 +82,12 @@ export function QuestionsList({
           ) : (
             questions.map(q => (
               <div key={q.question.id} className="flex gap-4 group">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${q.profile.photo || 'bg-gray-200 text-gray-500'}`}>
-                  {`${q.profile.firstName.slice(0, 2)}${q.profile.lastName.slice(0, 2)}`.toUpperCase()}
+                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden">
+                  {q.profile.photo ? (
+                    <img src={q.profile.photo} alt={q.profile.firstName} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-gray-500">{`${q.profile.firstName.slice(0, 2)}${q.profile.lastName.slice(0, 2)}`.toUpperCase()}</span>
+                  )}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
@@ -114,7 +120,11 @@ export function QuestionsList({
                             className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none resize-none bg-gray-50"
                           ></textarea>
                           <div className="flex justify-end mt-2">
-                            <button className="px-5 py-1.5 bg-black text-white text-xs font-bold rounded-full hover:bg-gray-800 transition" onClick={() => onAnswerSubmit(q.question.id, replyDescription)}>
+                            <button className="px-5 py-1.5 bg-black text-white text-xs font-bold rounded-full hover:bg-gray-800 transition" onClick={() => {
+                              onAnswerSubmit(q.question.id, replyDescription);
+                              setReplyDescription('');
+                              setActiveReplyId(null);
+                            }}>
                               Publicar respuesta
                             </button>
                           </div>
@@ -136,10 +146,10 @@ export function QuestionsList({
                         <div>
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-bold text-black text-xs">
-                              {ans.profile.firstName}
+                              {`${ans.profile.firstName} ${ans.profile.lastName}`}
                             </span>
                             <span className="text-xs text-gray-400">
-                              {formatLocaleDate(ans.answer.createAt)}
+                              {formatLocaleDate(ans.answer.createdAt)}
                             </span>
                           </div>
 

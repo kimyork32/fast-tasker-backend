@@ -158,6 +158,7 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
           numQuestions: prevTask.numQuestions + 1,
         };
       });
+      setQuestionDescription('');
     } catch(error) {
       console.error("Error al crear la pregunta:", error);
       alert("Hubo un error al enviar tu pregunta. Inténtalo de nuevo.");
@@ -174,25 +175,15 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
     };
 
     try {
-      // 1. Llama a tu servicio para crear la respuesta. Esto devuelve un `AnswerResponse`.
-      const newAnswerResponse = await createAnswer(taskId, answerRequest);
+      // 1. Llama a tu servicio. El backend devuelve un `AnswerProfileResponse` completo.
+      // Usamos 'as unknown as ...' para asegurar a TypeScript que es el tipo correcto.
+      const newAnswerProfile = await createAnswer(taskId, answerRequest) as unknown as AnswerProfileResponse;
+      console.log(`newAnswerResponse: ${JSON.stringify(newAnswerProfile)}`)
 
-      // 2. Construye el objeto `AnswerProfileResponse` que el estado espera.
-      //    Necesitamos el perfil del usuario actual. Asumimos que está en `taskComplete.profile`.
-      //    Si no es así, necesitarás obtenerlo de otra fuente.
-      if (!taskComplete?.profile) {
-        throw new Error("No se pudo encontrar el perfil del usuario actual para la respuesta.");
-      }
-
-      const newAnswerForState: AnswerProfileResponse = {
-        answer: newAnswerResponse,
-        profile: taskComplete.profile,
-      };
-
-      // 3. Actualiza el estado local con el objeto correctamente tipado.
+      // 2. Actualiza el estado local con el objeto que viene del backend.
       setQuestions(prevQuestions => prevQuestions.map(q => {
         if (q.question.id === questionId) {
-          return { ...q, answers: [...(q.answers || []), newAnswerForState] };
+          return { ...q, answers: [...(q.answers || []), newAnswerProfile] };
         }
         return q;
       }));

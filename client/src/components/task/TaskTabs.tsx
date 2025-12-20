@@ -82,6 +82,7 @@ export function TaskTabs({
             onQuestionSubmit={onQuestionSubmit} 
             setQuestionDescription={setQuestionDescription}
             onAnswerSubmit={onAnswerSubmit}
+            isCreator={isCreator}
           />
         )}
       </div>

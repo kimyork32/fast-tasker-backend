@@ -65,6 +65,7 @@ export interface MinimalProfileData {
 }
 
 export interface ChatProfileResponse {
+  id: string;
   firstName: string;
   lastName: string;
   photo?: string;
@@ -160,7 +161,7 @@ export interface OfferResponse {
 
 export interface OfferProfileResponse {
   offer: OfferResponse;
-  profile: MinimalProfileData;
+  profile: ChatProfileResponse;
 }
 
 // ---DTOs answer ---
@@ -171,15 +172,15 @@ export interface AnswerRequest {
 
 export interface AnswerResponse {
   id: string;
-  questionId: string;
   description: string;
-  status: string;
-  createAt: string;
+  questionId: string;
+  answeredAt: string;
+  createdAt: string;
 }
 
 export interface AnswerProfileResponse {
   answer: AnswerResponse;
-  profile: MinimalProfileData;
+  profile: ChatProfileResponse;
 }
 
 

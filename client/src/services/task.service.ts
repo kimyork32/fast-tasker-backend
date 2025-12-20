@@ -112,7 +112,7 @@ export const getQuestionsByTask = (taskId: string) : Promise<QuestionProfileResp
  * crear answer
  */
 export const createAnswer = (taskId: string, data: AnswerRequest) : Promise<AnswerResponse> => {
-  return apiClient<AnswerResponse>(`${TASK_PREFIX}/${taskId}/createAnswer`, {
+  return apiClient<AnswerResponse>(`${TASK_PREFIX}/${taskId}/answer`, {
     method: 'POST',
     body: JSON.stringify(data),
   }, true);
