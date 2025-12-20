@@ -1,6 +1,7 @@
 package com.fasttasker.fast_tasker.application.service;
 
 import com.fasttasker.fast_tasker.application.dto.task.*;
+import com.fasttasker.fast_tasker.application.dto.tasker.ChatProfileResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.MinimalProfileResponse;
 import com.fasttasker.fast_tasker.application.exception.*;
 import com.fasttasker.fast_tasker.application.mapper.TaskMapper;
@@ -12,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -95,12 +95,9 @@ public class TaskService {
     @Transactional(readOnly = true)
     public TaskCompleteResponse getTaskCompleteById(UUID taskId) {
         Task task = findTask(taskId);
-        log.info("task: {}", task.toString());
         Tasker tasker = taskerRepository.findById(task.getPosterId());
-        log.info("tasker: {}", tasker.toString());
 
         MinimalProfileResponse profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
-        log.info("profileResponse: {}", profileResponse.toString());
 
         return taskMapper.toTaskCompleteResponse(task, profileResponse);
     }
@@ -169,7 +166,7 @@ public class TaskService {
                             .map(answer -> {
                                 Tasker answerer = taskersById.get(answer.getResponderId());
                                 // answererProfileResponse
-                                MinimalProfileResponse apr = taskerMapper.toMinimalProfileResponse(answerer);
+                                ChatProfileResponse apr = taskerMapper.toChatProfileResponse(answerer);
                                 // answeredResponse
                                 AnswerResponse ar = taskMapper.toAnswerResponse(answer);
                                 return taskMapper.toAnswerProfileResponse(ar, apr);
@@ -308,9 +305,8 @@ public class TaskService {
         // Find tasker
         Tasker tasker = taskerRepository.findById(responderId);
 
-        MinimalProfileResponse profileResponse = taskerMapper.toMinimalProfileResponse(tasker);
+        ChatProfileResponse profileResponse = taskerMapper.toChatProfileResponse(tasker);
         AnswerResponse answerResponse = taskMapper.toAnswerResponse(answerSaved);
-
         return taskMapper.toAnswerProfileResponse(answerResponse, profileResponse);
     }
     /**

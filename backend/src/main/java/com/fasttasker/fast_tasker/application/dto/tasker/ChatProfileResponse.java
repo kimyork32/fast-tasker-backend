@@ -4,6 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record ChatProfileResponse (
+    String id,
     String firstName,
     String lastName,
     String photo

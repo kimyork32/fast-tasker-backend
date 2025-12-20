@@ -1,6 +1,7 @@
 package com.fasttasker.fast_tasker.application.mapper;
 
 import com.fasttasker.fast_tasker.application.dto.task.*;
+import com.fasttasker.fast_tasker.application.dto.tasker.ChatProfileResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.LocationResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.MinimalProfileResponse;
 import com.fasttasker.fast_tasker.domain.task.*;
@@ -158,6 +159,7 @@ public class TaskMapper {
         return AnswerResponse.builder()
                 .id(answer.getId().toString())
                 .description(answer.getDescription())
+                .questionId(answer.getQuestion().getId().toString())
                 .answeredId(answer.getResponderId().toString())
                 .createdAt(answer.getCreatedAt().toString())
                 .build();
@@ -165,7 +167,7 @@ public class TaskMapper {
 
     public AnswerProfileResponse toAnswerProfileResponse(
             AnswerResponse answer,
-            MinimalProfileResponse profile
+            ChatProfileResponse profile
     ) {
         return AnswerProfileResponse.builder()
                 .answer(answer)
