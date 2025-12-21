@@ -3,13 +3,14 @@ pipeline {
     tools { maven 'maven-3' }
 
     stages {
-        stage('Descargar Código') {
+        stage('clean and download code') {
             steps {
+                cleanWs()
                 checkout scm
             }
         }
         
-        stage('Compilar y Analizar') {
+        stage('compile and analize') {
             steps {
                 dir('backend') {
                     withSonarQubeEnv('sonar-server') {
