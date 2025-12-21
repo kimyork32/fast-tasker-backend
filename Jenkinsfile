@@ -6,6 +6,8 @@ pipeline {
         stage('clean and download code') {
             steps {
                 cleanWs()
+                sh 'rm -rf backend/.scannerwork'
+                sh 'rm -rf backend/target'
                 checkout scm
             }
         }
