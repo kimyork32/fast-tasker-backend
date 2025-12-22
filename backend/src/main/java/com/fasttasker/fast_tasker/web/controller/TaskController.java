@@ -36,9 +36,9 @@ public class TaskController {
             @RequestBody TaskRequest request,
             Authentication authentication
     ) {
-        UUID accountId = jwtService.extractAccountId(authentication);
+        UUID posterId = jwtService.extractTaskerId(authentication);
 
-        TaskResponse response = taskService.createTask(request, accountId);
+        TaskResponse response = taskService.createTask(request, posterId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
@@ -50,8 +50,8 @@ public class TaskController {
 
     @GetMapping("/my-tasks")
     public ResponseEntity<List<TaskResponse>> getAllMyTasks(Authentication authentication) {
-        UUID accountId = jwtService.extractAccountId(authentication);
-        List<TaskResponse> posterTasks = taskService.listTasksByPoster(accountId);
+        UUID posterId = jwtService.extractTaskerId(authentication);
+        List<TaskResponse> posterTasks = taskService.listTasksByPoster(posterId);
         return ResponseEntity.ok(posterTasks);
     }
 
@@ -67,8 +67,8 @@ public class TaskController {
             @RequestBody OfferRequest offerRequest,
             Authentication authentication
     ) {
-        UUID accountId = jwtService.extractAccountId(authentication);
-        OfferProfileResponse offerProfileResponse = taskService.createOffer(offerRequest, taskId, accountId);
+        UUID taskerId = jwtService.extractTaskerId(authentication);
+        OfferProfileResponse offerProfileResponse = taskService.createOffer(offerRequest, taskId, taskerId);
         return ResponseEntity.status(HttpStatus.CREATED).body(offerProfileResponse);
     }
 
@@ -84,8 +84,8 @@ public class TaskController {
             @RequestBody QuestionRequest questionRequest,
             Authentication authentication
     ) {
-        UUID accountId = jwtService.extractAccountId(authentication);
-        QuestionProfileResponse response = taskService.createQuestion(questionRequest, taskId, accountId);
+        UUID askedById = jwtService.extractTaskerId(authentication);
+        QuestionProfileResponse response = taskService.createQuestion(questionRequest, taskId, askedById);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -101,8 +101,8 @@ public class TaskController {
             @RequestBody AnswerRequest answerRequest,
             Authentication authentication
     ) {
-        UUID accountId = jwtService.extractAccountId(authentication);
-        AnswerProfileResponse response = taskService.answerQuestion(answerRequest, taskId, accountId);
+        UUID responderId = jwtService.extractTaskerId(authentication);
+        AnswerProfileResponse response = taskService.answerQuestion(answerRequest, taskId, responderId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

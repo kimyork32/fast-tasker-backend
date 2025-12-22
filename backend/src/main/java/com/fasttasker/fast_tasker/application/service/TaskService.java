@@ -47,9 +47,7 @@ public class TaskService {
      *
      */
     @Transactional
-    public TaskResponse createTask(TaskRequest taskRequest, UUID accountId) {
-        UUID posterId = taskerRepository.findByAccountId(accountId).getId();
-
+    public TaskResponse createTask(TaskRequest taskRequest, UUID posterId) {
         Task newTask = taskMapper.toTaskEntity(taskRequest, posterId);
 
         Task savedTask = taskRepository.save(newTask);
@@ -74,9 +72,7 @@ public class TaskService {
      * return all tasks created by a specific user (Tasker)
      */
     @Transactional(readOnly = true)
-    public List<TaskResponse> listTasksByPoster(UUID accountId) {
-        UUID posterId = taskerRepository.findByAccountId(accountId).getId();
-
+    public List<TaskResponse> listTasksByPoster(UUID posterId) {
         return taskRepository.findByPosterId(posterId)
                 .stream()
                 .map(taskMapper::toResponse)
@@ -103,9 +99,7 @@ public class TaskService {
     }
 
     @Transactional
-    public QuestionProfileResponse createQuestion(QuestionRequest questionRequest, UUID taskId, UUID accountId) {
-        UUID askedById = taskerRepository.findByAccountId(accountId).getId();
-
+    public QuestionProfileResponse createQuestion(QuestionRequest questionRequest, UUID taskId, UUID askedById) {
         // Find task for the question
         Task task = findTask(taskId);
         Question question = taskMapper.toQuestionEntity(questionRequest, askedById, task);
@@ -197,9 +191,7 @@ public class TaskService {
      * @param taskId id of the task
      */
     @Transactional
-    public OfferProfileResponse createOffer(OfferRequest offerRequest, UUID taskId, UUID accountId) {
-
-        UUID taskerId = taskerRepository.findByAccountId(accountId).getId();
+    public OfferProfileResponse createOffer(OfferRequest offerRequest, UUID taskId, UUID taskerId) {
 
         // Find task
         Task task = findTask(taskId);
@@ -275,9 +267,8 @@ public class TaskService {
     public AnswerProfileResponse answerQuestion(
             AnswerRequest answerRequest,
             UUID taskId,
-            UUID accountId
+            UUID responderId
     ) {
-        UUID responderId = taskerRepository.findByAccountId(accountId).getId();
         UUID questionId = UUID.fromString(answerRequest.questionId());
 
         // Find task

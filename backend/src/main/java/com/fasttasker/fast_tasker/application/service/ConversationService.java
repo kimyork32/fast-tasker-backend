@@ -64,8 +64,7 @@ public class ConversationService {
      * @return list of conversations
      */
     @Transactional(readOnly = true)
-    public List<ConversationSummary> getUserInbox(UUID accountId) {
-        UUID taskerId = taskerRepository.findByAccountId(accountId).getId();
+    public List<ConversationSummary> getUserInbox(UUID taskerId) {
 
         log.info("taskerId: {}", taskerId);
         return conversationRepository.findByParticipantId(taskerId).stream()
