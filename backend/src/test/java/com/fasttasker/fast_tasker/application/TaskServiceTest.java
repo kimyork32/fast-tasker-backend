@@ -67,22 +67,18 @@ class TaskServiceTest {
                 .build();
 
         // Mocking Mapper and Repository
-        Tasker mockTasker = mock(Tasker.class);
         Task mockTask = mock(Task.class);
         Task mockSavedTask = mock(Task.class);
-        UUID mockAccountId = UUID.randomUUID();
         UUID mockPosterId = UUID.randomUUID();
         TaskResponse mockResponse = mock(TaskResponse.class);
 
-        when(taskerRepository.findByAccountId(mockAccountId)).thenReturn(mockTasker);
-        when(mockTasker.getId()).thenReturn(mockPosterId);
         when(taskMapper.toTaskEntity(taskRequest, mockPosterId)).thenReturn(mockTask);
         when(taskRepository.save(mockTask)).thenReturn(mockSavedTask);
         when(taskMapper.toResponse(mockSavedTask)).thenReturn(mockResponse);
         when(mockResponse.title()).thenReturn(taskRequest.title());
 
         // 2. WHEN
-        TaskResponse taskResponse = taskService.createTask(taskRequest, mockAccountId);
+        TaskResponse taskResponse = taskService.createTask(taskRequest, mockPosterId);
 
         // 3. THEN
         // verify the DTO response
@@ -100,7 +96,6 @@ class TaskServiceTest {
                 .description("answer description")
                 .build();
         UUID taskId = UUID.randomUUID();
-        UUID accountId = UUID.randomUUID();
         UUID responderId = UUID.randomUUID();
         UUID answerId = UUID.randomUUID();
 
@@ -116,8 +111,6 @@ class TaskServiceTest {
         AnswerResponse mockAnswerResponse = mock(AnswerResponse.class);
         AnswerProfileResponse mockProfileResponse = mock(AnswerProfileResponse.class);
 
-        when(taskerRepository.findByAccountId(accountId)).thenReturn(mockTasker);
-        when(mockTasker.getId()).thenReturn(responderId);
         when(taskRepository.findById(taskId)).thenReturn(mockTask);
         when(mockTask.getQuestionById(questionId)).thenReturn(mockQuestion);
         when(taskMapper.toAnswerEntity(answerRequest, responderId, mockQuestion)).thenReturn(mockAnswer);
@@ -132,7 +125,7 @@ class TaskServiceTest {
         when(taskMapper.toAnswerProfileResponse(mockAnswerResponse, mockChatProfile)).thenReturn(mockProfileResponse);
 
         // WHEN
-        AnswerProfileResponse result = taskService.answerQuestion(answerRequest, taskId, accountId);
+        AnswerProfileResponse result = taskService.answerQuestion(answerRequest, taskId, responderId);
 
         // THEN
         assertThat(result)
