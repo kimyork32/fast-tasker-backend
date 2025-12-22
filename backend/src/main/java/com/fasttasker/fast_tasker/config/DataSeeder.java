@@ -1,5 +1,6 @@
 package com.fasttasker.fast_tasker.config;
 
+import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
 import com.fasttasker.fast_tasker.application.service.AccountService;
 import com.fasttasker.fast_tasker.application.service.TaskService;
 import com.fasttasker.fast_tasker.application.service.TaskerService;
@@ -64,8 +65,8 @@ public class DataSeeder implements CommandLineRunner {
                         .build())
                 .build();
 
-        taskerService.registerTasker(taskerRequest1);
-        taskerService.registerTasker(taskerRequest2);
+        TaskerResponse taskerResponse1 = taskerService.registerTasker(taskerRequest1);
+        TaskerResponse taskerResponse2 = taskerService.registerTasker(taskerRequest2);
 
 
         // simulating that the tasker creating a task
@@ -82,7 +83,7 @@ public class DataSeeder implements CommandLineRunner {
                 .taskDate("2026-12-31")
                 .build();
 
-        TaskResponse taskResponse = taskService.createTask(taskRequest, UUID.fromString(accountResponse1.id()));
+        TaskResponse taskResponse = taskService.createTask(taskRequest, UUID.fromString(taskerResponse1.id()));
 
 
         // simulating that the tasker 2 creates an offer
@@ -93,6 +94,6 @@ public class DataSeeder implements CommandLineRunner {
         taskService.createOffer(
                 offerRequest,
                 UUID.fromString(taskResponse.id()),
-                UUID.fromString(accountResponse2.id()));
+                UUID.fromString(taskerResponse2.id()));
     }
 }
