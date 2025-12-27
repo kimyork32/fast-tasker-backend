@@ -1,139 +1,315 @@
 package com.fasttasker.fast_tasker.application;
 
 import com.fasttasker.fast_tasker.application.dto.task.*;
-import com.fasttasker.fast_tasker.application.dto.tasker.ChatProfileResponse;
-import com.fasttasker.fast_tasker.application.dto.tasker.LocationRequest;
-import com.fasttasker.fast_tasker.application.dto.tasker.ProfileResponse;
+import com.fasttasker.fast_tasker.application.dto.tasker.*;
+import com.fasttasker.fast_tasker.application.exception.TaskNotFoundException;
 import com.fasttasker.fast_tasker.application.mapper.TaskMapper;
 import com.fasttasker.fast_tasker.application.mapper.TaskerMapper;
 import com.fasttasker.fast_tasker.application.service.TaskService;
-import com.fasttasker.fast_tasker.domain.task.Answer;
-import com.fasttasker.fast_tasker.domain.task.ITaskRepository;
-import com.fasttasker.fast_tasker.domain.task.Question;
-import com.fasttasker.fast_tasker.domain.task.Task;
+import com.fasttasker.fast_tasker.domain.task.*;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import com.fasttasker.fast_tasker.domain.tasker.Tasker;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
-/**
- * Unit test for TaskService
- */
 @ExtendWith(MockitoExtension.class)
 class TaskServiceTest {
 
     @Mock
-    private ITaskRepository taskRepository;
-
+    ITaskRepository taskRepository;
     @Mock
-    private ITaskerRepository taskerRepository;
-
+    ITaskerRepository taskerRepository;
     @Mock
-    private TaskMapper taskMapper;
-
+    TaskMapper taskMapper;
     @Mock
-    private TaskerMapper taskerMapper;
+    TaskerMapper taskerMapper;
 
     @InjectMocks
-    private TaskService taskService;
+    TaskService taskService;
 
-    @Test
-    void shouldSaveTaskSuccess() {
-        // 1. GIVEN
-        var locationRequest = LocationRequest.builder()
-                .latitude(-13.412453)
-                .longitude(-12.158023)
-                .address("address street")
-                .zip("04014")
-                .build();
+    final UUID taskId = UUID.randomUUID();
+    final UUID taskerId = UUID.randomUUID();
+    final UUID posterId = UUID.randomUUID();
+    Task task;
 
-        var taskRequest = TaskRequest.builder()
-                .title("title for task")
-                .description("description for task")
-                .budget(200)
-                .location(locationRequest)
-                .taskDate("2030-12-31")
-                .build();
-
-        // Mocking Mapper and Repository
-        Task mockTask = mock(Task.class);
-        Task mockSavedTask = mock(Task.class);
-        UUID mockPosterId = UUID.randomUUID();
-        TaskResponse mockResponse = mock(TaskResponse.class);
-
-        when(taskMapper.toTaskEntity(taskRequest, mockPosterId)).thenReturn(mockTask);
-        when(taskRepository.save(mockTask)).thenReturn(mockSavedTask);
-        when(taskMapper.toResponse(mockSavedTask)).thenReturn(mockResponse);
-        when(mockResponse.title()).thenReturn(taskRequest.title());
-
-        // 2. WHEN
-        TaskResponse taskResponse = taskService.createTask(taskRequest, mockPosterId);
-
-        // 3. THEN
-        // verify the DTO response
-        assertThat(taskResponse).isNotNull();
-        assertThat(taskResponse.title()).isEqualTo(taskRequest.title());
-        verify(taskRepository).save(mockTask);
+    @BeforeEach
+    void setUp() {
+        task = mock(Task.class);
     }
 
-    @Test
-    void shouldAnswerQuestionSuccess() {
-        // GIVEN
-        UUID questionId = UUID.randomUUID();
-        var answerRequest = AnswerRequest.builder()
-                .questionId(questionId.toString())
-                .description("answer description")
-                .build();
-        UUID taskId = UUID.randomUUID();
-        UUID responderId = UUID.randomUUID();
-        UUID answerId = UUID.randomUUID();
+    @Nested
+    @DisplayName("createTask()")
+    class CreateTask {
+        @Test
+        @DisplayName("Saves task and returns response")
+        void savesTaskWhenValid() {
+            TaskRequest request = mock(TaskRequest.class);
+            Task taskEntity = mock(Task.class);
+            TaskResponse response = mock(TaskResponse.class);
 
-        // Mocks
-        Task mockTask = mock(Task.class);
-        Question mockQuestion = mock(Question.class);
-        Answer mockAnswer = mock(Answer.class);
-        Task mockSavedTask = mock(Task.class);
-        Question mockSavedQuestion = mock(Question.class);
-        Answer mockSavedAnswer = mock(Answer.class);
-        Tasker mockTasker = mock(Tasker.class);
-        ChatProfileResponse mockChatProfile = mock(ChatProfileResponse.class);
-        AnswerResponse mockAnswerResponse = mock(AnswerResponse.class);
-        AnswerProfileResponse mockProfileResponse = mock(AnswerProfileResponse.class);
+            when(taskMapper.toTaskEntity(request, posterId)).thenReturn(taskEntity);
+            when(taskRepository.save(taskEntity)).thenReturn(taskEntity);
+            when(taskMapper.toResponse(taskEntity)).thenReturn(response);
 
-        when(taskRepository.findById(taskId)).thenReturn(mockTask);
-        when(mockTask.getQuestionById(questionId)).thenReturn(mockQuestion);
-        when(taskMapper.toAnswerEntity(answerRequest, responderId, mockQuestion)).thenReturn(mockAnswer);
-        when(mockAnswer.getId()).thenReturn(answerId);
-        when(mockSavedAnswer.getId()).thenReturn(answerId);
-        when(taskRepository.save(mockTask)).thenReturn(mockSavedTask);
-        when(mockSavedTask.getQuestionById(questionId)).thenReturn(mockSavedQuestion);
-        when(mockSavedQuestion.getAnswers()).thenReturn(List.of(mockSavedAnswer));
-        when(taskerRepository.findById(responderId)).thenReturn(mockTasker);
-        when(taskerMapper.toChatProfileResponse(mockTasker)).thenReturn(mockChatProfile);
-        when(taskMapper.toAnswerResponse(mockSavedAnswer)).thenReturn(mockAnswerResponse);
-        when(taskMapper.toAnswerProfileResponse(mockAnswerResponse, mockChatProfile)).thenReturn(mockProfileResponse);
+            var result = taskService.createTask(request, posterId);
 
-        // WHEN
-        AnswerProfileResponse result = taskService.answerQuestion(answerRequest, taskId, responderId);
+            assertThat(result).isEqualTo(response);
+            verify(taskRepository).save(taskEntity);
+        }
+    }
 
-        // THEN
-        assertThat(result)
-                .isNotNull()
-                .isEqualTo(mockProfileResponse);
+    @Nested
+    @DisplayName("Listing Tasks")
+    class ListTasks {
+        @Test
+        @DisplayName("listActiveTasks: returns mapped list")
+        void listActiveTasksReturnsList() {
+            when(taskRepository.findByStatus(TaskStatus.ACTIVE)).thenReturn(List.of(task));
+            when(taskMapper.toResponse(task)).thenReturn(mock(TaskResponse.class));
 
-        verify(mockQuestion).addAnswer(mockAnswer);
-        verify(taskRepository).save(mockTask);
+            assertThat(taskService.listActiveTasks()).hasSize(1);
+        }
 
+        @Test
+        @DisplayName("listTasksByPoster: returns mapped list")
+        void listTasksByPosterReturnsList() {
+            when(taskRepository.findByPosterId(posterId)).thenReturn(List.of(task));
+            when(taskMapper.toResponse(task)).thenReturn(mock(TaskResponse.class));
+
+            assertThat(taskService.listTasksByPoster(posterId)).hasSize(1);
+        }
+    }
+
+    @Nested
+    @DisplayName("getTaskById()")
+    class GetTaskById {
+        @Test
+        @DisplayName("Returns response when found")
+        void returnsResponseWhenFound() {
+            when(taskRepository.findById(taskId)).thenReturn(task);
+
+            TaskResponse response = mock(TaskResponse.class);
+            when(taskMapper.toResponse(task)).thenReturn(response);
+
+            assertThat(taskService.getTaskById(taskId)).isEqualTo(response);
+        }
+
+        @Test
+        @DisplayName("Throws exception when not found")
+        void throwsExceptionWhenNotFound() {
+            when(taskRepository.findById(taskId)).thenReturn(null);
+
+            assertThatThrownBy(() -> taskService.getTaskById(taskId))
+                    .isInstanceOf(TaskNotFoundException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("getTaskCompleteById()")
+    class GetTaskComplete {
+        @Test
+        @DisplayName("Returns complete response with profile")
+        void returnsCompleteResponse() {
+            when(taskRepository.findById(taskId)).thenReturn(task);
+            when(task.getPosterId()).thenReturn(posterId);
+
+            Tasker tasker = mock(Tasker.class);
+            when(taskerRepository.findById(posterId)).thenReturn(tasker);
+
+            TaskCompleteResponse response = mock(TaskCompleteResponse.class);
+            when(taskMapper.toTaskCompleteResponse(eq(task), any())).thenReturn(response);
+
+            assertThat(taskService.getTaskCompleteById(taskId)).isEqualTo(response);
+        }
+    }
+
+    @Nested
+    @DisplayName("createQuestion()")
+    class CreateQuestion {
+        @Test
+        @DisplayName("Adds question and returns profile response")
+        void addsQuestionSuccessfully() {
+            QuestionRequest request = mock(QuestionRequest.class);
+            Question question = mock(Question.class);
+            UUID questionId = UUID.randomUUID();
+
+            when(taskRepository.findById(taskId)).thenReturn(task);
+
+            when(taskMapper.toQuestionEntity(request, taskerId, task)).thenReturn(question);
+            when(question.getId()).thenReturn(questionId);
+            when(question.getAskedById()).thenReturn(taskerId);
+
+            when(task.getQuestions()).thenReturn(List.of(question));
+            when(taskRepository.save(task)).thenReturn(task);
+
+            when(taskerRepository.findById(taskerId)).thenReturn(mock(Tasker.class));
+
+            QuestionProfileResponse response = mock(QuestionProfileResponse.class);
+            when(taskMapper.toQuestionProfileResponse(any(), any(), any())).thenReturn(response);
+
+            var result = taskService.createQuestion(request, taskId, taskerId);
+
+            assertThat(result).isEqualTo(response);
+            verify(task).addQuestion(question);
+        }
+    }
+
+    @Nested
+    @DisplayName("listQuestionsByTask()")
+    class ListQuestions {
+        @BeforeEach
+        void init() {
+            when(taskRepository.findById(taskId)).thenReturn(task);
+        }
+
+        @Test
+        @DisplayName("Returns empty when no questions")
+        void returnsEmptyWhenNone() {
+            when(task.getQuestions()).thenReturn(Collections.emptyList());
+            assertThat(taskService.listQuestionsByTask(taskId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Returns mapped DTOs when questions exist")
+        void returnsMappedDtosWhenExist() {
+            Question question = mock(Question.class);
+            Answer answer = mock(Answer.class);
+            UUID responderId = UUID.randomUUID();
+
+            when(question.getAskedById()).thenReturn(taskerId);
+
+            when(answer.getResponderId()).thenReturn(responderId);
+            when(question.getAnswers()).thenReturn(List.of(answer));
+
+            when(task.getQuestions()).thenReturn(List.of(question));
+
+            when(taskerRepository.findAllById(anyList())).thenReturn(List.of(mock(Tasker.class), mock(Tasker.class)));
+
+            when(taskMapper.toQuestionResponse(question)).thenReturn(mock(QuestionResponse.class));
+            when(taskMapper.toAnswerResponse(answer)).thenReturn(mock(AnswerResponse.class));
+            when(taskerMapper.toMinimalProfileResponse(any())).thenReturn(mock(MinimalProfileResponse.class));
+
+            when(taskerMapper.toChatProfileResponse(any())).thenReturn(mock(ChatProfileResponse.class));
+
+            when(taskMapper.toQuestionProfileResponse(any(), any(), anyList())).thenReturn(mock(QuestionProfileResponse.class));
+
+            var result = taskService.listQuestionsByTask(taskId);
+
+            assertThat(result).isNotEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("createOffer()")
+    class CreateOffer {
+        @Test
+        @DisplayName("Adds offer and returns response")
+        void addsOfferSuccessfully() {
+            OfferRequest request = mock(OfferRequest.class);
+            Offer offer = mock(Offer.class);
+            UUID offerId = UUID.randomUUID();
+
+            when(taskRepository.findById(taskId)).thenReturn(task);
+            when(taskMapper.toOfferEntity(request, taskerId, task)).thenReturn(offer);
+            when(offer.getId()).thenReturn(offerId);
+
+            when(task.getOffers()).thenReturn(List.of(offer));
+            when(taskRepository.save(task)).thenReturn(task);
+
+            when(taskerRepository.findById(taskerId)).thenReturn(mock(Tasker.class));
+
+            OfferProfileResponse response = mock(OfferProfileResponse.class);
+            when(taskMapper.toOfferProfileResponse(any(), any())).thenReturn(response);
+
+            var result = taskService.createOffer(request, taskId, taskerId);
+
+            assertThat(result).isEqualTo(response);
+            verify(task).addOffer(offer);
+        }
+    }
+
+    @Nested
+    @DisplayName("listOffersByTask()")
+    class ListOffers {
+        @BeforeEach
+        void init() {
+            when(taskRepository.findById(taskId)).thenReturn(task);
+        }
+
+        @Test
+        @DisplayName("Returns empty when no offers")
+        void returnsEmptyWhenNone() {
+            when(task.getOffers()).thenReturn(Collections.emptyList());
+            assertThat(taskService.listOffersByTask(taskId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Returns mapped offers when exist")
+        void returnsOffersWhenExist() {
+            Offer offer = mock(Offer.class);
+            when(offer.getOffertedById()).thenReturn(taskerId);
+
+            when(task.getOffers()).thenReturn(List.of(offer));
+            when(taskerRepository.findAllById(anyList())).thenReturn(List.of(mock(Tasker.class)));
+
+            OfferProfileResponse expectedDto = mock(OfferProfileResponse.class);
+            when(taskMapper.toOfferProfileResponse(any(), any())).thenReturn(expectedDto);
+
+            assertThat(taskService.listOffersByTask(taskId))
+                    .hasSize(1)
+                    .first().isEqualTo(expectedDto);
+        }
+    }
+
+    @Nested
+    @DisplayName("answerQuestion()")
+    class AnswerQuestion {
+        @Test
+        @DisplayName("Adds answer and returns response")
+        void addsAnswerSuccessfully() {
+            UUID questionId = UUID.randomUUID();
+            UUID answerId = UUID.randomUUID();
+            AnswerRequest request = new AnswerRequest(questionId.toString(), "Answer text");
+
+            Question question = mock(Question.class);
+            Answer answer = mock(Answer.class);
+
+            when(taskRepository.findById(taskId)).thenReturn(task);
+            when(task.getQuestionById(questionId)).thenReturn(question);
+
+            when(taskMapper.toAnswerEntity(request, taskerId, question)).thenReturn(answer);
+            when(answer.getId()).thenReturn(answerId);
+
+            when(taskRepository.save(task)).thenReturn(task);
+            when(task.getQuestionById(questionId)).thenReturn(question);
+            when(question.getAnswers()).thenReturn(List.of(answer));
+
+            when(taskerRepository.findById(taskerId)).thenReturn(mock(Tasker.class));
+
+            AnswerProfileResponse response = mock(AnswerProfileResponse.class);
+            when(taskMapper.toAnswerProfileResponse(any(), any())).thenReturn(response);
+
+            var result = taskService.answerQuestion(request, taskId, taskerId);
+
+            assertThat(result).isEqualTo(response);
+            verify(question).addAnswer(answer);
+        }
     }
 }
