@@ -1,0 +1,177 @@
+package com.fasttasker.fast_tasker.application.mapper;
+
+import com.fasttasker.fast_tasker.application.dto.task.*;
+import com.fasttasker.fast_tasker.application.dto.tasker.ChatProfileResponse;
+import com.fasttasker.fast_tasker.application.dto.tasker.LocationResponse;
+import com.fasttasker.fast_tasker.application.dto.tasker.MinimalProfileResponse;
+import com.fasttasker.fast_tasker.domain.task.*;
+import com.fasttasker.fast_tasker.domain.tasker.Location;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+@Component
+public class TaskMapper {
+    // toEntity //////////////////////////////////////
+    public Task toTaskEntity(TaskRequest request, UUID posterId) {
+        if (request == null) return null;
+
+        return Task.builder()
+                .title(request.title())
+                .description(request.description())
+                .budget(request.budget())
+                .location(Location.builder()
+                        .latitude(request.location().latitude())
+                        .longitude(request.location().longitude())
+                        .address(request.location().address())
+                        .zip(request.location().zip())
+                        .build())
+                .taskDate(LocalDate.parse(request.taskDate()))
+                .posterId(posterId)
+                .build();
+        // Note: assignedTaskerId, questions, offers are managed internally by the entity
+    }
+
+    /**
+     * Creates an Offer entity from a request.
+     * IMPORTANT: This creates a partial Offer. You must call task.addOffer(offer)
+     * to properly associate it with a task and set remaining fields.
+     *
+     * Alternative: Use the full constructor with all required fields.
+     */
+    public Offer toOfferEntity(OfferRequest request, UUID offertedById, Task task) {
+        if (request == null) return null;
+
+        // Use the full constructor that validates and sets all fields including ID
+        return Offer.builder()
+                .price(request.price())
+                .description(request.description())
+                .offertedById(offertedById)
+                .task(task)
+                .build();
+        // The constructor now handles: id generation, status (PENDING), createdAt (now)
+    }
+
+    public Question toQuestionEntity(QuestionRequest request, UUID askedById, Task task) {
+        if (request == null) return null;
+
+        return Question.builder()
+                .description(request.description())
+                .askedById(askedById)
+                .task(task)
+                .build();
+        // The constructor handles: id generation, status (PENDING), createdAt (now)
+    }
+
+    public Answer toAnswerEntity(AnswerRequest request, UUID responderId, Question question) {
+        if (request == null) return null;
+
+        return Answer.builder()
+                .description(request.description())
+                .responderId(responderId)
+                .question(question)
+                .build();
+    }
+
+    // toResponse //////////////////////////////////////
+    public TaskResponse toResponse(Task task) {
+        if (task == null) return null;
+
+        var location = task.getLocation();
+
+        var locationResponse = LocationResponse.builder()
+                .latitude(location.getLatitude())
+                .longitude(location.getLongitude())
+                .address(location.getAddress())
+                .build();
+
+        return TaskResponse.builder()
+                .id(task.getId().toString())
+                .title(task.getTitle())
+                .description(task.getDescription())
+                .budget(task.getBudget())
+                .location(locationResponse)
+                .taskDate(task.getTaskDate().toString())
+                .status(task.getStatus().name())
+                .posterId(task.getPosterId().toString())
+                .build();
+    }
+
+    public OfferResponse toOfferResponse(Offer offer) {
+        if (offer == null) return null;
+
+        return OfferResponse.builder()
+                .id(offer.getId().toString())
+                .price(offer.getPrice())
+                .description(offer.getDescription())
+                .status(offer.getStatus().name())
+                .createAt(offer.getCreatedAt().toString())
+                .build();
+    }
+
+    public OfferProfileResponse toOfferProfileResponse(
+            OfferResponse offer,
+            MinimalProfileResponse profile
+    ) {
+        return new OfferProfileResponse(offer, profile);
+    }
+
+    public TaskCompleteResponse toTaskCompleteResponse(
+            Task task,
+            MinimalProfileResponse profile
+    ) {
+        return new TaskCompleteResponse(
+                toResponse(task),
+                profile,
+                task.getOffers().size(),
+                task.getQuestions().size()
+        );
+    }
+
+    public QuestionResponse toQuestionResponse(Question question) {
+        if (question == null) return null;
+
+        return QuestionResponse.builder()
+                .id(question.getId().toString())
+                .description(question.getDescription())
+                .status(question.getStatus().name())
+                .createAt(question.getCreatedAt().toString())
+                .build();
+    }
+
+    public QuestionProfileResponse toQuestionProfileResponse(
+            QuestionResponse question,
+            MinimalProfileResponse profile,
+            List<AnswerProfileResponse> answers
+    ) {
+        return QuestionProfileResponse.builder()
+                .question(question)
+                .profile(profile)
+                .answers(answers)
+                .build();
+    }
+
+    public AnswerResponse toAnswerResponse(Answer answer) {
+        if (answer == null) return null;
+
+        return AnswerResponse.builder()
+                .id(answer.getId().toString())
+                .description(answer.getDescription())
+                .questionId(answer.getQuestion().getId().toString())
+                .answeredId(answer.getResponderId().toString())
+                .createdAt(answer.getCreatedAt().toString())
+                .build();
+    }
+
+    public AnswerProfileResponse toAnswerProfileResponse(
+            AnswerResponse answer,
+            ChatProfileResponse profile
+    ) {
+        return AnswerProfileResponse.builder()
+                .answer(answer)
+                .profile(profile)
+                .build();
+    }
+}
