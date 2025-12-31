@@ -5,7 +5,6 @@ import com.fasttasker.fast_tasker.application.mapper.NotificationMapper;
 import com.fasttasker.fast_tasker.domain.notification.INotificationRepository;
 import com.fasttasker.fast_tasker.domain.notification.Notification;
 import com.fasttasker.fast_tasker.domain.notification.NotificationType;
-import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +17,11 @@ public class NotificationService {
     private final SimpMessagingTemplate messagingTemplate;
     private final INotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
-    private final ITaskerRepository taskerRepository;
 
-    public NotificationService(SimpMessagingTemplate messagingTemplate, INotificationRepository notificationRepository, NotificationMapper notificationMapper, ITaskerRepository taskerRepository) {
+    public NotificationService(SimpMessagingTemplate messagingTemplate, INotificationRepository notificationRepository, NotificationMapper notificationMapper) {
         this.messagingTemplate = messagingTemplate;
         this.notificationRepository = notificationRepository;
         this.notificationMapper = notificationMapper;
-        this.taskerRepository = taskerRepository;
     }
 
     /**
@@ -63,8 +60,7 @@ public class NotificationService {
         // TODO implement here
     }
 
-    public List<NotificationResponse> getAll(UUID accountId) {
-        UUID taskerId = taskerRepository.findByAccountId(accountId).getId();
+    public List<NotificationResponse> getAll(UUID taskerId) {
         List<Notification> notifications = notificationRepository.findAllByReceiverTaskerId(taskerId);
 
         return notifications.stream()

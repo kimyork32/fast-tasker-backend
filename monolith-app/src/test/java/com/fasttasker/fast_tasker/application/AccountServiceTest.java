@@ -47,6 +47,9 @@ class AccountServiceTest {
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private RabbitTemplate rabbitTemplate;
+
     @InjectMocks
     private AccountService accountService;
 

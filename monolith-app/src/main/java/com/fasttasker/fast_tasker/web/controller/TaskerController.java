@@ -89,8 +89,8 @@ public class TaskerController {
 
     @GetMapping("/notifications")
     public ResponseEntity<List<NotificationResponse>> getNotificationsByTasker(Authentication authentication) {
-        UUID accountId = jwtService.extractAccountId(authentication);
-        List<NotificationResponse> notifications = notificationService.getAll(accountId);
+        UUID taskerId = jwtService.extractTaskerId(authentication);
+        List<NotificationResponse> notifications = notificationService.getAll(taskerId);
         return ResponseEntity.ok(notifications);
     }
 }
