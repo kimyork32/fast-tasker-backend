@@ -28,5 +28,13 @@ pipeline {
                 }
             }
         }
+
+        stage('Build Notification Service') {
+            steps {
+                dir('fast-tasker-notification') {
+                    sh 'mvn clean package -DskipTests'
+                } 
+            }
+         }  
     }
 }
