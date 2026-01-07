@@ -29,7 +29,7 @@ spring:
             - id: monolith-service
               uri: http://127.0.0.1:8081
               predicates:
-                - Path=/api/v1/auth/**,/api/v1/tasker/**,/api/v1/tasks/**,/api/v1/accounts/**
+                - Path=/api/v1/auth/**,/api/v1/tasker/**,/api/v1/tasks/**,/api/v1/accounts/**,/api/v1/conversations/**
 
             # Ruta hacia el Servicio de Notificaciones
             - id: notification-service
@@ -39,6 +39,6 @@ spring:
 
             # Ruta para WebSockets (Notificaciones en tiempo real)
             - id: websocket-service
-              uri: http://127.0.0.1:8083
+              uri: http://127.0.0.1:8081
               predicates:
                 - Path=/ws/**

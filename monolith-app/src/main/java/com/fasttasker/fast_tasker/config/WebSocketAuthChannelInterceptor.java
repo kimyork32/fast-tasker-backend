@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import com.fasttasker.common.config.UserAuthenticationProvider;
 
 import java.util.List;
 

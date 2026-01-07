@@ -1,6 +1,11 @@
 version: '3.8'
 
+# bring up everything without the "frontend" profile, exec: docker-compose up -d
+# if you only want to up the db and RabbitMQ, exec: docker-compose up -d db rabbitmq
+# if you want to run the backend, exec: docker-compose up -d backend notification-service <other-services>
+
 services:
+
   # bd
   db:
     image: postgres
@@ -15,25 +20,55 @@ services:
     volumes:
       - fasttasker_data:/var/lib/postgresql/data
 
+  # RabbitMQ (Message Broker)
+  rabbitmq:
+      image: rabbitmq:3-management  # "management" include web itnerface
+      container_name: ft-rabbitmq
+      restart: always
+      ports:
+        - "5672:5672"
+        - "15672:15672" # web manager
+      environment:
+        RABBITMQ_DEFAULT_USER: guest
+        RABBITMQ_DEFAULT_PASS: guest
+      volumes:
+        - rabbitmq_data:/var/lib/rabbitmq # persistence (if the container was restarted)
+
   # backend (monolithic)
   backend:
     build: ./monolith-app
     container_name: ft-backend
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
       - db
+      - rabbitmq
     environment:
       DB_URL: jdbc:postgresql://db:5432/fast_tasker
 
-  #client
+  notification-service:
+    build: ./notification-service-app
+    container_name: ft-notification-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - db
+      - rabbitmq
+    environment: 
+      DB_URL: jdbc:postgresql://db:5432/fast_tasker
+
+  # up only client ("frontend" profile): docker-compose --profile frontend up
+  #client (nextjs)
   client:
-    build: ./client
-    container_name: ft-client
+    profiles: ["frontend"]  
+    build:
+      context: ../fasttasker-client
     ports:
       - "3000:3000"
-    depends_on:
-      - backend
+    volumes:
+      - ../fasttasker-client:/app
+      - /app/node_modules
 
 volumes:
   fasttasker_data:
+  rabbitmq_data:

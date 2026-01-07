@@ -2,9 +2,7 @@ pipeline {
     agent none 
 
     stages {
-        // -----------------------------------------------------------
-        // PASO 0: COMÚN (Se ejecuta siempre, para todos)
-        // -----------------------------------------------------------
+        // with any agent, clean enviroment and download repo github backend and save source-code
         stage('Setup Code') {
             agent any 
             steps {
@@ -14,20 +12,21 @@ pipeline {
             }
         }
         
-        // -----------------------------------------------------------
-        // CAMINO A: Flujo para DEVELOP (Tu lógica original)
-        // -----------------------------------------------------------
+        // flow DEVELOP
         stage('CI Flow (Develop)') {
-            // Esta es la magia: Solo entra aquí si es rama develop o PR hacia develop
+            // when exists PR for develop
             when {
                 anyOf {
                     branch 'develop'
                     changeRequest target: 'develop'
                 }
             }
+            // then perform the following steps
             stages {
+                // in parallel, perform the following stages:
                 stage('Parallel Analysis') {
                     parallel {
+                        // integration-unit tests: monolithic
                         stage('Monolith Build') {
                             agent any 
                             tools { maven 'maven-3' } 
@@ -43,6 +42,7 @@ pipeline {
                             }
                         }
 
+                        // integration-unit tests: notification service
                         stage('Notification Build') {
                             agent any 
                             tools { maven 'maven-3' }
@@ -60,6 +60,7 @@ pipeline {
                     }
                 }
                 
+                // listen quality gate from sonarqube
                 stage('Quality Gate') {
                     agent any 
                     steps {
@@ -71,34 +72,32 @@ pipeline {
             }
         }
 
-        // -----------------------------------------------------------
-        // CAMINO B: Flujo para STAGING (Seguridad y Performance)
-        // -----------------------------------------------------------
+        // flow STATING
         stage('Staging Checks') {
-            // Solo entra aquí si el PR apunta a la rama 'staging'
+            // when exists PR for STATING 
             when {
                 changeRequest target: 'staging'
             }
-            // También lo hacemos en paralelo para ser eficientes
+            // in parallel:
             parallel {
+                // security test
                 stage('Security Scan (SAST/DAST)') {
                     agent any
                     steps {
                         cleanWs()
                         unstash 'source-code'
-                        echo "--- EJECUTANDO TEST DE SEGURIDAD ---"
-                        // Ejemplo: OWASP Dependency Check o Trivy
-                        sh 'echo "Running Trivy or OWASP..."' 
+                        echo "--- RUN SECURITY TEST ---"
+                        sh 'echo "Running Trivy or OWASP..."'
                     }
                 }
 
+                // performance test
                 stage('Performance Tests') {
                     agent any
                     steps {
                         cleanWs()
                         unstash 'source-code'
-                        echo "--- EJECUTANDO TEST DE PERFORMANCE ---"
-                        // Ejemplo: JMeter o k6
+                        echo "--- RUN PERFORMANCE TEST ---"
                         sh 'echo "Running k6 / JMeter tests..."'
                     }
                 }

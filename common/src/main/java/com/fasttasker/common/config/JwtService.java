@@ -63,7 +63,6 @@ public class JwtService {
 
         Object details = authentication.getDetails();
 
-        // Refactorización aplicada: Verificación de tipo segura
         if (details instanceof Claims claims) {
             String taskerIdStr = claims.get("taskerId", String.class);
             return taskerIdStr != null ? UUID.fromString(taskerIdStr) : null;
