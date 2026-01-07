@@ -1,5 +1,6 @@
 package com.fasttasker.fast_tasker.config;
 
+import com.fasttasker.common.config.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;

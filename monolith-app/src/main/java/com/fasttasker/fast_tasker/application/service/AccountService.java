@@ -7,7 +7,7 @@ import com.fasttasker.fast_tasker.application.dto.notification.NotificationReque
 import com.fasttasker.fast_tasker.application.dto.account.RegisterAccountRequest;
 import com.fasttasker.fast_tasker.application.exception.*;
 import com.fasttasker.fast_tasker.application.mapper.AccountMapper;
-import com.fasttasker.fast_tasker.config.JwtService;
+import com.fasttasker.common.config.JwtService;
 import com.fasttasker.fast_tasker.config.RabbitMQConfig;
 import com.fasttasker.fast_tasker.domain.account.*;
 import com.fasttasker.fast_tasker.domain.notification.NotificationType;

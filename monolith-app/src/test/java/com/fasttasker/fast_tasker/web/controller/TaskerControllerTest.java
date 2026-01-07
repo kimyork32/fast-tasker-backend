@@ -4,7 +4,7 @@ import com.fasttasker.fast_tasker.application.dto.task.AssignTaskerResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
 import com.fasttasker.fast_tasker.application.service.TaskerService;
 import com.fasttasker.fast_tasker.config.DataSeeder;
-import com.fasttasker.fast_tasker.config.JwtService;
+import com.fasttasker.common.config.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

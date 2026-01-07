@@ -6,7 +6,7 @@ import com.fasttasker.fast_tasker.application.dto.task.AssignTaskerResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRegistrationResponse;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerRequest;
 import com.fasttasker.fast_tasker.application.dto.tasker.TaskerResponse;
-import com.fasttasker.fast_tasker.config.JwtService;
+import com.fasttasker.common.config.JwtService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

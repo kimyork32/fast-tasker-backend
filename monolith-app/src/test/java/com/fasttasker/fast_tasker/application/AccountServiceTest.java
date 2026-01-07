@@ -7,7 +7,7 @@ import com.fasttasker.fast_tasker.application.dto.account.RegisterAccountRequest
 import com.fasttasker.fast_tasker.application.dto.notification.NotificationRequest;
 import com.fasttasker.fast_tasker.application.mapper.AccountMapper;
 import com.fasttasker.fast_tasker.application.service.AccountService;
-import com.fasttasker.fast_tasker.config.JwtService;
+import com.fasttasker.common.config.JwtService;
 import com.fasttasker.fast_tasker.domain.account.*;
 import com.fasttasker.fast_tasker.domain.notification.NotificationType;
 import com.fasttasker.fast_tasker.domain.tasker.ITaskerRepository;

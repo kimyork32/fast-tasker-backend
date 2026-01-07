@@ -1,5 +1,6 @@
 package com.fasttasker.fast_tasker.config;
 
+import com.fasttasker.common.config.JwtService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
