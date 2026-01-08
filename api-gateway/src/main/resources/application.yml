@@ -1,7 +1,10 @@
 server:
-  port: 8082 # port for api-gateway
+  port: ${GATEWAY_PORT} # port for api-gateway
 
 spring:
+  config: 
+    import: "optional:file:../.env[.properties]" # load the .env file from the root
+
   application:
     name: api-gateway
   cloud:
@@ -9,13 +12,13 @@ spring:
       default-filters: # disable CORS temporally. Remove CORS in microservices (before monolith will be empty)
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
       server:
-        webflux: # using for nextjs
+        webflux: # optimization for Netty
 
         # CORS config
           globalcors:
             cors-configurations:
               '[/**]':
-                allowedOrigins: "http://localhost:3000" # URL frontend
+                allowedOrigins: "${CLIENT_URL}:${CLIENT_PORT}" # URL frontend and PORT
                 allowedMethods:
                   - GET
                   - POST
@@ -28,20 +31,19 @@ spring:
           routes:
             # Monolith
             - id: monolith
-              uri: http://127.0.0.1:8081 # the ip address is the loopback (ip for traffic local)
-                                         # port 8081
+              uri: "${MONOLITH_URI:http://127.0.0.1}:${MONOLITH_PORT}"
               # allowed routes:
               predicates:
                 - Path=/api/v1/auth/**,/api/v1/tasker/**,/api/v1/tasks/**,/api/v1/accounts/**,/api/v1/conversations/**
 
             # notification-service
             - id: notification-service
-              uri: http://127.0.0.1:8083
+              uri: "${NOTIFICATION_URI:http://127.0.0.1}:${NOTIFICATION_PORT}"
               predicates:
                 - Path=/api/v1/notifications/**
 
             # websockets routes (notification and chat)
             - id: websocket-service
-              uri: http://127.0.0.1:8081
+              uri: "${WEBSOCKET_URI:ws://127.0.0.1}:${WEBSOCKET_PORT}"
               predicates:
                 - Path=/ws/**
