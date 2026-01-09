@@ -87,7 +87,7 @@ public class AccountService {
         try {
             rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.ROUTING_KEY, notificationRequest);
         } catch (Exception e) {
-            log.error("No se pudo enviar la notificación a RabbitMQ (el servicio puede estar inactivo): {}", e.getMessage());
+            log.error("cannot send notification to RabbitMQ: {}", e.getMessage());
         }
 
         return accountMapper.toResponse(savedAccount);

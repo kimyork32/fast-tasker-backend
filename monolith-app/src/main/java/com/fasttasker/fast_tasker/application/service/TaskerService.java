@@ -146,7 +146,7 @@ public class TaskerService {
                     request
             );
         } catch (Exception e) {
-            log.error("No se pudo enviar la notificación a RabbitMQ: {}", e.getMessage());
+            log.error("cannot send notification to RabbitMQ: {}", e.getMessage());
         }
     }
 
