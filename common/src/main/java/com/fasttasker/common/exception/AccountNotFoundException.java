@@ -1,4 +1,4 @@
-package com.fasttasker.fast_tasker.application.exception;
+package com.fasttasker.common.exception;
 
 import java.util.UUID;
 

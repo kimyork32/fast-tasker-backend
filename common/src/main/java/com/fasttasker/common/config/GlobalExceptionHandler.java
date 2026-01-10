@@ -1,8 +1,8 @@
-package com.fasttasker.fast_tasker.config;
+package com.fasttasker.common.config;
 
-import com.fasttasker.fast_tasker.application.exception.AccountNotFoundException;
-import com.fasttasker.fast_tasker.application.exception.DomainException;
-import com.fasttasker.fast_tasker.application.exception.EmailAlreadyExistsException;
+import com.fasttasker.common.exception.AccountNotFoundException;
+import com.fasttasker.common.exception.DomainException;
+import com.fasttasker.common.exception.EmailAlreadyExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.fasttasker.api_gateway.config; // Ajusta el paquete
+package com.fasttasker.api_gateway.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -53,9 +53,6 @@ public class SecurityConfig {
                         .requestMatchers("/ws/**").permitAll() // allow handshake for websocket
                         .anyRequest().authenticated()
                 )
-                .headers(headers -> headers
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
-                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

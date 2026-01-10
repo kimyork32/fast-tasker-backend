@@ -1,4 +1,4 @@
-package com.fasttasker.fast_tasker.application.exception;
+package com.fasttasker.common.exception;
 
 public class EmailAlreadyExistsException extends RuntimeException {
     public EmailAlreadyExistsException(String email) {

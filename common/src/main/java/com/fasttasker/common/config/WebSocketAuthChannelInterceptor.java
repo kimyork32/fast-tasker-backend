@@ -1,7 +1,8 @@
-package com.fasttasker.fast_tasker.config;
+package com.fasttasker.common.config;
 
-import com.fasttasker.common.config.JwtService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -10,10 +11,7 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import com.fasttasker.common.config.UserAuthenticationProvider;
 
 import java.util.List;
 
@@ -57,11 +55,10 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
         try {
             String token = bearerToken.substring(7);
             Authentication auth = userAuthenticationProvider.validateToken(token);
-            
-            // FIX: Inyectamos los Claims en los detalles para que JwtService.extractTaskerId funcione
-            if (auth instanceof UsernamePasswordAuthenticationToken) {
+
+            if (auth instanceof UsernamePasswordAuthenticationToken authToken) {
                 var claims = jwtService.extractAllClaims(token);
-                ((UsernamePasswordAuthenticationToken) auth).setDetails(claims);
+                authToken.setDetails(claims);
             }
 
             accessor.setUser(auth);
